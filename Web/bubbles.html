@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bubbles</title>
+    <style>
+        .bubble {
+            background: white;
+            border: 1px solid black;
+            height: 60px;
+            position: absolute;
+            width: 60px;
+        }
+    </style>
+</head>
+<body style="background-repeat: no-repeat">
+<canvas id="default-canvas" style="display: none"></canvas>
+<script>
+    'use strict';
+
+    function lineConnect(canvas, to, from) {
+        var h = Math.sqrt(Math.pow(to.left - from.left, 2) + Math.pow(to.top - from.top, 2));
+        var a = from.top - to.top;
+
+        var radians = Math.acos(a / h);
+        if (to.left < from.left) {
+            radians = Math.PI * 2 - radians;
+        }
+
+        const padding = 10;
+        var context = canvas.getContext('2d');
+        var middle = {
+            left: (to.left + from.left) / 2,
+            top: (to.top + from.top) / 2
+        };
+        to = {
+            left: middle.left,
+            top: middle.top - h / 2 + padding
+        };
+        from = {
+            left: middle.left,
+            top: middle.top + h / 2 - padding
+        };
+
+        context.save();
+        context.translate(middle.left, middle.top);
+        context.rotate(radians);
+        context.translate(-middle.left, -middle.top);
+        connect(context, to, from);
+        context.restore();
+
+        function connect(context, to, from) {
+            const base = 10;
+            context.beginPath();
+            context.moveTo(to.left, to.top);
+
+            context.lineTo(to.left - base, to.top + base);
+            context.lineTo(to.left + base, to.top + base);
+
+            context.moveTo(to.left - base / 2, to.top + base);
+            context.lineTo(to.left - base / 2, from.top);
+            context.lineTo(to.left + base / 2, from.top);
+            context.lineTo(to.left + base / 2, to.top + base);
+
+            context.fill();
+        }
+    }
+</script>
+<script>
+    var xTree, yTree;
+    var directions = ['bottom', 'left', 'top', 'right'];
+    const offset = 53;
+    const bubbleLength = 60;
+
+    var Bubble = {
+        dic: {},
+        xMax: 0,
+        yMax: 0,
+        initArray: [],
+
+        create: function (id, innerHTML, direction, distance, parent) {
+            Bubble.dic[id] = {
+                innerHTML: innerHTML,
+                direction: direction === 'random' ? directions[id % 4] : direction,
+                distance: distance,
+                parent: parent
+            };
+        },
+
+        getRect: function (id) {
+            var bubble = Bubble.dic[id];
+
+            if (!bubble.xTo) {
+                bubble.xTo = bubble.yTo = bubbleLength;
+
+                if (bubble.parent) {
+                    var parentRect = Bubble.getRect(bubble.parent);
+
+                    if (bubble.direction.match(/left|right/)) {
+                        bubble.xTo += (parentRect.xTo + bubble.distance);
+                        bubble.yTo = parentRect.yTo;
+                    } else {
+                        bubble.yTo += (parentRect.yTo + bubble.distance);
+                        bubble.xTo = parentRect.xTo;
+                    }
+                } else {
+                    Bubble.initArray.push(id);
+                }
+            }
+
+            Bubble.xMax = Math.max(Bubble.xMax, bubble.xTo);
+            Bubble.yMax = Math.max(Bubble.yMax, bubble.yTo);
+
+            return {
+                xTo: bubble.xTo,
+                yTo: bubble.yTo
+            }
+        },
+
+        display: function () {
+            for (var id in Bubble.dic) {
+                Bubble.getRect(id)
+            }
+
+            xTree = Tree.create(0, Bubble.xMax * 10);
+            yTree = Tree.create(0, Bubble.yMax * 10);
+
+            var xMid = xTree.to / 2;
+            var yMid = yTree.to / 2;
+            var radiansUnit = Math.PI * 2 / Bubble.initArray.length;
+            for (var i = 0; i < Bubble.initArray.length; i++) {
+                var radians = radiansUnit * (i + 1);
+                var x = xMid + Math.cos(radians) * bubbleLength * 1.5;
+                var y = yMid + Math.sin(radians) * bubbleLength * 1.5;
+
+                id = Bubble.initArray[i];
+                var position = positionPop(id, x, x + bubbleLength, y, y + bubbleLength);
+                place(id, position);
+            }
+
+            for (id in Bubble.dic) {
+                place(id);
+            }
+
+            function place(id, position) {
+                var element = document.getElementById(id);
+                if (element) {
+                    return {
+                        left: parseInt(element.style.left),
+                        top: parseInt(element.style.top)
+                    }
+                }
+
+                var bubble = Bubble.dic[id];
+                if (position) {
+                    $(bubble.innerHTML)
+                            .attr('id', id)
+                            .addClass('bubble')
+                            .css({
+                                left: position.left,
+                                top: position.top
+                            })
+                            .appendTo(document.body);
+                } else {
+                    var parentPosition = place(bubble.parent);
+                    var leftFrom = parentPosition.left;
+                    var topFrom = parentPosition.top;
+
+                    switch (bubble.direction) {
+                        case 'bottom':
+                            topFrom -= bubble.distance;
+                            break;
+                        case 'left':
+                            leftFrom += bubble.distance;
+                            break;
+                        case 'top':
+                            topFrom += bubble.distance;
+                            break;
+                        case 'right':
+                            leftFrom -= bubble.distance;
+                            break;
+                    }
+
+                    place(id, positionPop(id, leftFrom, leftFrom + bubbleLength, topFrom, topFrom + bubbleLength));
+                }
+            }
+
+            function positionPop(id, leftFrom, leftTo, topFrom, topTo, prevCommand, attemptTime) {
+                var overlapsX = [];
+                var overlapsY = [];
+
+                Tree.search(xTree, leftFrom, leftTo, function (x) {
+                            overlapsX.push.apply(overlapsX, x);
+                        }
+                );
+
+                Tree.search(yTree, topFrom, topTo, function (y) {
+                            overlapsY.push.apply(overlapsY, y);
+                        }
+                );
+
+                function isOverlapped(a, b) {
+                    a.sort();
+                    b.sort();
+
+                    for (var iA = 0, iB = 0; iA < a.length && iB < b.length;) {
+                        if (a[iA] < b[iB]) {
+                            iA++;
+                        } else if (a[iA] > b[iB]) {
+                            iB++;
+                        } else {
+                            return true;
+                        }
+                    }
+                }
+
+                if (!isOverlapped(overlapsX, overlapsY)) {
+                    Tree.insert(xTree, leftFrom, leftTo, id);
+                    Tree.insert(yTree, topFrom, topTo, id);
+
+                    return {
+                        left: leftFrom,
+                        top: topFrom
+                    }
+                }
+
+                else {
+                    attemptTime = attemptTime || 0;
+                    attemptTime++;
+
+                    var hash = (attemptTime ^ id) * 0.618 % 1;
+                    var command = Math.round(hash * 3);
+                    if ((command + 2) % 4 === prevCommand) {
+                        command = (command + 1 ) % 4;
+                    }
+
+                    var offsetRand = Math.round(hash * offset);
+                    switch (command) {
+                        case 0:
+                            topFrom -= offsetRand;
+                            leftFrom += offsetRand;
+                            break;
+                        case 1:
+                            leftFrom += offsetRand;
+                            topFrom += offsetRand;
+                            break;
+                        case 2:
+                            topFrom += offsetRand;
+                            leftFrom -= offsetRand;
+                            break;
+                        case 3:
+                            leftFrom -= offsetRand;
+                            topFrom -= offsetRand;
+                            break;
+                    }
+
+                    leftFrom = Math.min(Math.max(0, leftFrom), xTree.to - bubbleLength);
+                    topFrom = Math.min(Math.max(0, topFrom), yTree.to - bubbleLength);
+
+                    return positionPop(
+                            id, leftFrom, leftFrom + bubbleLength, topFrom, topFrom + bubbleLength,
+                            command, attemptTime);
+                }
+            }
+        },
+
+        link: function () {
+            function getTop(element) {
+                return {
+                    left: parseInt(element.style.left) + bubbleLength / 2,
+                    top: parseInt(element.style.top)
+                }
+            }
+
+            function getRight(element) {
+                return {
+                    left: parseInt(element.style.left) + bubbleLength,
+                    top: parseInt(element.style.top) + bubbleLength / 2
+                }
+            }
+
+            function getBottom(element) {
+                return {
+                    left: parseInt(element.style.left) + bubbleLength / 2,
+                    top: parseInt(element.style.top) + bubbleLength
+                }
+            }
+
+            function getLeft(element) {
+                return {
+                    left: parseInt(element.style.left),
+                    top: parseInt(element.style.top) + bubbleLength / 2
+                }
+            }
+
+            var canvas = document.getElementById('default-canvas');
+            canvas.width = xTree.to;
+            canvas.height = yTree.to;
+
+            for (var id in Bubble.dic) {
+                var bubble = Bubble.dic[id];
+
+                if (bubble.parent) {
+                    var element = document.getElementById(id);
+                    var parentElement = document.getElementById(bubble.parent);
+
+                    switch (bubble.direction) {
+                        case 'bottom':
+                            lineConnect(canvas, getBottom(element), getTop(parentElement));
+                            break;
+                        case 'left':
+                            lineConnect(canvas, getLeft(element), getRight(parentElement));
+                            break;
+                        case 'top':
+                            lineConnect(canvas, getTop(element), getBottom(parentElement));
+                            break;
+                        case 'right':
+                            lineConnect(canvas, getRight(element), getLeft(parentElement));
+                            break;
+                    }
+                }
+            }
+
+            $(document.body).css('background-image', 'url(' + canvas.toDataURL() + ')');
+        }
+    };
+
+    function shrink() {
+        var maxBottom = 0, maxRight = 0;
+        var minTop = Infinity, minLeft = Infinity;
+
+        var bubbles = $('.bubble');
+        for (var i = 0; i < bubbles.length; i++) {
+            var bubble = bubbles[i];
+
+            var left = parseInt(bubble.style.left);
+            var top = parseInt(bubble.style.top);
+            minLeft = Math.min(minLeft, left);
+            minTop = Math.min(minTop, top);
+
+            var right = left + bubbleLength;
+            var bottom = top + bubbleLength;
+            maxRight = Math.max(maxRight, right);
+            maxBottom = Math.max(maxBottom, bottom);
+        }
+
+        for (i = 0; i < bubbles.length; i++) {
+            bubble = bubbles[i];
+            bubble.style.left = parseInt(bubble.style.left) - minLeft + 'px';
+            bubble.style.top = parseInt(bubble.style.top) - minTop + 'px';
+        }
+
+        $(document.body).css({
+            'background-position': `-${minLeft}px -${minTop}px`,
+            'width': maxRight - minLeft + 'px',
+            'height': maxBottom - minTop + 'px'
+        })
+    }
+</script>
+<script>
+    const distance = 300;
+
+    /* Sample */
+    Bubble.create(1, '<div>1</div>');
+    Bubble.create(10, '<div>10</div>');
+    Bubble.create(11, '<div>11</div>');
+    Bubble.create(2, '<div>2</div>', 'random', distance, 1);
+    Bubble.create(3, '<div>3</div>', 'random', distance, 1);
+    Bubble.create(4, '<div>4</div>', 'random', distance, 1);
+    Bubble.create(5, '<div>5</div>', 'random', distance, 1);
+    Bubble.create(6, '<div>6</div>', 'random', distance, 5);
+    Bubble.create(7, '<div>7</div>', 'random', distance, 6);
+    Bubble.create(8, '<div>8</div>', 'random', distance, 6);
+    Bubble.create(9, '<div>9</div>', 'random', distance, 6);
+    /* end */
+
+    Bubble.display();
+    Bubble.link();
+    shrink();
+
+    var iframe = top.window.document.getElementById('graph-iframe');
+    iframe.height = self.document.body.scrollHeight;
+    iframe.width = self.document.body.scrollWidth;
+</script>
+</body>
+</html>
