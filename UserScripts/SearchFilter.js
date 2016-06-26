@@ -8,7 +8,7 @@ function main() {
 
     var update;
     var isEngine;
-    if (isEngine = (href.includes('google.co.uk/'))) {
+    if (isEngine = (href.includes('google') && href.includes('search?'))) {
         update = function () {
             var rc = $('.srg > .g > .rc');
             var links = rc.find('.r > a');
@@ -40,7 +40,9 @@ function main() {
                 var link = element.find('.t > a:first');
                 var abstract = element.find('.c-abstract');
                 if (link.length && abstract.length) {
-                    link = link.attr('href').match(/(url=)(.{5})/).pop();
+                    var href = link.attr('href');
+                    link.attr('href', href.replace('https:', 'http:'));
+                    link = href.match(/(url=)(.{5})/).pop();
 
                     mapMain[link] = '-' +
                         abstract.contents()
@@ -223,5 +225,5 @@ function getText(element) {
 }
 
 function enoughText(element) {
-    return purify(getText(element)).length > purify(getText(document.body)).length / 2;
+    return purify(getText(element)).length > purify(getText(document.body)).length / 4;
 }
