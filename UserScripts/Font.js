@@ -18,7 +18,7 @@ function inject(font) {
 $(window).on('load', () => {
     probeLang();
     travel(document.body);
-    GM_setValue('fontQueue', fontQueue.slice(0, 30).join(','));
+    GM_setValue('fontQueue', fontQueue.slice(0, 50).join(','));
 });
 
 var isTraditional;
@@ -37,9 +37,9 @@ var cache;
 function travel(element, probe) {
     var $element = $(element);
     var fontFamily = $element.css('font-family').replace(/'|"/g, '').toLowerCase();
-    var fonts = render(fontFamily.split(', '));
+    var fonts = redirect(fontFamily.split(', '));
 
-    function render(fonts) {
+    function redirect(fonts) {
         var isModified;
 
         for (var i = 0; i < fonts.length; i++) {

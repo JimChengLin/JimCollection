@@ -24,37 +24,9 @@ function main() {
                 mapMain[link] += abstract.text();
 
                 var emList = abstract.find('em');
-                mapBackup[link] =
-                    emList.length ?
-                    '-' + emList.first().text() + '...' + emList.last().text() : extract(mapMain[link]);
+                mapBackup[link] = emList.length ?
+                '-' + emList.first().text() + '...' + emList.last().text() : extract(mapMain[link]);
             }
-        };
-    }
-
-    else if (isEngine = (href.includes('baidu.com/s?'))) {
-        update = function () {
-            var result = $('.c-container');
-            result.map((i, element) => {
-                element = $(element);
-
-                var link = element.find('.t > a:first');
-                var abstract = element.find('.c-abstract');
-                if (link.length && abstract.length) {
-                    var href = link.attr('href');
-                    link.attr('href', href.replace('https:', 'http:'));
-                    link = href.match(/(url=)(.{5})/).pop();
-
-                    mapMain[link] = '-' +
-                        abstract.contents()
-                                .filter((i, elem) => elem.nodeType === Node.TEXT_NODE || elem.tagName === 'EM')
-                                .text();
-
-                    var emList = abstract.find('em');
-                    mapBackup[link] =
-                        emList.length ?
-                        '-' + emList.first().text() + '...' + emList.last().text() : extract(mapMain[link]);
-                }
-            });
         };
     }
 
@@ -83,17 +55,9 @@ function main() {
     else if (top === self) {
         var record = GM_getValue('mapMain');
         mapMain = record ? JSON.parse(record) : {};
-
-        var abstract = document.referrer.includes('baidu.com/link?url=') ?
-            mapMain[href = document.referrer.match(/(url=)(.{5})/).pop()] :
-        mapMain[href] || mapMain[href = document.referrer];
-
+        var abstract = mapMain[href];
         if (abstract) {
-            $(() => {
-                if (!clean(abstract) && href !== document.referrer) {
-                    clean(JSON.parse(GM_getValue('mapBackup'))[href]);
-                }
-            });
+            $(() => clean(abstract) || clean(JSON.parse(GM_getValue('mapBackup'))[href]));
         }
     }
 }
