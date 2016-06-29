@@ -30,6 +30,30 @@ function main() {
         };
     }
 
+    else if (isEngine = (href.includes('baidu.com/s?'))) {
+        update = function () {
+            var result = $('.c-container');
+            result.map((i, element) => {
+                element = $(element);
+
+                var link = element.find('.t > a:first');
+                var abstract = element.find('.c-abstract');
+                if (link.length && abstract.length) {
+                    link.trigger('mousedown');
+                    link = link.attr('href');
+
+                    mapMain[link] = '-' +
+                        abstract.contents()
+                                .filter((i, elem) => elem.nodeType === Node.TEXT_NODE || elem.tagName === 'EM').text();
+
+                    var emList = abstract.find('em');
+                    mapBackup[link] = emList.length ?
+                    '-' + emList.first().text() + '...' + emList.last().text() : extract(mapMain[link]);
+                }
+            });
+        };
+    }
+
     function commit() {
         update();
         GM_setValue('mapMain', JSON.stringify(mapMain));
@@ -49,7 +73,17 @@ function main() {
                 commit();
                 change = false;
             }
-        }, 500);
+        }, 1000);
+    }
+
+    else if (href.includes('baidu.com/link?')) {
+        var url = $('head > noscript').text().match(/URL='(.+)'/).pop();
+        mapMain = JSON.parse(GM_getValue('mapMain'));
+        mapBackup = JSON.parse(GM_getValue('mapBackup'));
+        mapMain[url] = mapMain[href];
+        mapBackup[url] = mapBackup[href];
+        GM_setValue('mapMain', JSON.stringify(mapMain));
+        GM_setValue('mapBackup', JSON.stringify(mapBackup));
     }
 
     else if (top === self) {
