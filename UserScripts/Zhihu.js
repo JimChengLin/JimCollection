@@ -16,8 +16,47 @@ if (location.pathname.startsWith('/story')) {
                 link = link.parentElement;
             }
             const sign = 'link.zhihu.com/?target=';
-            if (link.href.includes(sign)) {
+            if (link.href && link.href.includes(sign)) {
                 link.href = decodeURIComponent(link.href.substr(link.href.indexOf(sign) + sign.length));
             }
         });
+
+    if (location.pathname.endsWith('/topic')) {
+        $(ZhihuFilter);
+    }
+}
+
+function ZhihuFilter() {
+    const DAY_NOW = Math.round(Date.now() / 60 / 60 / 24);
+
+    var dayDiff = {
+        init: () => {
+            this.record = {};
+            for (let url of GM_listValues()) {
+                let diff = DAY_NOW - GM_getValue(url);
+                diff > 21 ? GM_deleteValue(url) : this.record[url] = diff;
+            }
+        },
+
+        search: (url) => {
+            if (url in this.record) {
+                return this.record[url];
+            } else {
+                GM_setValue(url, DAY_NOW);
+                return this.record[url] = 0;
+            }
+        }
+    };
+    dayDiff.init();
+
+    var observer = new MutationObserver((records) => {
+        for (let record of records) {
+            for (let node of record.addedNodes) {
+                if (node.classList.contains('question_link') && dayDiff.search(node.href) > 1) {
+                    $(node).closest('.feed-item').remove();
+                }
+            }
+        }
+    });
+    observer.observe(document.body, {childList: true, subtree: true});
 }
