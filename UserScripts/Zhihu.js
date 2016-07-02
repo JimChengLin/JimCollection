@@ -52,7 +52,7 @@ function ZhihuFilter() {
     var observer = new MutationObserver((records) => {
         for (let record of records) {
             for (let node of record.addedNodes) {
-                if (node.classList.contains('question_link') && dayDiff.search(node.href) > 1) {
+                if (node.classList && node.classList.contains('question_link') && dayDiff.search(node.href) > 1) {
                     $(node).closest('.feed-item').remove();
                 }
             }
