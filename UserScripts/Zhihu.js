@@ -27,7 +27,7 @@ if (location.pathname.startsWith('/story')) {
 }
 
 function ZhihuFilter() {
-    const DAY_NOW = Math.round(Date.now() / 60 / 60 / 24);
+    const DAY_NOW = Math.round(Date.now() / 1000 / 60 / 60 / 24);
 
     var dayDiff = {
         init: () => {
