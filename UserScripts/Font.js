@@ -94,6 +94,8 @@ function simplify(element) {
         var childNode = childNodes[i];
         if (childNode.nodeType === Node.TEXT_NODE) {
             childNode.data = transform(childNode.data);
+        } else if (childNode.value) {
+            childNode.value = transform(childNode.value);
         }
     }
 
