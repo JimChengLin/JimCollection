@@ -49,14 +49,26 @@ function ZhihuFilter() {
     };
     dayDiff.init();
 
-    var observer = new MutationObserver((records) => {
-        for (let record of records) {
-            for (let node of record.addedNodes) {
-                if (node.classList && node.classList.contains('question_link') && dayDiff.search(node.href) > 1) {
-                    $(node).closest('.feed-item').remove();
-                }
-            }
-        }
-    });
+    var change;
+    var observer = new MutationObserver(() => change = true);
     observer.observe(document.body, {childList: true, subtree: true});
+
+    setInterval(() => {
+        if (change) {
+            $('.question_link').map((i, element)=> {
+                element = $(element);
+                if (dayDiff.search(element.attr('href')) > 7) {
+                    return element.hide();
+                }
+                let item = element.closest('.feed-item');
+                let link = item.find('link');
+                if (link) {
+                    if (dayDiff.search(link.attr('href')) > 1) {
+                        element.hide();
+                    }
+                }
+            });
+            change = false;
+        }
+    }, 1000);
 }
