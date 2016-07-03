@@ -57,15 +57,15 @@ function ZhihuFilter() {
         if (change) {
             $('.question_link').map((i, element)=> {
                 element = $(element);
-                if (dayDiff.search(element.attr('href')) > 7) {
-                    return element.hide();
+                if (element.hasClass('_pass')) {
+                    return;
+                } else {
+                    element.addClass('_pass');
                 }
+
                 let item = element.closest('.feed-item');
-                let link = item.find('link');
-                if (link) {
-                    if (dayDiff.search(link.attr('href')) > 1) {
-                        element.hide();
-                    }
+                if (dayDiff.search(element.attr('href')) > 7 || dayDiff.search(item.find('link').attr('href')) > 1) {
+                    item.hide();
                 }
             });
             change = false;
