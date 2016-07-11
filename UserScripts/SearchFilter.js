@@ -32,6 +32,7 @@ function main() {
 
     else if (isEngine = (href.includes('baidu.com/s?'))) {
         update = function () {
+            $('span:contains("商业推广")').closest('div').remove();
             var result = $('.c-container');
             result.map((i, element) => {
                 element = $(element);
