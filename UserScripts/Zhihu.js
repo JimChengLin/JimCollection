@@ -17,6 +17,10 @@ $(window)
     });
 
 if (location.pathname.endsWith('/topic')) {
+    $(window).on('scroll', (event)=> {
+        event.stopImmediatePropagation();
+    });
+
     $(()=> {
         const DAY_NOW = Math.round(Date.now() / 1000 / 60 / 60 / 24);
         const dayDiff = {
@@ -56,4 +60,8 @@ if (location.pathname.endsWith('/topic')) {
             }
         }, 1000);
     });
+}
+
+if (location.href === 'http://daily.zhihu.com/') {
+    $(() => $('.main-content').siblings().add('.read-more').remove());
 }
