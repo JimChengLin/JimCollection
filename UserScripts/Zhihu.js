@@ -11,7 +11,6 @@ switch (location.host) {
 
 function zhihuDaily() {
     $(() => {
-        $('.main-content').siblings().add('.read-more').remove();
         if (location.pathname.startsWith('/story')) {
             $('.question:last-child').not(':contains("查看知乎原文")').remove();
         }
@@ -72,7 +71,7 @@ function zhihu() {
                         let item = element.closest('.feed-item');
                         if (dayDiff.search(element.attr('href')) > 7 ||
                             dayDiff.search(item.find('link').attr('href')) > 1) {
-                            item.hide();
+                            item.fadeIn();
                         }
                     });
                     change = false;
