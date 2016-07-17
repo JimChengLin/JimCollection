@@ -68,7 +68,7 @@ function main() {
         commit();
         var change;
         var observer = new MutationObserver(() => change = true);
-        observer.observe(document.body, {childList: true, subtree: true});
+        observer.observe(document.body, {childList: true, subtree: true, attributes: true});
         setInterval(() => {
             if (change) {
                 commit();

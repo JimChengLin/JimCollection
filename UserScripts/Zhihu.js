@@ -4,7 +4,7 @@ switch (location.host) {
     case 'daily.zhihu.com':
         zhihuDaily();
         break;
-    case 'zhihu.com':
+    case 'www.zhihu.com':
         zhihu();
         break;
 }
