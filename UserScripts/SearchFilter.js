@@ -7,8 +7,10 @@ function main() {
     var mapBackup;
 
     var update;
+    var setting;
     var isEngine;
     if (isEngine = (href.includes('google') && href.includes('search?'))) {
+        setting = {childList: true, subtree: true};
         update = function () {
             var rc = $('.srg > .g > .rc');
             var links = rc.find('.r > a');
@@ -69,7 +71,7 @@ function main() {
         commit();
         var change;
         var observer = new MutationObserver(() => change = true);
-        observer.observe(document.body, {childList: true, subtree: true, attributes: true});
+        observer.observe(document.body, setting || {childList: true, subtree: true, attributes: true});
         setInterval(() => {
             if (change) {
                 commit();
