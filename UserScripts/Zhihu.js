@@ -46,10 +46,11 @@ function zhihu() {
                     this.record = {};
                     for (let url of GM_listValues()) {
                         let diff = DAY_NOW - GM_getValue(url);
-                        diff > 21 ? GM_deleteValue(url) : this.record[url] = diff;
+                        diff > 14 ? GM_deleteValue(url) : this.record[url] = diff;
                     }
                 },
                 search: (url) => {
+                    url = url.relace('/question/', '');
                     if (url in this.record) {
                         return this.record[url];
                     } else {
@@ -62,7 +63,7 @@ function zhihu() {
 
             let change;
             const observer = new MutationObserver(() => change = true);
-            observer.observe(document.querySelector('div.zu-main-content > div'), {childList: true, subtree: true});
+            observer.observe(document.querySelector('div.zu-main-content'), {childList: true, subtree: true});
 
             setInterval(() => {
                 if (change) {

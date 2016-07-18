@@ -157,7 +157,6 @@ var Page = {
                                 return false;
                             }
                         });
-
                         return true;
                     }
                 }
