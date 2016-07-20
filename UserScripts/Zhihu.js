@@ -71,8 +71,8 @@ function zhihu() {
                     $('.question_link').map((i, elem) => {
                         elem = $(elem);
                         let item = elem.closest('.feed-item');
-                        if (DayDiff.search(elem.attr('href')) > 7 ||
-                            DayDiff.search(item.find('link').attr('href')) > 1) {
+                        if (DayDiff.search(elem.attr('href')) >= 7 ||
+                            DayDiff.search(item.find('link').attr('href')) >= 1) {
                             item.fadeOut();
                         }
                     });

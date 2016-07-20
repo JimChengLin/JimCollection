@@ -33,7 +33,7 @@ function main() {
     }
 
     else if (isEngine = (href.includes('baidu.com/s?'))) {
-        $('<style>#content_right{display:none}</style>').appendTo('html');
+        $('<style>#content_right{visibility:hidden}</style>').appendTo('html');
         update = function () {
             $('span:contains("商业推广")').closest('div').remove();
             var result = $('.c-container');
