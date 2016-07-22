@@ -12,7 +12,10 @@ switch (location.host) {
 function zhihuDaily() {
     $(() => {
         if (location.pathname.startsWith('/story')) {
-            $('.question:last-child').not(':contains("查看知乎原文")').remove();
+            const target = $('.question:last-child').not(':contains("查看知乎原文")');
+            if (target.length && target.text().length < 100) {
+                target.remove();
+            }
         }
     });
 }
@@ -68,6 +71,7 @@ function zhihu() {
 
             setInterval(() => {
                 if (change) {
+                    $('.goog-scrollfloater-floating').remove();
                     $('.question_link').map((i, elem) => {
                         elem = $(elem);
                         let item = elem.closest('.feed-item');
