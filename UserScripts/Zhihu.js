@@ -41,25 +41,26 @@ function zhihu() {
 
         $(()=> {
             const DAY_NOW = Math.round(Date.now() / 1000 / 60 / 60 / 24);
-            const dayDiff = {
-                init: () => {
-                    this.record = {};
+            const DayDiff = {
+                record: {},
+                load: () => {
                     for (let url of GM_listValues()) {
                         let diff = DAY_NOW - GM_getValue(url);
-                        diff > 14 ? GM_deleteValue(url) : this.record[url] = diff;
+                        diff > 14 ? GM_deleteValue(url) : DayDiff.record[url] = diff;
                     }
                 },
                 search: (url) => {
-                    url = url.relace('/question/', '');
-                    if (url in this.record) {
-                        return this.record[url];
+                    url = url.match(/[0-9]+/).pop();
+                    if (url in DayDiff.record) {
+                        return DayDiff.record[url];
                     } else {
                         GM_setValue(url, DAY_NOW);
-                        return this.record[url] = 0;
+                        DayDiff.record[url] = 0;
+                        return 0;
                     }
                 }
             };
-            dayDiff.init();
+            DayDiff.load();
 
             let change;
             const observer = new MutationObserver(() => change = true);
@@ -67,12 +68,12 @@ function zhihu() {
 
             setInterval(() => {
                 if (change) {
-                    $('.question_link').map((i, element) => {
-                        element = $(element);
-                        let item = element.closest('.feed-item');
-                        if (dayDiff.search(element.attr('href')) > 7 ||
-                            dayDiff.search(item.find('link').attr('href')) > 1) {
-                            item.fadeIn();
+                    $('.question_link').map((i, elem) => {
+                        elem = $(elem);
+                        let item = elem.closest('.feed-item');
+                        if (DayDiff.search(elem.attr('href')) > 7 ||
+                            DayDiff.search(item.find('link').attr('href')) > 1) {
+                            item.fadeOut();
                         }
                     });
                     change = false;
