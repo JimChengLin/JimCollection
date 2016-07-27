@@ -38,7 +38,10 @@ function zhihu() {
         });
 
     if (location.pathname.endsWith('/topic')) {
-        $(window).on('scroll', (event) => event.stopImmediatePropagation());
+        $(window).on('scroll', (event) => {
+            $('._hint').remove();
+            event.stopImmediatePropagation();
+        });
 
         $(()=> {
             const DAY_NOW = () => Date.now() / 1000 / 60 / 60 / 24;

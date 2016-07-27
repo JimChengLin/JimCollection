@@ -11,12 +11,11 @@ Element.prototype.addEventListener = function (type, listener, userCapture) {
 
 // Event
 $(window)
-    .on('click resize', () => Page.escape())
+    .on('click resize scroll', () => Page.escape())
     .on('click', (event) => Page.target = event.target);
 
 window ? register() : setTimeout(register, 100);
 function register() {
-    addEventListener('scroll', () => Page.escape(), true);
     addEventListener('keydown', (event) => {
         var isTab = (event.code === 'Tab');
         var isCommand = Page.isCommand(event);
