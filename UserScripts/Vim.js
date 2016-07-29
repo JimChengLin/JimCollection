@@ -31,7 +31,7 @@ function register() {
         function shouldTab() {
             return document.activeElement.tagName === 'INPUT' &&
                 (!document.activeElement.type || document.activeElement.type === 'text') &&
-                $(document.activeElement).closest('form').find('input:visible').length > 1;
+                $(document.activeElement).closest('form').find('input[type="password"]').length;
         }
     }, true);
 
