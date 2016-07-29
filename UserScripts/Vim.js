@@ -20,12 +20,18 @@ function register() {
         var isTab = (event.code === 'Tab');
         var isCommand = Page.isCommand(event);
 
-        if (isTab) {
+        if (isTab && !shouldTab()) {
             event.preventDefault();
             event.stopImmediatePropagation();
             isCommand ? Page.escape() : document.activeElement.blur();
         } else if (isCommand) {
             event.stopImmediatePropagation();
+        }
+
+        function shouldTab() {
+            return document.activeElement.tagName === 'INPUT' &&
+                (!document.activeElement.type || document.activeElement.type === 'text') &&
+                $(document.activeElement).closest('form').find('input:visible').length > 1;
         }
     }, true);
 
@@ -279,7 +285,6 @@ var Page = {
                     .css(style)
                     .appendTo('html');
             }
-
             return map;
         }
     },
