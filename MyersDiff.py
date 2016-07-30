@@ -62,22 +62,35 @@ def overlap(a_snake_s: set, b_snake_s: set) -> set:
     return a_snake_s & b_snake_s
 
 
-def find_mid_snake(a: str, b: str):
+def find_mid_snake(a: str, b: str) -> set:
     delta = len(a) - len(b)
+    is_even = (delta % 2 == 0)
+
     diff_gen = diff_len(a, b)
     diff_reverse_gen = diff_len_reverse(a, b)
 
+    result = set()
+    reverse = set()
     for supply in range(ceil((len(a) + len(b)) / 2)):
         try:
-            print(diff_gen.send(None))
-            print(diff_reverse_gen.send(None))
+            forward = next(diff_gen)
+            if not is_even:
+                result.update(overlap(forward, reverse))
+            reverse = next(diff_reverse_gen)
+            if is_even:
+                result.update(overlap(forward, reverse))
         except StopIteration:
             break
-        print('------')
+    return result
+
+
+def diff(a: str, b: str):
+    if len(a) > 0 and len(b) > 0:
+        pass
 
 
 if __name__ == '__main__':
     # 测试用例
     A = 'ABCABBA'
     B = 'CBABAC'
-    find_mid_snake(A, B)
+    print(find_mid_snake(A, B))
