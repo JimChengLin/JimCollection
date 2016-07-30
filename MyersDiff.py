@@ -81,16 +81,27 @@ def find_mid_snake(a: str, b: str) -> set:
                 result.update(overlap(forward, reverse))
         except StopIteration:
             break
+    print(result)
     return result
+
+
+_result = set()
 
 
 def diff(a: str, b: str):
     if len(a) > 0 and len(b) > 0:
-        pass
+        _a = find_mid_snake(a, b)
+        _a = _a.pop()
+        _result.add(_a)
+        u, v = _a
+        x, y = u - 1, v - 1
+        diff(a[:x + 1], b[:y + 1])
+        diff(a[u:], b[v:])
 
 
 if __name__ == '__main__':
     # 测试用例
     A = 'ABCABBA'
     B = 'CBABAC'
-    print(find_mid_snake(A, B))
+    diff(A, B)
+    print(_result)
