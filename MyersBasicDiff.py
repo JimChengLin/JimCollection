@@ -1,7 +1,4 @@
-from math import ceil
-
-
-def diff_len(a: str, b: str) -> set:
+def diff_len(a: str, b: str):
     # 一对字符串之间的差异, 表现在图中, 就是竖线与横线
     # 考虑最差的情况, 即A与B完全不相等, 将会有a+b最大总长度的竖线与横线
     # 可以将这个值理解为弹药数量, 每一个差异都是要消灭的敌人
@@ -30,7 +27,6 @@ def diff_len(a: str, b: str) -> set:
             # 第二三个判断的作用: 一般情况
             # 正确性: k_n+1或k_n-1线最优解可以漂移出增加1个弹药的k_n线最优解
             if nth_k == -supply or (nth_k != supply and best_x_nth_k_line[nth_k - 1] < best_x_nth_k_line[nth_k + 1]):
-
                 # 从k_n+1漂移到k_n, x的位置不变, y往下一个单位
                 x = best_x_nth_k_line[nth_k + 1]
             else:
@@ -40,6 +36,7 @@ def diff_len(a: str, b: str) -> set:
             y = x - nth_k
 
             # 本轮弹药补给使用完毕, 开始尝试能否走对角线, 获取战果
+            # str下标是从0开始的, 所以实际上a[x] == b[y]等同于自然下标a[x+1] == b[y+1]
             while x < len(a) and y < len(b) and a[x] == b[y]:
                 x += 1
                 y += 1
@@ -48,31 +45,21 @@ def diff_len(a: str, b: str) -> set:
 
             # 所有子弹已经打完, 无法获取更多战果
             if x >= len(a) and y >= len(b):
-                stop_s = set()
-                for kx in best_x_nth_k_line.items():
-                    k, x = kx
-                    y = x - k
-                    # 只关心范围内的停驻点
-                    if 1 <= x <= len(a) and 1 <= y <= len(b):
-                        stop_s.add((x, y))
-                print('diff_len is', supply)
-                print(stop_s)
-                return stop_s
+                return print('diff_len is', supply)
 
 
 # 从相反方向出发的函数
 # 将输入reverse一遍即可, k线下标不变
 # 结果应该相同
-def diff_len_reverse(a: str, b: str) -> set:
+def diff_len_reverse(a: str, b: str):
     a = a[::-1]
     b = b[::-1]
-    x_reverse_table = [0, *reversed(range(1, len(a) + 1))]
-    y_reverse_table = [0, *reversed(range(1, len(b) + 1))]
 
     max_supply = len(a) + len(b)
     best_x_nth_k_line = {1: 0}
     for supply in range(max_supply + 1):
         for nth_k in range(-supply, supply + 1, 2):
+
             if nth_k == -supply or (nth_k != supply and best_x_nth_k_line[nth_k - 1] < best_x_nth_k_line[nth_k + 1]):
                 x = best_x_nth_k_line[nth_k + 1]
             else:
@@ -85,23 +72,7 @@ def diff_len_reverse(a: str, b: str) -> set:
             best_x_nth_k_line[nth_k] = x
 
             if x >= len(a) and y >= len(b):
-                stop_s = set()
-                for kx in best_x_nth_k_line.items():
-                    k, x = kx
-                    y = x - k
-                    # 只关心范围内的停驻点
-                    if 1 <= x <= len(a) and 1 <= y <= len(b):
-                        stop_s.add((x_reverse_table[x], y_reverse_table[y]))
-                print('diff_len_reverse is', supply)
-                print(stop_s)
-                return stop_s
-
-
-def find_mid_snake(a: str, b: str):
-    delta = len(a) - len(b)
-    for supply in range(ceil((len(a) + len(b)) / 2)):
-        for nth_k in range(-supply, supply + 1, 2):
-            pass
+                return print('diff_len_reverse is', supply)
 
 
 if __name__ == '__main__':
