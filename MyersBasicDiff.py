@@ -47,35 +47,7 @@ def diff_len(a: str, b: str):
                 return print('diff_len is', supply)
 
 
-# 从相反方向出发的函数
-# 将输入reverse一遍即可, k线下标不变
-# 结果应当相同
-def diff_len_reverse(a: str, b: str):
-    a = a[::-1]
-    b = b[::-1]
-
-    max_supply = len(a) + len(b)
-    max_x_nth_k_line = {1: 0}
-    for supply in range(max_supply + 1):
-        for nth_k in range(-supply, supply + 1, 2):
-
-            if nth_k == -supply or (nth_k != supply and max_x_nth_k_line[nth_k - 1] < max_x_nth_k_line[nth_k + 1]):
-                x = max_x_nth_k_line[nth_k + 1]
-            else:
-                x = max_x_nth_k_line[nth_k - 1] + 1
-            y = x - nth_k
-
-            while x < len(a) and y < len(b) and a[x] == b[y]:
-                x += 1
-                y += 1
-            max_x_nth_k_line[nth_k] = x
-
-            if x >= len(a) and y >= len(b):
-                return print('diff_len_reverse is', supply)
-
-
 if __name__ == '__main__':
     A = 'ABCABBA'
     B = 'CBABAC'
     diff_len(A, B)
-    diff_len_reverse(A, B)

@@ -1,7 +1,7 @@
 from math import ceil
 
 
-def find_mid_snake(a: str, b: str):
+def find_mid_snake(a: str, b: str) -> tuple:
     # 通过delta可以判断是在正方向扩张还是反方向扩张的时候overlap
     delta = len(a) - len(b)
     is_even = (delta % 2 == 0)
@@ -10,11 +10,13 @@ def find_mid_snake(a: str, b: str):
     # pool用于检测扩张时是否overlap反方向的path
     # 没有检测到overlap时, 要覆写pool
     overlap_pool = set()
+    counter = [0, 0]
 
     # 正方向扩张
     def forward():  # generator
         max_x_nth_k = {1: 0}
         for supply in range(half_supply + 1):
+            counter[0] = supply
             for nth_k in range(-supply, supply + 1, 2):
                 # snake: [..., point: (x, y)]
                 snake = []
@@ -31,9 +33,8 @@ def find_mid_snake(a: str, b: str):
                 # snake中间点
                 snake.append((x, y))
 
-                if not is_even and delta - (supply - 1) <= nth_k <= delta + (supply - 1) \
-                        and (x, y) in overlap_pool:
-                    yield snake, supply
+                if not is_even and (x, y) in overlap_pool:
+                    yield snake
 
                 while x < len(a) and y < len(b) and a[x] == b[y]:
                     x += 1
@@ -41,9 +42,8 @@ def find_mid_snake(a: str, b: str):
                     # snake对角点
                     snake.append((x, y))
 
-                    if not is_even and delta - (supply - 1) <= nth_k <= delta + (supply - 1) \
-                            and (x, y) in overlap_pool:
-                        yield snake, supply
+                    if not is_even and (x, y) in overlap_pool:
+                        yield snake
                 max_x_nth_k[nth_k] = x
 
             # 切换到反方向的generator, 覆写pool
@@ -60,16 +60,17 @@ def find_mid_snake(a: str, b: str):
         reverse_b = b[::-1]
 
         def r_a(i: int) -> int:
-            return i + (((1 + len(reverse_a)) / 2 - i) * 2)
+            return i + round((len(reverse_a) / 2 - i) * 2)
 
         def r_b(i: int) -> int:
-            return i + (((1 + len(reverse_b)) / 2 - i) * 2)
+            return i + round((len(reverse_b) / 2 - i) * 2)
 
         def r_ab(point: tuple) -> tuple:
             return r_a(point[0]), r_b(point[1])
 
         max_x_nth_k = {1: 0}
         for supply in range(half_supply + 1):
+            counter[1] = supply
             for nth_k in range(-supply, supply + 1, 2):
 
                 snake = []
@@ -83,18 +84,16 @@ def find_mid_snake(a: str, b: str):
                 y = x - nth_k
                 snake.append((x, y))
 
-                if is_even and delta - (supply - 1) <= nth_k <= delta + (supply - 1) \
-                        and (r_a(x), r_b(y)) in overlap_pool:
-                    yield [r_ab(point) for point in snake], supply
+                if is_even and (r_a(x), r_b(y)) in overlap_pool:
+                    yield [r_ab(point) for point in snake]
 
                 while x < len(reverse_a) and y < len(reverse_b) and reverse_a[x] == reverse_b[y]:
                     x += 1
                     y += 1
                     snake.append((x, y))
 
-                    if is_even and delta - (supply - 1) <= nth_k <= delta + (supply - 1) \
-                            and (r_a(x), r_a(y)) in overlap_pool:
-                        yield [r_ab(point) for point in snake], supply
+                    if is_even and (r_a(x), r_a(y)) in overlap_pool:
+                        yield [r_ab(point) for point in snake]
                 max_x_nth_k[nth_k] = x
 
             overlap_pool.clear()
@@ -104,25 +103,20 @@ def find_mid_snake(a: str, b: str):
             yield False
 
     # 主体调用部分
-    forward_g = forward()
-    reverse_g = reverse()
+    forward_gen = forward()
+    reverse_gen = reverse()
     for _ in range(half_supply + 1):
-        counter = [0, 0]
 
-        result = next(forward_g)
+        result = next(forward_gen)
         if result:
-            mid_snake, supply = result
-            counter[0] = supply
-            return mid_snake, sum(counter)
+            return result, sum(counter)
 
-        result = next(reverse_g)
+        result = next(reverse_gen)
         if result:
-            mid_snake, supply = result
-            counter[1] = supply
-            return mid_snake, sum(counter)
+            return result, sum(counter)
 
 
 if __name__ == '__main__':
-    A = 'ABCABBA'
-    B = 'CBABAC'
+    B = 'AC'
+    A = 'C'
     print(find_mid_snake(A, B))
