@@ -16,6 +16,7 @@ def find_mid_snake(a: str, b: str) -> tuple:
     def forward():  # generator
         max_x_nth_k = {1: 0}
         for supply in range(half_supply + 1):
+            extend_l = []
             counter[0] = supply
             for nth_k in range(-supply, supply + 1, 2):
                 # snake: [..., point: (x, y)]
@@ -47,12 +48,11 @@ def find_mid_snake(a: str, b: str) -> tuple:
                     if not is_even and (x, y) in overlap_pool:
                         yield snake, common
                 max_x_nth_k[nth_k] = x
+                extend_l.extend(snake)
 
             # 切换到反方向的generator, 覆写pool
             overlap_pool.clear()
-            for kx in max_x_nth_k.items():
-                k, x = kx
-                overlap_pool.add((x, x - k))
+            overlap_pool.update(extend_l)
             yield False
 
     # 反方向扩张
@@ -72,6 +72,7 @@ def find_mid_snake(a: str, b: str) -> tuple:
 
         max_x_nth_k = {1: 0}
         for supply in range(half_supply + 1):
+            extend_l = []
             counter[1] = supply
             for nth_k in range(-supply, supply + 1, 2):
 
@@ -88,22 +89,22 @@ def find_mid_snake(a: str, b: str) -> tuple:
                 snake.append((x, y))
 
                 if is_even and (r_a(x), r_b(y)) in overlap_pool:
-                    yield [r_ab(point) for point in snake], common
+                    yield [r_ab(point) for point in reversed(snake)], common
 
                 while x < len(reverse_a) and y < len(reverse_b) and reverse_a[x] == reverse_b[y]:
-                    common.append(a[x])
+                    common.append(reverse_a[x])
                     x += 1
                     y += 1
                     snake.append((x, y))
 
                     if is_even and (r_a(x), r_a(y)) in overlap_pool:
-                        yield [r_ab(point) for point in snake], common
+                        yield [r_ab(point) for point in reversed(snake)], common
                 max_x_nth_k[nth_k] = x
+                extend_l.extend(snake)
 
             overlap_pool.clear()
-            for kx in max_x_nth_k.items():
-                k, x = kx
-                overlap_pool.add((r_a(x), r_b(x - k)))
+            for point in extend_l:
+                overlap_pool.add(r_ab(point))
             yield False
 
     # 主体调用部分
@@ -122,7 +123,33 @@ def find_mid_snake(a: str, b: str) -> tuple:
             return snake, common, sum(counter)
 
 
+def diff(a: str, b: str, output_l: list):
+    if len(a) > 0 and len(b) > 0:
+        snake, common, supply = find_mid_snake(a, b)
+
+        # snake: [(x, y), ..., (u, v)]
+        x, y = snake[0]
+        u, v = snake[-1]
+
+        if supply > 1:
+            diff(a[:x], b[:y], output_l)
+            output_l.extend(common)
+            diff(a[u:], b[v:], output_l)
+        elif len(b) > len(a):
+            output_l.extend(list(a))
+        else:
+            output_l.extend(list(b))
+
+
 if __name__ == '__main__':
-    B = 'AC'
-    A = 'C'
-    print(find_mid_snake(A, B))
+    A = 'ABCABBA'
+    B = 'CBABAC'
+
+
+    def main():
+        output_l = []
+        diff(A, B, output_l)
+        print(output_l)
+
+
+    main()
