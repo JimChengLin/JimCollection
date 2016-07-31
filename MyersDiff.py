@@ -20,6 +20,7 @@ def find_mid_snake(a: str, b: str) -> tuple:
             for nth_k in range(-supply, supply + 1, 2):
                 # snake: [..., point: (x, y)]
                 snake = []
+                common = []
                 if nth_k == -supply or \
                         (nth_k != supply and max_x_nth_k[nth_k - 1] < max_x_nth_k[nth_k + 1]):
                     x = max_x_nth_k[nth_k + 1]
@@ -34,16 +35,17 @@ def find_mid_snake(a: str, b: str) -> tuple:
                 snake.append((x, y))
 
                 if not is_even and (x, y) in overlap_pool:
-                    yield snake
+                    yield snake, common
 
                 while x < len(a) and y < len(b) and a[x] == b[y]:
+                    common.append(a[x])
                     x += 1
                     y += 1
                     # snake对角点
                     snake.append((x, y))
 
                     if not is_even and (x, y) in overlap_pool:
-                        yield snake
+                        yield snake, common
                 max_x_nth_k[nth_k] = x
 
             # 切换到反方向的generator, 覆写pool
@@ -74,6 +76,7 @@ def find_mid_snake(a: str, b: str) -> tuple:
             for nth_k in range(-supply, supply + 1, 2):
 
                 snake = []
+                common = []
                 if nth_k == -supply or \
                         (nth_k != supply and max_x_nth_k[nth_k - 1] < max_x_nth_k[nth_k + 1]):
                     x = max_x_nth_k[nth_k + 1]
@@ -85,15 +88,16 @@ def find_mid_snake(a: str, b: str) -> tuple:
                 snake.append((x, y))
 
                 if is_even and (r_a(x), r_b(y)) in overlap_pool:
-                    yield [r_ab(point) for point in snake]
+                    yield [r_ab(point) for point in snake], common
 
                 while x < len(reverse_a) and y < len(reverse_b) and reverse_a[x] == reverse_b[y]:
+                    common.append(a[x])
                     x += 1
                     y += 1
                     snake.append((x, y))
 
                     if is_even and (r_a(x), r_a(y)) in overlap_pool:
-                        yield [r_ab(point) for point in snake]
+                        yield [r_ab(point) for point in snake], common
                 max_x_nth_k[nth_k] = x
 
             overlap_pool.clear()
@@ -109,11 +113,13 @@ def find_mid_snake(a: str, b: str) -> tuple:
 
         result = next(forward_gen)
         if result:
-            return result, sum(counter)
+            snake, common = result
+            return snake, common, sum(counter)
 
         result = next(reverse_gen)
         if result:
-            return result, sum(counter)
+            snake, common = result
+            return snake, common, sum(counter)
 
 
 if __name__ == '__main__':
