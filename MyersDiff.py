@@ -104,20 +104,25 @@ def find_mid_snake(a: str, b: str):
             yield False
 
     # 主体调用部分
-    forward_gen = forward()
-    reverse_gen = reverse()
+    forward_g = forward()
+    reverse_g = reverse()
     for _ in range(half_supply + 1):
-        result = next(forward_gen)
-        print(result)
+        counter = [0, 0]
+
+        result = next(forward_g)
         if result:
-            return
-        result = next(reverse_gen)
-        print(result)
+            mid_snake, supply = result
+            counter[0] = supply
+            return mid_snake, sum(counter)
+
+        result = next(reverse_g)
         if result:
-            return
+            mid_snake, supply = result
+            counter[1] = supply
+            return mid_snake, sum(counter)
 
 
 if __name__ == '__main__':
     A = 'ABCABBA'
     B = 'CBABAC'
-    find_mid_snake(A, B)
+    print(find_mid_snake(A, B))
