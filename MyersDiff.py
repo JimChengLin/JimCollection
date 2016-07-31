@@ -1,107 +1,123 @@
 from math import ceil
 
 
-def diff_len(a: str, b: str):
-    max_supply = len(a) + len(b)
-    best_x_nth_k_line = {1: 0}
-
-    for supply in range(max_supply + 1):
-        snake_s = set()
-        for nth_k in range(-supply, supply + 1, 2):
-
-            if nth_k == -supply or (nth_k != supply and best_x_nth_k_line[nth_k - 1] < best_x_nth_k_line[nth_k + 1]):
-                x = best_x_nth_k_line[nth_k + 1]
-            else:
-                x = best_x_nth_k_line[nth_k - 1] + 1
-            y = x - nth_k
-
-            while x < len(a) and y < len(b) and a[x] == b[y]:
-                snake_s.add((x, y))
-                x += 1
-                y += 1
-            best_x_nth_k_line[nth_k] = x
-
-            if x >= len(a) and y >= len(b):
-                yield snake_s
-                return
-        yield snake_s
-
-
-def diff_len_reverse(a: str, b: str):
-    a = a[::-1]
-    b = b[::-1]
-    x_reverse_table = [0, *reversed(range(1, len(a) + 1))]
-    y_reverse_table = [0, *reversed(range(1, len(b) + 1))]
-
-    max_supply = len(a) + len(b)
-    best_x_nth_k_line = {1: 0}
-
-    for supply in range(max_supply + 1):
-        snake_s = set()
-        for nth_k in range(-supply, supply + 1, 2):
-
-            if nth_k == -supply or (nth_k != supply and best_x_nth_k_line[nth_k - 1] < best_x_nth_k_line[nth_k + 1]):
-                x = best_x_nth_k_line[nth_k + 1]
-            else:
-                x = best_x_nth_k_line[nth_k - 1] + 1
-            y = x - nth_k
-
-            while x < len(a) and y < len(b) and a[x] == b[y]:
-                snake_s.add((x_reverse_table[x + 1] - 1, y_reverse_table[y + 1] - 1))
-                x += 1
-                y += 1
-            best_x_nth_k_line[nth_k] = x
-
-            if x >= len(a) and y >= len(b):
-                yield snake_s
-                return
-        yield snake_s
-
-
-def overlap(a_snake_s: set, b_snake_s: set) -> set:
-    return a_snake_s & b_snake_s
-
-
-def find_mid_snake(a: str, b: str) -> set:
+def find_mid_snake(a: str, b: str):
+    # 通过delta可以判断是在正方向扩张还是反方向扩张的时候overlap
     delta = len(a) - len(b)
     is_even = (delta % 2 == 0)
+    # 分治法
+    half_supply = ceil((len(a) + len(b)) / 2)
+    # pool用于检测扩张时是否overlap反方向的path
+    # 没有检测到overlap时, 要覆写pool
+    overlap_pool = set()
 
-    diff_gen = diff_len(a, b)
-    diff_reverse_gen = diff_len_reverse(a, b)
+    # 正方向扩张
+    def forward():  # generator
+        max_x_nth_k = {1: 0}
+        for supply in range(half_supply + 1):
+            for nth_k in range(-supply, supply + 1, 2):
+                # snake: [..., point: (x, y)]
+                snake = []
+                if nth_k == -supply or \
+                        (nth_k != supply and max_x_nth_k[nth_k - 1] < max_x_nth_k[nth_k + 1]):
+                    x = max_x_nth_k[nth_k + 1]
+                    # snake起始点, x不变, y-1
+                    snake.append((x, x - (nth_k + 1)))
+                else:
+                    # snake起始点, y不变, x-1
+                    snake.append((max_x_nth_k[nth_k - 1], max_x_nth_k[nth_k - 1] - (nth_k - 1)))
+                    x = max_x_nth_k[nth_k - 1] + 1
+                y = x - nth_k
+                # snake中间点
+                snake.append((x, y))
 
-    result = set()
-    reverse = set()
-    for supply in range(ceil((len(a) + len(b)) / 2)):
-        try:
-            forward = next(diff_gen)
-            if not is_even:
-                result.update(overlap(forward, reverse))
-            reverse = next(diff_reverse_gen)
-            if is_even:
-                result.update(overlap(forward, reverse))
-        except StopIteration:
-            break
-    print(result)
-    return result
+                if not is_even and delta - (supply - 1) <= nth_k <= delta + (supply - 1) \
+                        and (x, y) in overlap_pool:
+                    yield snake, supply
 
+                while x < len(a) and y < len(b) and a[x] == b[y]:
+                    x += 1
+                    y += 1
+                    # snake对角点
+                    snake.append((x, y))
 
-_result = set()
+                    if not is_even and delta - (supply - 1) <= nth_k <= delta + (supply - 1) \
+                            and (x, y) in overlap_pool:
+                        yield snake, supply
+                max_x_nth_k[nth_k] = x
 
+            # 切换到反方向的generator, 覆写pool
+            overlap_pool.clear()
+            for kx in max_x_nth_k.items():
+                k, x = kx
+                overlap_pool.add((x, x - k))
+            yield False
 
-def diff(a: str, b: str):
-    if len(a) > 0 and len(b) > 0:
-        _a = find_mid_snake(a, b)
-        _a = _a.pop()
-        _result.add(_a)
-        u, v = _a
-        x, y = u - 1, v - 1
-        diff(a[:x + 1], b[:y + 1])
-        diff(a[u:], b[v:])
+    # 反方向扩张
+    def reverse():
+        # 输入reverse就相当于反方向扩张, 输出时再变换恢复
+        reverse_a = a[::-1]
+        reverse_b = b[::-1]
+
+        def r_a(i: int) -> int:
+            return i + (((1 + len(reverse_a)) / 2 - i) * 2)
+
+        def r_b(i: int) -> int:
+            return i + (((1 + len(reverse_b)) / 2 - i) * 2)
+
+        def r_ab(point: tuple) -> tuple:
+            return r_a(point[0]), r_b(point[1])
+
+        max_x_nth_k = {1: 0}
+        for supply in range(half_supply + 1):
+            for nth_k in range(-supply, supply + 1, 2):
+
+                snake = []
+                if nth_k == -supply or \
+                        (nth_k != supply and max_x_nth_k[nth_k - 1] < max_x_nth_k[nth_k + 1]):
+                    x = max_x_nth_k[nth_k + 1]
+                    snake.append((x, x - (nth_k + 1)))
+                else:
+                    snake.append((max_x_nth_k[nth_k - 1], max_x_nth_k[nth_k - 1] - (nth_k - 1)))
+                    x = max_x_nth_k[nth_k - 1] + 1
+                y = x - nth_k
+                snake.append((x, y))
+
+                if is_even and delta - (supply - 1) <= nth_k <= delta + (supply - 1) \
+                        and (r_a(x), r_b(y)) in overlap_pool:
+                    yield [r_ab(point) for point in snake], supply
+
+                while x < len(reverse_a) and y < len(reverse_b) and reverse_a[x] == reverse_b[y]:
+                    x += 1
+                    y += 1
+                    snake.append((x, y))
+
+                    if is_even and delta - (supply - 1) <= nth_k <= delta + (supply - 1) \
+                            and (r_a(x), r_a(y)) in overlap_pool:
+                        yield [r_ab(point) for point in snake], supply
+                max_x_nth_k[nth_k] = x
+
+            overlap_pool.clear()
+            for kx in max_x_nth_k.items():
+                k, x = kx
+                overlap_pool.add((r_a(x), r_b(x - k)))
+            yield False
+
+    # 主体调用部分
+    forward_gen = forward()
+    reverse_gen = reverse()
+    for _ in range(half_supply + 1):
+        result = next(forward_gen)
+        print(result)
+        if result:
+            return
+        result = next(reverse_gen)
+        print(result)
+        if result:
+            return
 
 
 if __name__ == '__main__':
-    # 测试用例
     A = 'ABCABBA'
     B = 'CBABAC'
-    diff(A, B)
-    print(_result)
+    find_mid_snake(A, B)
