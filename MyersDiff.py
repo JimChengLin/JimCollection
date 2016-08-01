@@ -7,16 +7,17 @@ def find_mid_snake(a: str, b: str) -> tuple:
     is_odd = not is_even
     # 分治法
     half_supply = ceil((len(a) + len(b)) / 2)
-    # pool用于检测扩张时是否overlap反方向的path
+    # pool用于检测扩张时是否overlap
     overlap_pool = set()
+    # 当前supply
     counter = [0, 0]
 
     # 正方向扩张
     def forward():
         max_x_nth_k = {1: 0}
         for supply in range(half_supply + 1):
-            extend_l = []
             counter[0] = supply
+            extend_l = []
 
             for nth_k in range(-supply, supply + 1, 2):
                 # snake: [..., point: (x, y)]
@@ -29,7 +30,7 @@ def find_mid_snake(a: str, b: str) -> tuple:
                     # snake起始点, x不变, y-1
                     snake.append((x, x - (nth_k + 1)))
                 else:
-                    # y不变, x-1
+                    # y不变, x+1
                     snake.append((max_x_nth_k[nth_k - 1], max_x_nth_k[nth_k - 1] - (nth_k - 1)))
                     x = max_x_nth_k[nth_k - 1] + 1
                 y = x - nth_k
@@ -76,8 +77,8 @@ def find_mid_snake(a: str, b: str) -> tuple:
 
         max_x_nth_k = {1: 0}
         for supply in range(half_supply + 1):
-            extend_l = []
             counter[1] = supply
+            extend_l = []
 
             for nth_k in range(-supply, supply + 1, 2):
                 snake = []
@@ -140,6 +141,7 @@ def diff(a: str, b: str, output_l: list):
         return result
 
     if len(a) > 0 and len(b) > 0:
+        # 直接处理小规模问题
         if len(a) <= 2 and len(b) <= 2:
             if a == b:
                 output_l.extend(a)
@@ -154,16 +156,12 @@ def diff(a: str, b: str, output_l: list):
         # snake: [(x, y), ..., (u, v)]
         x, y = snake[0]
         u, v = snake[-1]
-
-        print(a, b)
         if supply > 1:
             diff(a[:x], b[:y], output_l)
             output_l.extend(to_str(snake))
-            if a[u - 1] == b[v - 1]:
-                # ASCII定义的Cancel
-                output_l.append(chr(24))
 
-            if u - 1 == 0 and v - 1 == 0:
+            # 必须跳跃的两种情况
+            if (u - 1 == 0 and v - 1 == 0) or (a[u - 1] == b[v - 1]):
                 diff(a[u:], b[v:], output_l)
             else:
                 diff(a[max(u - 1, 0):], b[max(v - 1, 0):], output_l)
@@ -174,9 +172,6 @@ def diff(a: str, b: str, output_l: list):
 
 
 if __name__ == '__main__':
-    B = '1234'
-    A = '1224533324'
-
     X = 'ABCBDAB'
     Y = 'BDCABA'
 
