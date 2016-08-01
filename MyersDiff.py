@@ -125,8 +125,18 @@ def find_mid_snake(a: str, b: str) -> tuple:
 
 def diff(a: str, b: str, output_l: list):
     if len(a) > 0 and len(b) > 0:
-        snake, common, supply = find_mid_snake(a, b)
+        # 小规模问题加速组件
+        if len(a) <= 2 and len(b) <= 2:
+            if a == b:
+                output_l.extend(a)
+            else:
+                for char in a:
+                    if char in b:
+                        output_l.append(char)
+                        break
+            return
 
+        snake, common, supply = find_mid_snake(a, b)
         # snake: [(x, y), ..., (u, v)]
         x, y = snake[0]
         u, v = snake[-1]
@@ -134,7 +144,7 @@ def diff(a: str, b: str, output_l: list):
         if supply > 1:
             diff(a[:x], b[:y], output_l)
             output_l.extend(common)
-            diff(a[u:], b[v:], output_l)
+            diff(a[max(u - 1, 0):], b[max(v - 1, 0):], output_l)
         elif len(b) > len(a):
             output_l.extend(list(a))
         else:
@@ -142,8 +152,8 @@ def diff(a: str, b: str, output_l: list):
 
 
 if __name__ == '__main__':
-    A = 'ABCABBA'
-    B = 'CBABAC'
+    A = 'MZJAWXU'
+    B = 'XMJYAUZ'
 
 
     def main():
