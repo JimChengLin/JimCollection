@@ -130,6 +130,15 @@ def find_mid_snake(a: str, b: str) -> tuple:
 
 
 def diff(a: str, b: str, output_l: list):
+    def to_str(snake: list) -> str:
+        result = ''
+        for i in range(len(snake) - 1):
+            head = snake[i]
+            tail = snake[i + 1]
+            if tail == (head[0] + 1, head[1] + 1):
+                result += a[tail[0] - 1]
+        return result
+
     if len(a) > 0 and len(b) > 0:
         if len(a) <= 2 and len(b) <= 2:
             if a == b:
@@ -146,31 +155,27 @@ def diff(a: str, b: str, output_l: list):
         x, y = snake[0]
         u, v = snake[-1]
 
+        print(a, b)
         if supply > 1:
             diff(a[:x], b[:y], output_l)
-            output_l.extend(snake_to_str(snake, a))
+            output_l.extend(to_str(snake))
             if a[u - 1] == b[v - 1]:
-                del_zero = False
-            diff(a[max(u - 1, 0):], b[max(v - 1, 0):], output_l)
+                # ASCII定义的Cancel
+                output_l.append(chr(24))
+
+            if u - 1 == 0 and v - 1 == 0:
+                diff(a[u:], b[v:], output_l)
+            else:
+                diff(a[max(u - 1, 0):], b[max(v - 1, 0):], output_l)
         elif len(b) > len(a):
             output_l.extend(list(a))
         else:
             output_l.extend(list(b))
 
 
-def snake_to_str(snake: list, a: str) -> str:
-    result = ''
-    for i in range(len(snake) - 1):
-        head = snake[i]
-        tail = snake[i + 1]
-        if tail == (head[0] + 1, head[1] + 1):
-            result += a[tail[0] - 1]
-    return result
-
-
 if __name__ == '__main__':
-    A = 'MZJAWXU'
-    B = 'XMJYAUZ'
+    B = '1234'
+    A = '1224533324'
 
     X = 'ABCBDAB'
     Y = 'BDCABA'
@@ -181,7 +186,7 @@ if __name__ == '__main__':
 
     def main():
         output_l = []
-        diff(Y, X, output_l)
+        diff(V, U, output_l)
         print(output_l)
 
 
