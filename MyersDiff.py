@@ -21,7 +21,6 @@ def find_mid_snake(a: str, b: str) -> tuple:
             for nth_k in range(-supply, supply + 1, 2):
                 # snake: [..., point: (x, y)]
                 snake = []
-                common = []
                 is_overlap = False
 
                 if nth_k == -supply or \
@@ -44,14 +43,13 @@ def find_mid_snake(a: str, b: str) -> tuple:
                     y += 1
                     if is_overlap and (x, y) not in overlap_pool:
                         break
-                    common.append(a[x - 1])
                     # snake尾巴点
                     snake.append((x, y))
 
                     if not is_overlap and is_odd and (x, y) in overlap_pool:
                         is_overlap = True
                 if is_overlap:
-                    yield snake, common
+                    yield snake
                 max_x_nth_k[nth_k] = x
                 extend_l.extend(snake)
 
@@ -83,7 +81,6 @@ def find_mid_snake(a: str, b: str) -> tuple:
 
             for nth_k in range(-supply, supply + 1, 2):
                 snake = []
-                common = []
                 is_overlap = False
 
                 if nth_k == -supply or \
@@ -103,13 +100,12 @@ def find_mid_snake(a: str, b: str) -> tuple:
                     y += 1
                     if is_overlap and r_ab((x, y)) not in overlap_pool:
                         break
-                    common.append(reverse_a[x - 1])
                     snake.append((x, y))
 
                     if not is_overlap and is_even and r_ab((x, y)) in overlap_pool:
                         is_overlap = True
                 if is_overlap:
-                    yield [r_ab(point) for point in reversed(snake)], common
+                    yield [r_ab(point) for point in reversed(snake)]
                 max_x_nth_k[nth_k] = x
                 extend_l.extend(snake)
 
@@ -124,30 +120,52 @@ def find_mid_snake(a: str, b: str) -> tuple:
 
         result = next(forward_g)
         if result:
-            snake, common = result
-            return snake, common, sum(counter)
+            snake = result
+            return snake, sum(counter)
 
         result = next(reverse_g)
         if result:
-            snake, common = result
-            return snake, common, sum(counter)
+            snake = result
+            return snake, sum(counter)
 
 
 def diff(a: str, b: str, output_l: list):
     if len(a) > 0 and len(b) > 0:
-        snake, common, supply = find_mid_snake(a, b)
+        if len(a) <= 2 and len(b) <= 2:
+            if a == b:
+                output_l.extend(a)
+            else:
+                for char in a:
+                    if char in b:
+                        output_l.append(char)
+                        break
+            return
+
+        snake, supply = find_mid_snake(a, b)
         # snake: [(x, y), ..., (u, v)]
         x, y = snake[0]
         u, v = snake[-1]
 
         if supply > 1:
             diff(a[:x], b[:y], output_l)
-            output_l.extend(common)
-            diff(a[u:], b[v:], output_l)
+            output_l.extend(snake_to_str(snake, a))
+            if a[u - 1] == b[v - 1]:
+                del_zero = False
+            diff(a[max(u - 1, 0):], b[max(v - 1, 0):], output_l)
         elif len(b) > len(a):
             output_l.extend(list(a))
         else:
             output_l.extend(list(b))
+
+
+def snake_to_str(snake: list, a: str) -> str:
+    result = ''
+    for i in range(len(snake) - 1):
+        head = snake[i]
+        tail = snake[i + 1]
+        if tail == (head[0] + 1, head[1] + 1):
+            result += a[tail[0] - 1]
+    return result
 
 
 if __name__ == '__main__':
