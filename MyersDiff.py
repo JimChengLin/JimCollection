@@ -12,7 +12,7 @@ def find_mid_snake(a: str, b: str) -> tuple:
     # 当前supply
     counter = [0, 0]
 
-    # 正方向扩张
+    # 正向扩张
     def forward():
         max_x_nth_k = {1: 0}
         for supply in range(half_supply + 1):
@@ -59,7 +59,7 @@ def find_mid_snake(a: str, b: str) -> tuple:
             overlap_pool.update(extend_l)
             yield False
 
-    # 反方向扩张
+    # 反向扩张
     def reverse():
         # 输入reverse就相当于反方向扩张, 输出时再变换恢复
         reverse_a = a[::-1]
@@ -120,14 +120,12 @@ def find_mid_snake(a: str, b: str) -> tuple:
     for _ in range(half_supply + 1):
 
         result = next(forward_g)
-        if result:
-            snake = result
-            return snake, sum(counter)
+        if result is not False:
+            return result, sum(counter)
 
         result = next(reverse_g)
-        if result:
-            snake = result
-            return snake, sum(counter)
+        if result is not False:
+            return result, sum(counter)
 
 
 def diff(a: str, b: str, output_l: list):
