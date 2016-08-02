@@ -2,6 +2,7 @@ from math import ceil
 
 
 def find_mid_snake(a: str, b: str) -> tuple:
+    print(a,b)
     # 通过delta的奇偶性可以判断是在正方向扩张还是反方向扩张的时候overlap
     is_even = ((len(a) - len(b)) % 2 == 0)
     is_odd = not is_even
@@ -63,10 +64,10 @@ def find_mid_snake(a: str, b: str) -> tuple:
         reverse_b = b[::-1]
 
         def r_a(i: int) -> int:
-            return i + round((len(reverse_a) / 2 - i) * 2)
+            return i + round(((len(reverse_a) + 1) / 2 - i) * 2)
 
         def r_b(i: int) -> int:
-            return i + round((len(reverse_b) / 2 - i) * 2)
+            return i + round(((len(reverse_b) + 1) / 2 - i) * 2)
 
         def r_ab(point: tuple) -> tuple:
             a, b = point
@@ -137,9 +138,6 @@ def diff(a: str, b: str, output_l: list):
         if a[0] == b[0]:
             output_l.append(a[0])
             return diff(a[1:], b[1:], output_l)
-        if a[-1] == b[-1]:
-            output_l.append(a[-1])
-            return diff(a[:-1], b[:-1], output_l)
         # 小问题加速
         if len(a) <= 2 and len(b) <= 2:
             if a == b:
@@ -152,6 +150,7 @@ def diff(a: str, b: str, output_l: list):
             return
 
         snake, supply = find_mid_snake(a, b)
+        print(snake)
         # snake: [(x, y), ..., (u, v)]
         x, y = snake[0]
         u, v = snake[-1]
@@ -171,14 +170,51 @@ def diff(a: str, b: str, output_l: list):
 
 
 if __name__ == '__main__':
-    U = '企业名称:'
-    V = '企业名称: 有限售条件流通股; 出资额: 9233.1261; 百分比: 10.1014%; 法人性质: 企业法人企业名称:'
+    from random import randint, choice
+
+
+    def longest_common_string(string_a: str, string_b: str):
+        def get_longest_string_length(a_index: int, b_index: int):
+            if a_index == -1 or b_index == -1:
+                return 0
+            if string_a[a_index] == string_b[b_index]:
+                return get_longest_string_length(a_index - 1, b_index - 1) + 1
+            else:
+                longest_common_string_len_except_a = get_longest_string_length(a_index - 1, b_index)
+                longest_common_string_len_except_b = get_longest_string_length(a_index, b_index - 1)
+                if longest_common_string_len_except_a >= longest_common_string_len_except_b:
+                    return longest_common_string_len_except_a
+                else:
+                    return longest_common_string_len_except_b
+
+        return get_longest_string_length(len(string_a) - 1, len(string_b) - 1)
+
+
+    ALL_CHAR = 'QWERTYUIOP'
 
 
     def main():
+        for _ in range(100):
+            print('--------')
+            rand_a = ''.join(choice(ALL_CHAR) for _ in range(randint(3, 10)))
+            rand_b = ''.join(choice(ALL_CHAR) for _ in range(randint(3, 10)))
+            print('a:', rand_a)
+            print('b:', rand_b)
+
+            length = longest_common_string(rand_a, rand_b)
+            print('len:', length)
+            output_l = []
+            diff(rand_a, rand_b, output_l)
+            if len(output_l) != length:
+                return print('!', output_l)
+
+
+    def main_2():
+        a = 'TETPIEO'
+        b = 'YPT'
         output_l = []
-        diff(U, V, output_l)
+        diff(a, b, output_l)
         print(output_l)
 
 
-    main()
+    main_2()
