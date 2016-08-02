@@ -7,14 +7,14 @@ def find_mid_snake(a: str, b: str) -> tuple:
     is_odd = not is_even
     # 分治法
     half_supply = ceil((len(a) + len(b)) / 2)
-    # pool用于检测扩张时是否overlap
-    overlap_pool = set()
+    # 用于检测扩张时是否overlap
+    f_extend_s = set()
+    r_extend_s = set()
     # 当前supply
     counter = [0, 0]
 
     # 正向扩张
     def forward():
-        extend_l = []
         max_x_nth_k = {1: 0}
         for supply in range(half_supply + 1):
             counter[0] = supply
@@ -37,31 +37,28 @@ def find_mid_snake(a: str, b: str) -> tuple:
                 # snake中间点
                 snake.append((x, y))
 
-                if is_odd and (x, y) in overlap_pool:
+                if is_odd and (x, y) in r_extend_s:
                     is_overlap = True
                 while x < len(a) and y < len(b) and a[x] == b[y]:
                     x += 1
                     y += 1
-                    if is_overlap and (x, y) not in overlap_pool:
+                    if is_overlap and (x, y) not in r_extend_s:
                         break
                     # snake尾巴点
                     snake.append((x, y))
 
-                    if not is_overlap and is_odd and (x, y) in overlap_pool:
+                    if not is_overlap and is_odd and (x, y) in r_extend_s:
                         is_overlap = True
                 if is_overlap:
                     yield snake
                 max_x_nth_k[nth_k] = x
-                extend_l.extend(snake)
-
+                f_extend_s.update(snake)
             # 切换到反方向的generator
-            overlap_pool.clear()
-            overlap_pool.update(extend_l)
             yield False
 
     # 反向扩张
     def reverse():
-        # 输入reverse就相当于反方向扩张, 输出时再变换恢复
+        # reverse就相当于反向扩张, 输出时再变换恢复
         reverse_a = a[::-1]
         reverse_b = b[::-1]
 
@@ -75,7 +72,6 @@ def find_mid_snake(a: str, b: str) -> tuple:
             a, b = point
             return r_a(a), r_b(b)
 
-        extend_l = []
         max_x_nth_k = {1: 0}
         for supply in range(half_supply + 1):
             counter[1] = supply
@@ -94,24 +90,21 @@ def find_mid_snake(a: str, b: str) -> tuple:
                 y = x - nth_k
                 snake.append((x, y))
 
-                if is_even and r_ab((x, y)) in overlap_pool:
+                if is_even and r_ab((x, y)) in f_extend_s:
                     is_overlap = True
                 while x < len(reverse_a) and y < len(reverse_b) and reverse_a[x] == reverse_b[y]:
                     x += 1
                     y += 1
-                    if is_overlap and r_ab((x, y)) not in overlap_pool:
+                    if is_overlap and r_ab((x, y)) not in f_extend_s:
                         break
                     snake.append((x, y))
 
-                    if not is_overlap and is_even and r_ab((x, y)) in overlap_pool:
+                    if not is_overlap and is_even and r_ab((x, y)) in f_extend_s:
                         is_overlap = True
                 if is_overlap:
                     yield [r_ab(point) for point in reversed(snake)]
                 max_x_nth_k[nth_k] = x
-                extend_l.extend(snake)
-
-            overlap_pool.clear()
-            overlap_pool.update(r_ab(point) for point in extend_l)
+                f_extend_s.update(r_ab(point) for point in reversed(snake))
             yield False
 
     # 主体调用部分
@@ -128,18 +121,26 @@ def find_mid_snake(a: str, b: str) -> tuple:
             return snake, sum(counter)
 
 
-def diff(a: str, b: str, output_l: list):
-    def to_str(snake: list) -> str:
-        result = ''
-        for i in range(len(snake) - 1):
-            head = snake[i]
-            tail = snake[i + 1]
-            if tail == (head[0] + 1, head[1] + 1):
-                result += a[tail[0] - 1]
-        return result
+def snake_to_str(snake: list, source: str) -> str:
+    result = ''
+    for i in range(len(snake) - 1):
+        head = snake[i]
+        tail = snake[i + 1]
+        if tail == (head[0] + 1, head[1] + 1):
+            result += source[tail[0] - 1]
+    return result
 
+
+def diff(a: str, b: str, output_l: list):
     if len(a) > 0 and len(b) > 0:
-        # 小规模问题加速组件
+        # 头尾相同加速
+        if a[0] == b[0]:
+            output_l.append(a[0])
+            return diff(a[1:], b[1:], output_l)
+        if a[-1] == b[-1]:
+            output_l.append(a[-1])
+            return diff(a[:-1], b[:-1], output_l)
+        # 小问题加速
         if len(a) <= 2 and len(b) <= 2:
             if a == b:
                 output_l.extend(a)
@@ -156,7 +157,7 @@ def diff(a: str, b: str, output_l: list):
         u, v = snake[-1]
         if supply > 1:
             diff(a[:x], b[:y], output_l)
-            output_l.extend(to_str(snake))
+            output_l.extend(snake_to_str(snake, a))
 
             # 必须跳跃的两种情况
             if (u - 1 == 0 and v - 1 == 0) or (a[u - 1] == b[v - 1]):
