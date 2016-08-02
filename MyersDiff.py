@@ -7,14 +7,14 @@ def find_mid_snake(a: str, b: str) -> tuple:
     is_odd = not is_even
     # 分治法
     half_supply = ceil((len(a) + len(b)) / 2)
-    # pool用于检测扩张时是否overlap
-    overlap_pool = set()
+    # 用于检测扩张时是否overlap
+    f_extend_s = set()
+    r_extend_s = set()
     # 当前supply
     counter = [0, 0]
 
     # 正向扩张
     def forward():
-        extend_l = []
         max_x_nth_k = {1: 0}
         for supply in range(half_supply + 1):
             counter[0] = supply
@@ -37,45 +37,41 @@ def find_mid_snake(a: str, b: str) -> tuple:
                 # snake中间点
                 snake.append((x, y))
 
-                if is_odd and (x, y) in overlap_pool:
+                if is_odd and (x, y) in r_extend_s:
                     is_overlap = True
                 while x < len(a) and y < len(b) and a[x] == b[y]:
                     x += 1
                     y += 1
-                    if is_overlap and (x, y) not in overlap_pool:
+                    if is_overlap and (x, y) not in r_extend_s:
                         break
                     # snake尾巴点
                     snake.append((x, y))
 
-                    if not is_overlap and is_odd and (x, y) in overlap_pool:
+                    if not is_overlap and is_odd and (x, y) in r_extend_s:
                         is_overlap = True
                 if is_overlap:
                     yield snake
                 max_x_nth_k[nth_k] = x
-                extend_l.extend(snake)
-
+                f_extend_s.update(snake)
             # 切换到反方向的generator
-            overlap_pool.clear()
-            overlap_pool.update(extend_l)
             yield False
 
     # 反向扩张
     def reverse():
-        # 输入reverse就相当于反方向扩张, 输出时再变换恢复
+        # reverse就相当于反向扩张, 输出时再变换恢复
         reverse_a = a[::-1]
         reverse_b = b[::-1]
 
         def r_a(i: int) -> int:
-            return i + round((len(reverse_a) / 2 - i) * 2)
+            return i + round(((len(reverse_a) + 1) / 2 - i) * 2)
 
         def r_b(i: int) -> int:
-            return i + round((len(reverse_b) / 2 - i) * 2)
+            return i + round(((len(reverse_b) + 1) / 2 - i) * 2)
 
         def r_ab(point: tuple) -> tuple:
             a, b = point
             return r_a(a), r_b(b)
 
-        extend_l = []
         max_x_nth_k = {1: 0}
         for supply in range(half_supply + 1):
             counter[1] = supply
@@ -94,24 +90,21 @@ def find_mid_snake(a: str, b: str) -> tuple:
                 y = x - nth_k
                 snake.append((x, y))
 
-                if is_even and r_ab((x, y)) in overlap_pool:
+                if is_even and r_ab((x, y)) in f_extend_s:
                     is_overlap = True
                 while x < len(reverse_a) and y < len(reverse_b) and reverse_a[x] == reverse_b[y]:
                     x += 1
                     y += 1
-                    if is_overlap and r_ab((x, y)) not in overlap_pool:
+                    if is_overlap and r_ab((x, y)) not in f_extend_s:
                         break
                     snake.append((x, y))
 
-                    if not is_overlap and is_even and r_ab((x, y)) in overlap_pool:
+                    if not is_overlap and is_even and r_ab((x, y)) in f_extend_s:
                         is_overlap = True
                 if is_overlap:
-                    yield [r_ab(point) for point in reversed(snake)]
+                    yield [r_ab(point) for point in snake]
                 max_x_nth_k[nth_k] = x
-                extend_l.extend(snake)
-
-            overlap_pool.clear()
-            overlap_pool.update(r_ab(point) for point in extend_l)
+                r_extend_s.update(r_ab(point) for point in snake)
             yield False
 
     # 主体调用部分
@@ -136,6 +129,8 @@ def diff(a: str, b: str, output_l: list):
             tail = snake[i + 1]
             if tail == (head[0] + 1, head[1] + 1):
                 result += a[tail[0] - 1]
+            elif tail == (head[0] - 1, head[1] - 1):
+                result += a[head[0] - 1]
         return result
 
     if len(a) > 0 and len(b) > 0:
@@ -152,14 +147,15 @@ def diff(a: str, b: str, output_l: list):
 
         snake, supply = find_mid_snake(a, b)
         # snake: [(x, y), ..., (u, v)]
-        x, y = snake[0]
-        u, v = snake[-1]
+        sorted_snake = sorted(snake)
+        x, y = sorted_snake[0]
+        u, v = sorted_snake[-1]
         if supply > 1:
             diff(a[:x], b[:y], output_l)
             output_l.extend(to_str(snake))
 
             # 必须跳跃的两种情况
-            if (u - 1 == 0 and v - 1 == 0) or (a[u - 1] == b[v - 1]):
+            if (u - 1 == 0 and v - 1 == 0) or (u - 1 < len(a) and v - 1 < len(b) and a[u - 1] == b[v - 1]):
                 diff(a[u:], b[v:], output_l)
             else:
                 diff(a[max(u - 1, 0):], b[max(v - 1, 0):], output_l)
@@ -170,13 +166,53 @@ def diff(a: str, b: str, output_l: list):
 
 
 if __name__ == '__main__':
-    U = '企业名称:'
-    V = '企业名称: 有限售条件流通股; 出资额: 9233.1261; 百分比: 10.1014%; 法人性质: 企业法人企业名称:'
+    from random import randint, choice
+
+
+    def longest_common_string(string_a: str, string_b: str):
+        def get_longest_string_length(a_index: int, b_index: int):
+            if a_index == -1 or b_index == -1:
+                return 0
+            if string_a[a_index] == string_b[b_index]:
+                return get_longest_string_length(a_index - 1, b_index - 1) + 1
+            else:
+                longest_common_string_len_except_a = get_longest_string_length(a_index - 1, b_index)
+                longest_common_string_len_except_b = get_longest_string_length(a_index, b_index - 1)
+                if longest_common_string_len_except_a >= longest_common_string_len_except_b:
+                    return longest_common_string_len_except_a
+                else:
+                    return longest_common_string_len_except_b
+
+        return get_longest_string_length(len(string_a) - 1, len(string_b) - 1)
+
+
+    CHAR_L = 'QWERTYUIOP'
 
 
     def main():
+        for _ in range(100):
+            print('--------')
+            rand_a = ''.join(choice(CHAR_L) for _ in range(randint(3, 10)))
+            rand_b = ''.join(choice(CHAR_L) for _ in range(randint(3, 10)))
+            print('a:', rand_a)
+            print('b:', rand_b)
+
+            length = longest_common_string(rand_a, rand_b)
+            print('len:', length)
+            output_l = []
+            diff(rand_a, rand_b, output_l)
+            if len(output_l) != length:
+                return print('!', output_l)
+
+
+    def main_2():
+        a = 'IRRRE'
+        b = 'OTRPUWW'
+        length = longest_common_string(a, b)
+        print('len:', length)
+
         output_l = []
-        diff(U, V, output_l)
+        diff(a, b, output_l)
         print(output_l)
 
 
