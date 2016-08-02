@@ -15,9 +15,9 @@ def find_mid_snake(a: str, b: str) -> tuple:
     # 正向扩张
     def forward():
         max_x_nth_k = {1: 0}
+        extend_l = []
         for supply in range(half_supply + 1):
             counter[0] = supply
-            extend_l = []
 
             for nth_k in range(-supply, supply + 1, 2):
                 # snake: [..., point: (x, y)]
@@ -76,9 +76,9 @@ def find_mid_snake(a: str, b: str) -> tuple:
             return r_a(a), r_b(b)
 
         max_x_nth_k = {1: 0}
+        extend_l = []
         for supply in range(half_supply + 1):
             counter[1] = supply
-            extend_l = []
 
             for nth_k in range(-supply, supply + 1, 2):
                 snake = []
@@ -150,10 +150,7 @@ def diff(a: str, b: str, output_l: list):
                         break
             return
 
-        result = find_mid_snake(a, b)
-        if not result:
-            return
-        snake, supply = result
+        snake, supply = find_mid_snake(a, b)
         # snake: [(x, y), ..., (u, v)]
         x, y = snake[0]
         u, v = snake[-1]
