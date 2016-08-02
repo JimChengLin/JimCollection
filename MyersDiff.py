@@ -30,7 +30,7 @@ def find_mid_snake(a: str, b: str) -> tuple:
                     # snake起始点, x不变, y-1
                     snake.append((x, x - (nth_k + 1)))
                 else:
-                    # y不变, x+1
+                    # y不变, x-1
                     snake.append((max_x_nth_k[nth_k - 1], max_x_nth_k[nth_k - 1] - (nth_k - 1)))
                     x = max_x_nth_k[nth_k - 1] + 1
                 y = x - nth_k
@@ -119,13 +119,13 @@ def find_mid_snake(a: str, b: str) -> tuple:
     reverse_g = reverse()
     for _ in range(half_supply + 1):
 
-        result = next(forward_g)
-        if result is not False:
-            return result, sum(counter)
+        snake = next(forward_g)
+        if snake is not False:
+            return snake, sum(counter)
 
-        result = next(reverse_g)
-        if result is not False:
-            return result, sum(counter)
+        snake = next(reverse_g)
+        if snake is not False:
+            return snake, sum(counter)
 
 
 def diff(a: str, b: str, output_l: list):
