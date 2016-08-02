@@ -141,7 +141,7 @@ def diff(a: str, b: str, output_l: list):
         return result
 
     if len(a) > 0 and len(b) > 0:
-        # 直接处理小规模问题
+        # 小规模问题加速组件
         if len(a) <= 2 and len(b) <= 2:
             if a == b:
                 output_l.extend(a)
@@ -181,7 +181,7 @@ if __name__ == '__main__':
 
     def main():
         output_l = []
-        diff(V, U, output_l)
+        diff(X, Y, output_l)
         print(output_l)
 
 
