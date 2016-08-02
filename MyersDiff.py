@@ -127,13 +127,13 @@ def diff(a: str, b: str, output_l: list):
         for i in range(len(snake) - 1):
             head = snake[i]
             tail = snake[i + 1]
-            if tail == (head[0] + 1, head[1] + 1):
+            if tail == (head[0] + 1, head[1] + 1) or tail == (head[0] - 1, head[1] - 1):
                 result += a[tail[0] - 1]
-            elif tail == (head[0] - 1, head[1] - 1):
-                result += a[head[0] - 1]
         return result
 
     if len(a) > 0 and len(b) > 0:
+        print(a, b)
+        print(output_l)
         # 小规模问题加速组件
         if len(a) <= 2 and len(b) <= 2:
             if a == b:
@@ -146,6 +146,7 @@ def diff(a: str, b: str, output_l: list):
             return
 
         snake, supply = find_mid_snake(a, b)
+        print(snake)
         # snake: [(x, y), ..., (u, v)]
         sorted_snake = sorted(snake)
         x, y = sorted_snake[0]
@@ -192,8 +193,8 @@ if __name__ == '__main__':
     def main():
         for _ in range(100):
             print('--------')
-            rand_a = ''.join(choice(CHAR_L) for _ in range(randint(3, 10)))
-            rand_b = ''.join(choice(CHAR_L) for _ in range(randint(3, 10)))
+            rand_a = ''.join(choice(CHAR_L) for _ in range(randint(3, 5)))
+            rand_b = ''.join(choice(CHAR_L) for _ in range(randint(3, 5)))
             print('a:', rand_a)
             print('b:', rand_b)
 
@@ -206,8 +207,8 @@ if __name__ == '__main__':
 
 
     def main_2():
-        a = 'IRRRE'
-        b = 'OTRPUWW'
+        a = 'QTTOIRIYW'
+        b = 'QWTPPTUR'
         length = longest_common_string(a, b)
         print('len:', length)
 
@@ -216,4 +217,4 @@ if __name__ == '__main__':
         print(output_l)
 
 
-    main()
+    main_2()
