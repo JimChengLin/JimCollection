@@ -150,7 +150,10 @@ def diff(a: str, b: str, output_l: list):
                         break
             return
 
-        snake, supply = find_mid_snake(a, b)
+        result = find_mid_snake(a, b)
+        if not result:
+            return
+        snake, supply = result
         # snake: [(x, y), ..., (u, v)]
         x, y = snake[0]
         u, v = snake[-1]
