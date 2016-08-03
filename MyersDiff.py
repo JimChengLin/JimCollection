@@ -1,7 +1,7 @@
 from math import ceil
 
 
-def find_mid_snake(a: str, b: str) -> tuple:
+def find_mid_snake(a: str, b: str) -> list:
     # 通过delta的奇偶性可以判断是在正方向扩张还是反方向扩张的时候overlap
     is_even = ((len(a) - len(b)) % 2 == 0)
     is_odd = not is_even
@@ -63,10 +63,10 @@ def find_mid_snake(a: str, b: str) -> tuple:
         reverse_b = b[::-1]
 
         def r_a(i: int) -> int:
-            return i + round((len(reverse_a) / 2 - i) * 2)
+            return i + round(((len(reverse_a) - 1) / 2 - i) * 2)
 
         def r_b(i: int) -> int:
-            return i + round((len(reverse_b) / 2 - i) * 2)
+            return i + round(((len(reverse_b) - 1) / 2 - i) * 2)
 
         def r_ab(point: tuple) -> tuple:
             a, b = point
@@ -120,21 +120,9 @@ def find_mid_snake(a: str, b: str) -> tuple:
         if snake is not False:
             return snake, sum(counter)
 
-
+###
 def diff(a: str, b: str, output_l: list):
-    def to_str(snake: list) -> str:
-        result = ''
-        for i in range(len(snake) - 1):
-            head = snake[i]
-            tail = snake[i + 1]
-            if tail == (head[0] + 1, head[1] + 1) or tail == (head[0] - 1, head[1] - 1):
-                result += a[tail[0] - 1]
-        return result
-
     if len(a) > 0 and len(b) > 0:
-        print(a, b)
-        print(output_l)
-
         # 小规模问题加速组件
         if len(a) <= 2 and len(b) <= 2:
             if a == b:
@@ -149,11 +137,13 @@ def diff(a: str, b: str, output_l: list):
         snake, supply = find_mid_snake(a, b)
         print(snake)
         # snake: [(x, y), ..., (u, v)]
-        x, y = snake[0]
-        u, v = snake[-1]
+        sorted_snake = sorted(snake)
+        x, y = sorted_snake[0]
+        u, v = sorted_snake[-1]
+
         if supply > 1:
             diff(a[:x], b[:y], output_l)
-            output_l.extend(to_str(snake))
+            output_l.extend(snake)
 
             # 必须跳跃的两种情况
             if (u - 1 == 0 and v - 1 == 0) or (u - 1 < len(a) and v - 1 < len(b) and a[u - 1] == b[v - 1]):
@@ -208,14 +198,16 @@ if __name__ == '__main__':
 
 
     def main_2():
-        a = 'QTTOIRIYW'
-        b = 'QWTPPTUR'
-        length = longest_common_string(a, b)
-        print('len:', length)
+        a = 'IRIYW'
+        b = 'UR'
+        # length = longest_common_string(a, b)
+        # print('len:', length)
+        #
+        # output_l = []
+        # diff(a, b, output_l)
+        # print(output_l)
+        snake, supply = find_mid_snake(a, b)
+        print(snake, supply)
 
-        output_l = []
-        diff(a, b, output_l)
-        print(output_l)
 
-
-    main()
+    main_2()
