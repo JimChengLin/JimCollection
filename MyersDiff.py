@@ -7,7 +7,7 @@ def find_mid_snake(a: str, b: str) -> tuple:
     is_odd = not is_even
     # 分治法
     half_supply = ceil((len(a) + len(b)) / 2)
-    # 用于检测扩张时是否overlap
+    # set用于检测扩张时是否overlap
     f_extend_s = set()
     r_extend_s = set()
     # 当前supply
@@ -27,10 +27,10 @@ def find_mid_snake(a: str, b: str) -> tuple:
                 if nth_k == -supply or \
                         (nth_k != supply and max_x_nth_k[nth_k - 1] < max_x_nth_k[nth_k + 1]):
                     x = max_x_nth_k[nth_k + 1]
-                    # snake起始点, x不变, y-1
+                    # snake起始点, x不变, y少1
                     snake.append((x, x - (nth_k + 1)))
                 else:
-                    # y不变, x-1
+                    # y不变, x少1
                     snake.append((max_x_nth_k[nth_k - 1], max_x_nth_k[nth_k - 1] - (nth_k - 1)))
                     x = max_x_nth_k[nth_k - 1] + 1
                 y = x - nth_k
@@ -63,10 +63,10 @@ def find_mid_snake(a: str, b: str) -> tuple:
         reverse_b = b[::-1]
 
         def r_a(i: int) -> int:
-            return i + round(((len(reverse_a) + 1) / 2 - i) * 2)
+            return i + round((len(reverse_a) / 2 - i) * 2)
 
         def r_b(i: int) -> int:
-            return i + round(((len(reverse_b) + 1) / 2 - i) * 2)
+            return i + round((len(reverse_b) / 2 - i) * 2)
 
         def r_ab(point: tuple) -> tuple:
             a, b = point
@@ -134,6 +134,7 @@ def diff(a: str, b: str, output_l: list):
     if len(a) > 0 and len(b) > 0:
         print(a, b)
         print(output_l)
+
         # 小规模问题加速组件
         if len(a) <= 2 and len(b) <= 2:
             if a == b:
@@ -148,9 +149,8 @@ def diff(a: str, b: str, output_l: list):
         snake, supply = find_mid_snake(a, b)
         print(snake)
         # snake: [(x, y), ..., (u, v)]
-        sorted_snake = sorted(snake)
-        x, y = sorted_snake[0]
-        u, v = sorted_snake[-1]
+        x, y = snake[0]
+        u, v = snake[-1]
         if supply > 1:
             diff(a[:x], b[:y], output_l)
             output_l.extend(to_str(snake))
@@ -200,6 +200,7 @@ if __name__ == '__main__':
 
             length = longest_common_string(rand_a, rand_b)
             print('len:', length)
+
             output_l = []
             diff(rand_a, rand_b, output_l)
             if len(output_l) != length:
@@ -217,4 +218,4 @@ if __name__ == '__main__':
         print(output_l)
 
 
-    main_2()
+    main()
