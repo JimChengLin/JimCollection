@@ -3,7 +3,7 @@ from math import ceil
 
 def find_mid_snake(a: str, b: str) -> list:
     # 通过delta的奇偶性可以判断是在正方向扩张还是反方向扩张的时候overlap
-    is_even = ((len(a) - len(b)) % 2 == 0)
+    is_even = (len(a) - len(b)) % 2 == 0
     is_odd = not is_even
     # 分治法
     half_supply = ceil((len(a) + len(b)) / 2)
@@ -120,41 +120,6 @@ def find_mid_snake(a: str, b: str) -> list:
         if snake is not False:
             return snake, sum(counter)
 
-###
-def diff(a: str, b: str, output_l: list):
-    if len(a) > 0 and len(b) > 0:
-        # 小规模问题加速组件
-        if len(a) <= 2 and len(b) <= 2:
-            if a == b:
-                output_l.extend(a)
-            else:
-                for char in a:
-                    if char in b:
-                        output_l.append(char)
-                        break
-            return
-
-        snake, supply = find_mid_snake(a, b)
-        print(snake)
-        # snake: [(x, y), ..., (u, v)]
-        sorted_snake = sorted(snake)
-        x, y = sorted_snake[0]
-        u, v = sorted_snake[-1]
-
-        if supply > 1:
-            diff(a[:x], b[:y], output_l)
-            output_l.extend(snake)
-
-            # 必须跳跃的两种情况
-            if (u - 1 == 0 and v - 1 == 0) or (u - 1 < len(a) and v - 1 < len(b) and a[u - 1] == b[v - 1]):
-                diff(a[u:], b[v:], output_l)
-            else:
-                diff(a[max(u - 1, 0):], b[max(v - 1, 0):], output_l)
-        elif len(b) > len(a):
-            output_l.extend(list(a))
-        else:
-            output_l.extend(list(b))
-
 
 if __name__ == '__main__':
     from random import randint, choice
@@ -177,37 +142,26 @@ if __name__ == '__main__':
         return get_longest_string_length(len(string_a) - 1, len(string_b) - 1)
 
 
-    CHAR_L = 'QWERTYUIOP'
+    ALL_CHAR = 'QWERTY'
 
 
     def main():
-        for _ in range(100):
+        for _ in range(3):
             print('--------')
-            rand_a = ''.join(choice(CHAR_L) for _ in range(randint(3, 5)))
-            rand_b = ''.join(choice(CHAR_L) for _ in range(randint(3, 5)))
+            rand_a = ''.join(choice(ALL_CHAR) for _ in range(randint(3, 6)))
+            rand_b = ''.join(choice(ALL_CHAR) for _ in range(randint(3, 6)))
             print('a:', rand_a)
             print('b:', rand_b)
 
             length = longest_common_string(rand_a, rand_b)
             print('len:', length)
 
-            output_l = []
-            diff(rand_a, rand_b, output_l)
-            if len(output_l) != length:
-                return print('!', output_l)
-
 
     def main_2():
         a = 'IRIYW'
         b = 'UR'
-        # length = longest_common_string(a, b)
-        # print('len:', length)
-        #
-        # output_l = []
-        # diff(a, b, output_l)
-        # print(output_l)
         snake, supply = find_mid_snake(a, b)
         print(snake, supply)
 
 
-    main_2()
+    main()
