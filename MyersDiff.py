@@ -171,8 +171,8 @@ if __name__ == '__main__':
 
 
     def main_2():
-        a = 'RR'
-        b = 'RR'
+        a = 'WER'
+        b = 'TEY'
         snake, supply = find_mid_snake(a, b)
         print(snake, supply)
 
