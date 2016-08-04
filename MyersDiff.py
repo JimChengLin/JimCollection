@@ -109,7 +109,7 @@ def find_mid_snake(a: str, b: str) -> list:
                             snake.append((x, y))
                             x += 1
                             y += 1
-                    yield [r_ab(point) for point in snake]
+                    yield sorted(r_ab(point) for point in snake)
                 max_x_nth_k[nth_k] = x
                 r_extend_s.update(r_ab(point) for point in snake)
             yield False
@@ -126,6 +126,36 @@ def find_mid_snake(a: str, b: str) -> list:
         snake = next(reverse_g)
         if snake is not False:
             return snake
+
+
+def diff_path(a: str, b: str, output_l: list, offset_x=0, offset_y=0):
+    len_a = len(a)
+    len_b = len(b)
+
+    def apply_offset(snake: list) -> list:
+        for i in range(len(snake)):
+            x, y = snake[i]
+            snake[i] = (x + offset_x, y + offset_y)
+        return snake
+
+    if len_a == len_b == 1:
+        return
+    if len_a == 1:
+        return output_l.extend(apply_offset([(0, i) for i in range(len(b))]))
+    if len_b == 1:
+        return output_l.extend(apply_offset([(i, 0) for i in range(len(a))]))
+
+    def can_fetch(point) -> bool:
+        x, y = point
+        return x < len(a) and y < len(b)
+
+    snake = list(filter(can_fetch, find_mid_snake(a, b)))
+    head_x, head_y = snake[0]
+    tail_x, tail_y = snake[-1]
+
+    diff_path(a[:head_x + 1], b[:head_y + 1], output_l, offset_x, offset_y)
+    output_l.extend(apply_offset(snake))
+    diff_path(a[tail_x:], b[tail_y:], output_l, offset_x + tail_x, offset_y + tail_y)
 
 
 if __name__ == '__main__':
@@ -165,12 +195,20 @@ if __name__ == '__main__':
 
 
     def main_2():
-        # WERQ
-        # TE
-        a = 'WW'
-        b = 'WW'
+        # EQTRR
+        # WWTQRWW
+        a = 'RR'
+        b = 'RWW'
         snake = find_mid_snake(a, b)
         print(snake)
+
+
+    def main_3():
+        a = 'EQTRR'
+        b = 'WWTQRWW'
+        output_l = []
+        diff_path(a, b, output_l)
+        print(output_l)
 
 
     main_2()
