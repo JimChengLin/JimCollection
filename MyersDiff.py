@@ -10,15 +10,11 @@ def find_mid_snake(a: str, b: str) -> list:
     # set用于检测扩张时是否overlap
     f_extend_s = set()
     r_extend_s = set()
-    # 当前supply
-    counter = [0, 0]
 
     # 正向扩张
     def forward():
         max_x_nth_k = {1: 0}
         for supply in range(half_supply + 1):
-            counter[0] = supply
-
             for nth_k in range(-supply, supply + 1, 2):
                 # snake: [..., point: (x, y)]
                 snake = []
@@ -81,8 +77,6 @@ def find_mid_snake(a: str, b: str) -> list:
 
         max_x_nth_k = {1: 0}
         for supply in range(half_supply + 1):
-            counter[1] = supply
-
             for nth_k in range(-supply, supply + 1, 2):
                 snake = []
                 is_overlap = False
@@ -128,10 +122,10 @@ def find_mid_snake(a: str, b: str) -> list:
 
         snake = next(forward_g)
         if snake is not False:
-            return snake, sum(counter)
+            return snake
         snake = next(reverse_g)
         if snake is not False:
-            return snake, sum(counter)
+            return snake
 
 
 if __name__ == '__main__':
@@ -175,8 +169,8 @@ if __name__ == '__main__':
         # TE
         a = 'WW'
         b = 'WW'
-        snake, supply = find_mid_snake(a, b)
-        print(snake, supply)
+        snake = find_mid_snake(a, b)
+        print(snake)
 
 
     main_2()
