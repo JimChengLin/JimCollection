@@ -39,7 +39,7 @@ def find_mid_snake(a: str, b: str) -> list:
 
                 if is_odd and (x, y) in r_extend_s:
                     is_overlap = True
-                while x < len(a) - 1 and y < len(b) - 1 and a[x] == b[y]:
+                while x < len(a) - 1 and y < len(b) - 1 and a[x + 1] == b[y + 1]:
                     x += 1
                     y += 1
                     if is_overlap and (x, y) not in r_extend_s:
@@ -99,7 +99,7 @@ def find_mid_snake(a: str, b: str) -> list:
 
                 if is_even and r_ab((x, y)) in f_extend_s:
                     is_overlap = True
-                while x < len(reverse_a) - 1 and y < len(reverse_b) - 1 and reverse_a[x] == reverse_b[y]:
+                while x < len(reverse_a) - 1 and y < len(reverse_b) - 1 and reverse_a[x + 1] == reverse_b[y + 1]:
                     x += 1
                     y += 1
                     if is_overlap and r_ab((x, y)) not in f_extend_s:
@@ -171,10 +171,10 @@ if __name__ == '__main__':
 
 
     def main_2():
-        # WERQQTQ
-        # TEYWW
-        a = 'WER'
-        b = 'TEY'
+        # WERQ
+        # TE
+        a = 'WW'
+        b = 'WW'
         snake, supply = find_mid_snake(a, b)
         print(snake, supply)
 
