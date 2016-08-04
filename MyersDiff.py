@@ -3,7 +3,7 @@ from math import ceil
 
 def find_mid_snake(a: str, b: str) -> list:
     # 通过delta的奇偶性可以判断是在正方向扩张还是反方向扩张的时候overlap
-    is_even = (len(a) - len(b)) % 2 == 0
+    is_even = ((len(a) - len(b)) % 2 == 0)
     is_odd = not is_even
     # 分治法
     half_supply = ceil((len(a) + len(b)) / 2)
@@ -27,10 +27,10 @@ def find_mid_snake(a: str, b: str) -> list:
                 if nth_k == -supply or \
                         (nth_k != supply and max_x_nth_k[nth_k - 1] < max_x_nth_k[nth_k + 1]):
                     x = max_x_nth_k[nth_k + 1]
-                    # snake起始点, x不变, y少1
+                    # snake起始点, x相同, y少1
                     snake.append((x, x - (nth_k + 1)))
                 else:
-                    # y不变, x少1
+                    # y相同, x少1
                     snake.append((max_x_nth_k[nth_k - 1], max_x_nth_k[nth_k - 1] - (nth_k - 1)))
                     x = max_x_nth_k[nth_k - 1] + 1
                 y = x - nth_k
@@ -39,7 +39,7 @@ def find_mid_snake(a: str, b: str) -> list:
 
                 if is_odd and (x, y) in r_extend_s:
                     is_overlap = True
-                while x < len(a) and y < len(b) and a[x] == b[y]:
+                while x < len(a) - 1 and y < len(b) - 1 and a[x] == b[y]:
                     x += 1
                     y += 1
                     if is_overlap and (x, y) not in r_extend_s:
@@ -50,11 +50,18 @@ def find_mid_snake(a: str, b: str) -> list:
                     if not is_overlap and is_odd and (x, y) in r_extend_s:
                         is_overlap = True
                 if is_overlap:
+                    if snake[-1] == (0, 0):
+                        x = y = 1
+                        while (x, y) in r_extend_s:
+                            snake.append((x, y))
+                            x += 1
+                            y += 1
                     yield snake
                 max_x_nth_k[nth_k] = x
                 f_extend_s.update(snake)
             # 切换到反方向的generator
             yield False
+            f_extend_s.clear()
 
     # 反向扩张
     def reverse():
@@ -92,7 +99,7 @@ def find_mid_snake(a: str, b: str) -> list:
 
                 if is_even and r_ab((x, y)) in f_extend_s:
                     is_overlap = True
-                while x < len(reverse_a) and y < len(reverse_b) and reverse_a[x] == reverse_b[y]:
+                while x < len(reverse_a) - 1 and y < len(reverse_b) - 1 and reverse_a[x] == reverse_b[y]:
                     x += 1
                     y += 1
                     if is_overlap and r_ab((x, y)) not in f_extend_s:
@@ -102,10 +109,17 @@ def find_mid_snake(a: str, b: str) -> list:
                     if not is_overlap and is_even and r_ab((x, y)) in f_extend_s:
                         is_overlap = True
                 if is_overlap:
+                    if snake[-1] == (0, 0):
+                        x = y = 1
+                        while r_ab((x, y)) in f_extend_s:
+                            snake.append((x, y))
+                            x += 1
+                            y += 1
                     yield [r_ab(point) for point in snake]
                 max_x_nth_k[nth_k] = x
                 r_extend_s.update(r_ab(point) for point in snake)
             yield False
+            r_extend_s.clear()
 
     # 主体调用部分
     forward_g = forward()
@@ -115,7 +129,6 @@ def find_mid_snake(a: str, b: str) -> list:
         snake = next(forward_g)
         if snake is not False:
             return snake, sum(counter)
-
         snake = next(reverse_g)
         if snake is not False:
             return snake, sum(counter)
@@ -146,10 +159,10 @@ if __name__ == '__main__':
 
 
     def main():
-        for _ in range(3):
+        for _ in range(5):
             print('--------')
-            rand_a = ''.join(choice(ALL_CHAR) for _ in range(randint(3, 6)))
-            rand_b = ''.join(choice(ALL_CHAR) for _ in range(randint(3, 6)))
+            rand_a = ''.join(choice(ALL_CHAR) for _ in range(randint(3, 7)))
+            rand_b = ''.join(choice(ALL_CHAR) for _ in range(randint(3, 7)))
             print('a:', rand_a)
             print('b:', rand_b)
 
@@ -158,10 +171,10 @@ if __name__ == '__main__':
 
 
     def main_2():
-        a = 'IRIYW'
-        b = 'UR'
+        a = 'RR'
+        b = 'RR'
         snake, supply = find_mid_snake(a, b)
         print(snake, supply)
 
 
-    main()
+    main_2()
