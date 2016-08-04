@@ -158,6 +158,17 @@ def diff_path(a: str, b: str, output_l: list, offset_x=0, offset_y=0):
     diff_path(a[tail_x:], b[tail_y:], output_l, offset_x + tail_x, offset_y + tail_y)
 
 
+def parse_path(a: str, b: str, path: list) -> str:
+    result = ''
+    prev_x = prev_y = -1
+    for point in path:
+        x, y = point
+        if x != prev_x and y != prev_y and a[x] == b[y]:
+            result += a[x]
+            prev_x, prev_y = x, y
+    return result
+
+
 if __name__ == '__main__':
     from random import randint, choice
 
@@ -208,7 +219,7 @@ if __name__ == '__main__':
         b = 'WWTQRWW'
         output_l = []
         diff_path(a, b, output_l)
-        print(output_l)
+        print(parse_path(a, b, output_l))
 
 
-    main_2()
+    main_3()
