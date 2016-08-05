@@ -203,23 +203,28 @@ if __name__ == '__main__':
 
             length = longest_common_string(rand_a, rand_b)
             print('len:', length)
+            output_l = []
+            diff_path(rand_a, rand_b, output_l)
+            result = parse_path(rand_a, rand_b, output_l)
+            print(result, len(result))
+            if len(result) != length:
+                print('!')
+                break
 
 
     def main_2():
-        # EQTRR
-        # WWTQRWW
-        a = 'RR'
-        b = 'RWW'
+        a = 'EREQ'
+        b = 'YWEEWW'
         snake = find_mid_snake(a, b)
         print(snake)
 
 
     def main_3():
-        a = 'EQTRR'
-        b = 'WWTQRWW'
+        a = 'EREQ'
+        b = 'YWEEWW'
         output_l = []
         diff_path(a, b, output_l)
         print(parse_path(a, b, output_l))
 
 
-    main_3()
+    main_2()
