@@ -35,7 +35,7 @@ def find_mid_snake(a: str, b: str) -> list:
 
                 if is_odd and (x, y) in r_extend_s:
                     is_overlap = True
-                while x < len(a) - 1 and y < len(b) - 1 and a[x + 1] == b[y + 1]:
+                while x < len(a) - 1 and y < len(b) - 1 and a[x] == b[y]:
                     x += 1
                     y += 1
                     if is_overlap and (x, y) not in r_extend_s:
@@ -202,29 +202,34 @@ if __name__ == '__main__':
             print('b:', rand_b)
 
             length = longest_common_string(rand_a, rand_b)
-            print('len:', length)
+            print('expected len:', length)
+
             output_l = []
             diff_path(rand_a, rand_b, output_l)
+            print('path:', output_l)
             result = parse_path(rand_a, rand_b, output_l)
             print(result, len(result))
+
             if len(result) != length:
-                print('!')
-                break
+                return print('!')
 
 
     def main_2():
-        a = 'EREQ'
-        b = 'YWEEWW'
+        a = 'RTQTEY'
+        b = 'QETWWYE'
+
         snake = find_mid_snake(a, b)
         print(snake)
 
 
     def main_3():
-        a = 'EREQ'
-        b = 'YWEEWW'
+        a = 'RTQTEY'
+        b = 'QETWWYE'
+
         output_l = []
         diff_path(a, b, output_l)
+        print('path:', output_l)
         print(parse_path(a, b, output_l))
 
 
-    main_2()
+    main_3()
