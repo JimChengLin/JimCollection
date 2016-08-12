@@ -20,7 +20,7 @@ function register() {
         var isTab = (event.code === 'Tab');
         var isCommand = Page.isCommand(event);
 
-        if (isTab && !shouldTab()) {
+        if (isTab && !doTab()) {
             event.preventDefault();
             event.stopImmediatePropagation();
             isCommand ? Page.escape() : document.activeElement.blur();
@@ -28,7 +28,7 @@ function register() {
             event.stopImmediatePropagation();
         }
 
-        function shouldTab() {
+        function doTab() {
             return document.activeElement.tagName === 'INPUT' &&
                 (!document.activeElement.type || document.activeElement.type === 'text') &&
                 $(document.activeElement).closest('form').find('input[type="password"]').length;
