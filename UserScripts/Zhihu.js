@@ -73,7 +73,7 @@ function zhihu() {
                     $('.feed-item > link').map((i, elem) => {
                         elem = $(elem);
                         if (DayDiff.search(elem.attr('href')) >= 0.7) {
-                            elem.closest('.feed-item').fadeOut(700);
+                            elem.closest('.feed-item').fadeOut();
                         }
                     });
                     $('.goog-scrollfloater-floating').remove();
