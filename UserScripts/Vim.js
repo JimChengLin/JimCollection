@@ -16,9 +16,11 @@ $(window)
 
 window ? register() : setTimeout(register, 100);
 function register() {
-    setTimeout(() => {
-        document.activeElement && document.activeElement.blur && document.activeElement.blur();
-    }, 1100);
+    $(function () {
+        setTimeout(function () {
+            document.activeElement && document.activeElement.blur && document.activeElement.blur();
+        }, 1);
+    });
 
     addEventListener('keydown', (event) => {
         var isTab = (event.code === 'Tab');
