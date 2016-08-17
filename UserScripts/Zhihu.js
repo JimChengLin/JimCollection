@@ -72,7 +72,7 @@ function zhihu() {
                 if (change) {
                     $('.feed-item > link').map((i, elem) => {
                         elem = $(elem);
-                        if (DayDiff.search(elem.attr('href')) >= 0.7) {
+                        if (DayDiff.search(elem.attr('href')) > 0.6) {
                             elem.closest('.feed-item').fadeOut();
                         }
                     });
