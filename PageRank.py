@@ -5,8 +5,7 @@ import numpy as np
 class Vertex:
     all = []
 
-    def __init__(self, val: int, identifier: str = None):
-        self.val = val
+    def __init__(self, identifier: str = None):
         self.connect_to_l = []
         # 分配一个序号
         self.num = len(Vertex.all)
@@ -28,14 +27,13 @@ class Vertex:
 
 
 def page_rank():
-    input_matrix = [v.to_l() for v in Vertex.all]
-    matrix = np.array(input_matrix)
-    matrix = matrix.transpose()
-
-    vector = np.array([(v.val / len(Vertex.all),) for v in Vertex.all])
-    print(matrix)
-    print(vector)
-    print(matrix @ vector)
+    d = np.array([v.to_l() for v in Vertex.all])
+    d = d.transpose()
+    average = (1 / len(Vertex.all),)
+    v = np.array([average for _ in range(len(Vertex.all))])
+    print(d)
+    print(v)
+    print(d @ v)
 
 
 def clear():
@@ -44,10 +42,10 @@ def clear():
 
 if __name__ == '__main__':
     def main():
-        v_1 = Vertex(1)
-        v_2 = Vertex(1)
-        v_3 = Vertex(1)
-        v_4 = Vertex(1)
+        v_1 = Vertex()
+        v_2 = Vertex()
+        v_3 = Vertex()
+        v_4 = Vertex()
 
         v_1.connect_to(v_2, v_3, v_4)
         v_2.connect_to(v_3, v_4)

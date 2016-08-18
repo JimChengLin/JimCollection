@@ -16,6 +16,17 @@ $(window)
 
 window ? register() : setTimeout(register, 100);
 function register() {
+    $(() => {
+        setTimeout(() => {
+            var elem = document.activeElement;
+            if (elem && elem.blur) {
+                elem._focus = elem.focus;
+                elem.focus = $.noop;
+                elem.blur();
+            }
+        }, 1);
+    });
+
     addEventListener('keydown', (event) => {
         var isTab = (event.code === 'Tab');
         var isCommand = Page.isCommand(event);
@@ -347,7 +358,7 @@ var Page = {
         if ((element.tagName === 'INPUT' &&
             element.type.search(/(button|checkbox|file|hidden|image|radio|reset|submit)/i) === -1) ||
             element.hasAttribute('contenteditable') || element.tagName === 'TEXTAREA') {
-            element.focus();
+            element._focus ? element._focus() : element.focus();
         }
 
         else if (element.tagName === 'A' || element.tagName === 'INPUT') {
