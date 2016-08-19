@@ -9,7 +9,7 @@ function main() {
     var update;
     var setting;
     var isEngine;
-    if (isEngine = (href.includes('google') && href.includes('search?'))) {
+    if (isEngine = (href.includes('google') && href.includes('q='))) {
         setting = {childList: true, subtree: true};
         update = function () {
             var rc = $('.srg > .g > .rc');

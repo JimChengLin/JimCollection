@@ -14,19 +14,19 @@ $(window)
     .on('click resize scroll', () => Page.escape())
     .on('click', (event) => Page.target = event.target);
 
+$(() => {
+    setTimeout(() => {
+        var elem = document.activeElement;
+        if (elem && elem.blur) {
+            elem._focus = elem.focus;
+            elem.focus = $.noop;
+            elem.blur();
+        }
+    }, 100);
+});
+
 window ? register() : setTimeout(register, 100);
 function register() {
-    $(() => {
-        setTimeout(() => {
-            var elem = document.activeElement;
-            if (elem && elem.blur) {
-                elem._focus = elem.focus;
-                elem.focus = $.noop;
-                elem.blur();
-            }
-        }, 1);
-    });
-
     addEventListener('keydown', (event) => {
         var isTab = (event.code === 'Tab');
         var isCommand = Page.isCommand(event);
