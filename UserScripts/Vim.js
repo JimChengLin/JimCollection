@@ -359,6 +359,8 @@ var Page = {
             element.type.search(/(button|checkbox|file|hidden|image|radio|reset|submit)/i) === -1) ||
             element.hasAttribute('contenteditable') || element.tagName === 'TEXTAREA') {
             element._focus ? element._focus() : element.focus();
+            var len = element.value.length;
+            element.setSelectionRange(len, len);
         }
 
         else if (element.tagName === 'A' || element.tagName === 'INPUT') {
