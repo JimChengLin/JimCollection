@@ -14,14 +14,16 @@ $(window)
     .on('click resize scroll', () => Page.escape())
     .on('click', (event) => Page.target = event.target);
 
+var timeout;
 $(() => {
-    setTimeout(() => {
+    timeout = setTimeout(() => {
         var elem = document.activeElement;
         if (elem && elem.blur) {
             elem._focus = elem.focus;
             elem.focus = $.noop;
             elem.blur();
         }
+        timeout = null;
     }, 100);
 });
 
@@ -60,7 +62,7 @@ function register() {
             var char = String.fromCharCode(event.keyCode).toUpperCase();
             switch (char) {
                 case 'F':
-                    $('._hint').length ? Page.match(char) : Page.linkHint();
+                    $('._hint').length ? clearTimeout(timeout) || Page.match(char) : Page.linkHint();
                     break;
 
                 case 'J':
