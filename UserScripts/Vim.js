@@ -14,20 +14,15 @@ $(window)
     .on('click resize scroll', () => Page.escape())
     .on('click', (event) => Page.target = event.target);
 
-var timeout;
 $(() => {
-    timeout = setTimeout(() => {
-        var elem = document.activeElement;
-        if (elem && elem.blur && !elem.value) {
-            elem._focus = elem.focus;
-            elem.focus = $.noop;
-            elem.blur();
-        }
-        timeout = null;
-    }, 100);
+    $('input, textarea').map((i, elem) => {
+        elem._focus = elem.focus;
+        elem.focus = $.noop;
+    });
+    document.activeElement && document.activeElement.blur && document.activeElement.blur();
 });
 
-window ? register() : setTimeout(register, 100);
+window ? register() : setTimeout(register, 1);
 function register() {
     addEventListener('keydown', (event) => {
         var isTab = (event.code === 'Tab');
@@ -62,7 +57,7 @@ function register() {
             var char = String.fromCharCode(event.keyCode).toUpperCase();
             switch (char) {
                 case 'F':
-                    $('._hint').length ? clearTimeout(timeout) || Page.match(char) : Page.linkHint();
+                    $('._hint').length ? Page.match(char) : Page.linkHint();
                     break;
 
                 case 'J':
