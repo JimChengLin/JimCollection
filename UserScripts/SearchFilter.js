@@ -95,12 +95,15 @@ function main() {
         }
         var hrefHttp = href.replace('https:', 'http:');
         var hrefHttps = hrefHttp.replace('http:', 'https:');
-        $(() =>
-            (hrefHttp in mapMain && clean(mapMain[hrefHttp])) ||
-            (hrefHttps in mapMain && clean(mapMain[hrefHttps])) ||
-            (hrefHttp in mapBackup && clean(mapBackup[hrefHttp])) ||
-            (hrefHttps in mapBackup && clean(mapBackup[hrefHttps]))
-        );
+        $(() => {
+            for (var map of [mapMain, mapBackup]) {
+                for (var sign of [hrefHttp, hrefHttps]) {
+                    if (sign in map && clean(map[sign])) {
+                        return;
+                    }
+                }
+            }
+        });
     }
 }
 
