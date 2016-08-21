@@ -18,7 +18,7 @@ var timeout;
 $(() => {
     timeout = setTimeout(() => {
         var elem = document.activeElement;
-        if (elem && elem.blur) {
+        if (elem && elem.blur && !elem.value) {
             elem._focus = elem.focus;
             elem.focus = $.noop;
             elem.blur();
