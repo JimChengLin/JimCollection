@@ -14,6 +14,19 @@ $(window)
     .on('click resize scroll', () => Page.escape())
     .on('click', (event) => Page.target = event.target);
 
+var timeout;
+$(() => {
+    timeout = setTimeout(() => {
+        var elem = document.activeElement;
+        if (elem && elem.blur) {
+            elem._focus = elem.focus;
+            elem.focus = $.noop;
+            elem.blur();
+        }
+        timeout = null;
+    }, 100);
+});
+
 window ? register() : setTimeout(register, 100);
 function register() {
     addEventListener('keydown', (event) => {
@@ -72,7 +85,7 @@ function register() {
 }
 
 $(`<style>
-._click{box-shadow: inset 0 0 3px 0 black}
+._click{box-shadow: inset 0 0 3px 0 black;}
 ._plus{font-weight: bold;}
 ._hint{
     background-color: rgba(173, 216, 230, 0.7);
@@ -82,21 +95,8 @@ $(`<style>
     font-family: consolas;
     font-size: 13px;
     position: fixed;
-    z-index: 2147483648
+    z-index: 2147483648;
 }</style>`).appendTo('html');
-
-var timeout;
-$(() => {
-    timeout = setTimeout(() => {
-        var elem = document.activeElement;
-        if (elem && elem.blur) {
-            elem._focus = elem.focus;
-            elem.focus = $.noop;
-            elem.blur();
-        }
-        timeout = null;
-    }, 100);
-});
 
 var Page = {
     target: null,
