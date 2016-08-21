@@ -3,8 +3,8 @@
 main();
 function main() {
     var href = location.href;
-    var mapMain;
-    var mapBackup;
+    var mapMain = {};
+    var mapBackup = {};
 
     var update;
     var setting;
@@ -65,9 +65,6 @@ function main() {
     }
 
     if (isEngine) {
-        mapMain = {};
-        mapBackup = {};
-
         commit();
         var change;
         var observer = new MutationObserver(() => change = true);
@@ -92,11 +89,18 @@ function main() {
 
     else if (top === self) {
         var record = GM_getValue('mapMain');
-        mapMain = record ? JSON.parse(record) : {};
-        var abstract = mapMain[href];
-        if (abstract) {
-            $(() => clean(abstract) || clean(JSON.parse(GM_getValue('mapBackup'))[href]));
+        if (record) {
+            mapMain = JSON.parse(record);
+            mapBackup = JSON.parse(GM_getValue('mapBackup'));
         }
+        var hrefHttp = href.replace('https:', 'http:');
+        var hrefHttps = hrefHttp.replace('http:', 'https:');
+        $(() =>
+            (hrefHttp in mapMain && clean(mapMain[hrefHttp])) ||
+            (hrefHttps in mapMain && clean(mapMain[hrefHttps])) ||
+            (hrefHttp in mapBackup && clean(mapBackup[hrefHttp])) ||
+            (hrefHttps in mapBackup && clean(mapBackup[hrefHttps]))
+        );
     }
 }
 

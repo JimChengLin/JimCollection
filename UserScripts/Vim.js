@@ -85,8 +85,8 @@ function register() {
 }
 
 $(`<style>
-._click{box-shadow: inset 0 0 3px 0 black;}
-._plus{font-weight: bold;}
+._click{box-shadow: inset 0 0 3px 0 black}
+._plus{font-weight: bold}
 ._hint{
     background-color: rgba(173, 216, 230, 0.7);
     border-radius: 3px;
