@@ -14,19 +14,6 @@ $(window)
     .on('click resize scroll', () => Page.escape())
     .on('click', (event) => Page.target = event.target);
 
-var timeout;
-$(() => {
-    timeout = setTimeout(() => {
-        var elem = document.activeElement;
-        if (elem && elem.blur) {
-            elem._focus = elem.focus;
-            elem.focus = $.noop;
-            elem.blur();
-        }
-        timeout = null;
-    }, 100);
-});
-
 window ? register() : setTimeout(register, 100);
 function register() {
     addEventListener('keydown', (event) => {
@@ -97,6 +84,19 @@ $(`<style>
     position: fixed;
     z-index: 2147483648
 }</style>`).appendTo('html');
+
+var timeout;
+$(() => {
+    timeout = setTimeout(() => {
+        var elem = document.activeElement;
+        if (elem && elem.blur) {
+            elem._focus = elem.focus;
+            elem.focus = $.noop;
+            elem.blur();
+        }
+        timeout = null;
+    }, 100);
+});
 
 var Page = {
     target: null,
