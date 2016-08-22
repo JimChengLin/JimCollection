@@ -104,8 +104,10 @@ INIT_PERCENT = 0.1
 INCREASE_TH = 0.1
 INCREASE_RATE = 0.1
 
+params = {'dual_num': None, 'effective_rate': None}
 
-def dual(solution_l: list, params={'dual_num': None, 'effective_rate': None}):
+
+def dual(solution_l: list):
     prev_dual_num = params['dual_num']  # type: int
     prev_effective_rate = params['effective_rate']  # type: float
 
