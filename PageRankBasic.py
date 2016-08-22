@@ -6,10 +6,9 @@ class Vertex:
     all = []
 
     def __init__(self, identifier: str = None):
-        self.connect_to_l = []
-        # 分配一个序号
-        self.num = len(Vertex.all)
         self.id = identifier
+        self.connect_to_l = []
+        self.num = len(Vertex.all)
         Vertex.all.append(self)
 
     def connect_to(self, *other_vertex_i):
