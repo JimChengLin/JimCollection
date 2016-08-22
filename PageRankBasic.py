@@ -1,57 +1,82 @@
-import numpy as np
+M = ((0, 0, 1, 1 / 2),
+     (1 / 3, 0, 0, 0),
+     (1 / 3, 1 / 2, 0, 1 / 2),
+     (1 / 3, 1 / 2, 0, 0))
+
+V = (1 / 4,
+     1 / 4,
+     1 / 4,
+     1 / 4)
+
+DAMPING_FACTOR = 0.15
 
 
-# 将Vertex转化为行列式
-class Vertex:
-    all = []
-
-    def __init__(self, identifier: str = None):
-        self.id = identifier
-        self.connect_to_l = []
-        self.num = len(Vertex.all)
-        Vertex.all.append(self)
-
-    def connect_to(self, *other_vertex_i):
-        self.connect_to_l.extend(other_vertex_i)
-
-    def to_l(self) -> list:
-        output = list(0 for _ in range(len(Vertex.all)))
-        importance = 1 / len(self.connect_to_l)
-        for other_v in self.connect_to_l:
-            output[other_v.num] = importance
-        return output
-
-    def __repr__(self):
-        return self.id if self.id else 'No.' + str(self.num)
+def calc_without_random() -> list:
+    result = []
+    for row in M:
+        result.append(sum(a * b for a, b in zip(row, V)))
+    return result
 
 
-def page_rank():
-    d = np.array([v.to_l() for v in Vertex.all])
-    d = d.transpose()
-    average = (1 / len(Vertex.all),)
-    v = np.array([average for _ in range(len(Vertex.all))])
-    print(d)
-    print(v)
-    print(d @ v)
+def trans(val: float) -> float:
+    return val * (1 - DAMPING_FACTOR) + DAMPING_FACTOR * (1 / 4)
 
 
-def clear():
-    Vertex.all.clear()
+def calc_with_random() -> list:
+    result = []
+    for row in M:
+        result.append(sum(trans(a) * b for a, b in zip(row, V)))
+    return result
+
+
+M_DICT = {0: {2: 1, 3: 1 / 2},
+          1: {0: 1 / 3},
+          2: {0: 1 / 3, 1: 1 / 2, 3: 1 / 2},
+          3: {0: 1 / 3, 1: 1 / 2}}
+
+
+def calc_dict_without_random():
+    result = []
+    for i_col in range(4):
+        total = 0
+        for i_row in range(4):
+            total += M_DICT[i_col].get(i_row, 0) * V[i_row]
+        result.append(total)
+    return result
+
+
+def calc_dict_with_random():
+    result = []
+    for i_col in range(4):
+        total = 0
+        for i_row in range(4):
+            total += trans(M_DICT[i_col].get(i_row, 0)) * V[i_row]
+        result.append(total)
+    return result
+
+
+# 以下全部默认添加阻尼系数
+# -1表示权重
+M_DICT_WEIGHT = {0: {2: 1, 3: 1 / 2, -1: 1},
+                 1: {0: 1 / 3, -1: 2},
+                 2: {0: 1 / 3, 1: 1 / 2, 3: 1 / 2, -1: 3},
+                 3: {0: 1 / 3, 1: 1 / 2, -1: 4}}
+
+
+def calc_dict_with_weight():
+    result = []
+    for i_col in range(4):
+        total = 0
+        for i_row in range(4):
+            total += trans(M_DICT[i_col].get(i_row, 0)) * V[i_row]
+        total += M_DICT_WEIGHT[i_col][-1] * (1 / 4)
+        result.append(total)
+    return result
 
 
 if __name__ == '__main__':
-    def main():
-        v_1 = Vertex()
-        v_2 = Vertex()
-        v_3 = Vertex()
-        v_4 = Vertex()
-
-        v_1.connect_to(v_2, v_3, v_4)
-        v_2.connect_to(v_3, v_4)
-        v_3.connect_to(v_1)
-        v_4.connect_to(v_1, v_3)
-
-        page_rank()
-
-
-    main()
+    print(calc_without_random())
+    print(calc_dict_without_random())
+    print(calc_with_random())
+    print(calc_dict_with_random())
+    print(calc_dict_with_weight())
