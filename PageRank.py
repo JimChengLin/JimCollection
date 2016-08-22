@@ -1,27 +1,31 @@
-from AsyncDB import AsyncDB  # see my GitHub
+from AsyncDB import AsyncDB
 
-db = AsyncDB('calc.db')
+FACTOR = 0.15
+
+# 预期协程并发数
+CON_NUM = 1000
+
+# 从名字到下标的映射
+name_db = AsyncDB('name.db')
+
+# 从下标到数值的映射
+data_db = AsyncDB('data.db')
 
 
-# 将Vertex转化为行列式
+# 将Vertex转化为行列式写入硬盘, 为了读取速度, 下标先列再行
 class Vertex:
-    all = []
+    counter = 0
 
-    def __init__(self, identifier: str = None):
-        self.id = identifier
-        self.connect_to_l = []
-        self.num = len(Vertex.all)
-        Vertex.all.append(self)
+    def __init__(self, name: str):
+        self.name = name
+        self.num = None
 
-    def connect_to(self, *other_vertex_i):
-        self.connect_to_l.extend(other_vertex_i)
+    async def init_num(self):
+        self.num = 0
 
-    def to_l(self) -> list:
-        output = list(0 for _ in range(len(Vertex.all)))
-        importance = 1 / len(self.connect_to_l)
-        for other_v in self.connect_to_l:
-            output[other_v.num] = importance
-        return output
+    def set_weight(self, weight: float):
+        # -1 => 列标 self.num => 行标
+        data_db[(-1, self.num)] = weight
 
     def __repr__(self):
-        return self.id if self.id else 'No.' + str(self.num)
+        return 'name: {}, no.{}'.format(self.name, self.num)

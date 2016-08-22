@@ -8,7 +8,7 @@ V = (1 / 4,
      1 / 4,
      1 / 4)
 
-DAMPING_FACTOR = 0.15
+FACTOR = 0.15
 
 
 def calc_without_random() -> list:
@@ -19,7 +19,7 @@ def calc_without_random() -> list:
 
 
 def trans(val: float) -> float:
-    return val * (1 - DAMPING_FACTOR) + DAMPING_FACTOR * (1 / 4)
+    return val * (1 - FACTOR) + FACTOR * (1 / 4)
 
 
 def calc_with_random() -> list:
