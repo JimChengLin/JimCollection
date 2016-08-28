@@ -14,15 +14,23 @@ $(window)
     .on('click resize scroll', () => Page.escape())
     .on('click', (event) => Page.target = event.target);
 
+var shouldBlur = true;
+var interval = setInterval(() => {
+    if (shouldBlur) {
+        document.activeElement && document.activeElement.blur && document.activeElement.blur();
+    } else {
+        clearInterval(interval);
+    }
+}, 100);
+
 $(() => {
     $('input, textarea').map((i, elem) => {
         elem._focus = elem.focus;
         elem.focus = $.noop;
     });
-    document.activeElement && document.activeElement.blur && document.activeElement.blur();
 });
 
-window ? register() : setTimeout(register, 1);
+window ? register() : setTimeout(register);
 function register() {
     addEventListener('keydown', (event) => {
         var isTab = (event.code === 'Tab');
@@ -358,6 +366,7 @@ var Page = {
             element._focus ? element._focus() : element.focus();
             var len = element.value.length;
             element.setSelectionRange(len, len);
+            shouldBlur = false;
         }
 
         else if (element.tagName === 'A' || element.tagName === 'INPUT') {
