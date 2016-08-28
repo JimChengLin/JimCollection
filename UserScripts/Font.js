@@ -110,6 +110,7 @@ function simplify(element) {
 }
 
 const dict = {
+    '鑑': '鉴',
     '徵': '征',
     '餵': '喂',
     '亜': '亚',

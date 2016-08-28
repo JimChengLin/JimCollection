@@ -14,9 +14,11 @@ $(window)
     .on('click resize scroll', () => Page.escape())
     .on('click', (event) => Page.target = event.target);
 
+var counter = 0;
 var shouldBlur = true;
 var interval = setInterval(() => {
-    if (shouldBlur) {
+    if (shouldBlur && counter < 10) {
+        counter++;
         document.activeElement && document.activeElement.blur && document.activeElement.blur();
     } else {
         clearInterval(interval);
@@ -364,7 +366,7 @@ var Page = {
             element.type.search(/(button|checkbox|file|hidden|image|radio|reset|submit)/i) === -1) ||
             element.hasAttribute('contenteditable') || element.tagName === 'TEXTAREA') {
             element._focus ? element._focus() : element.focus();
-            var len = element.value.length;
+            var len = element.value.length * 2;
             element.setSelectionRange(len, len);
             shouldBlur = false;
         }
