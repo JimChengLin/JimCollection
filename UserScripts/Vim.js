@@ -350,6 +350,7 @@ var Page = {
             target = targets[i];
             var result = (target.scrollTop += offset);
             if (result !== offset) {
+                Page.target = target;
                 return;
             }
         }
