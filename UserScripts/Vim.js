@@ -355,6 +355,7 @@ var Page = {
             }
         }
         scrollBy(0, offset);
+        Page.target = document.activeElement;
     },
 
     plus: ()=> {
