@@ -368,9 +368,11 @@ var Page = {
             element.type.search(/(button|checkbox|file|hidden|image|radio|reset|submit)/i) === -1) ||
             element.hasAttribute('contenteditable') || element.tagName === 'TEXTAREA') {
             element._focus ? element._focus() : element.focus();
-            var len = element.value.length * 2;
-            element.setSelectionRange(len, len);
-            shouldBlur = false;
+            if (element.setSelectionRange) {
+                var len = element.value.length * 2;
+                element.setSelectionRange(len, len);
+                shouldBlur = false;
+            }
         }
 
         else if (element.tagName === 'A' || element.tagName === 'INPUT') {
