@@ -17,7 +17,7 @@ $(window)
 var counter = 0;
 var shouldBlur = true;
 var interval = setInterval(() => {
-    if (shouldBlur && counter < 10) {
+    if (shouldBlur && counter < 100) {
         counter++;
         document.activeElement && document.activeElement.blur && document.activeElement.blur();
     } else {
@@ -369,10 +369,10 @@ var Page = {
             element.type.search(/(button|checkbox|file|hidden|image|radio|reset|submit)/i) === -1) ||
             element.hasAttribute('contenteditable') || element.tagName === 'TEXTAREA') {
             element._focus ? element._focus() : element.focus();
+            shouldBlur = false;
             if (element.setSelectionRange) {
                 var len = element.value.length * 2;
                 element.setSelectionRange(len, len);
-                shouldBlur = false;
             }
         }
 
