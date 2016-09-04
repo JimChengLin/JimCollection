@@ -341,6 +341,7 @@ var Page = {
     },
 
     scrollTop: (offset) => {
+        document.body.click && document.body.click();
         var target = $(Page.target || 'div');
         var targets = target.add(target.parentsUntil('body'))
                             .filter((i, elem) =>
