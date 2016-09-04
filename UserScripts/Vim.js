@@ -17,7 +17,7 @@ $(window)
 var counter = 0;
 var shouldBlur = true;
 var interval = setInterval(() => {
-    if (shouldBlur && counter < 100) {
+    if (shouldBlur && counter < 100 && !Page.target) {
         counter++;
         document.activeElement && document.activeElement.blur && document.activeElement.blur();
     } else {
