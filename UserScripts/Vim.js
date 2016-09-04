@@ -38,15 +38,16 @@ function register() {
         var isTab = (event.code === 'Tab');
         var isCommand = Page.isCommand(event);
 
-        if (isTab && !doTab()) {
+        if (isTab && !doDefaultTab()) {
             event.preventDefault();
             event.stopImmediatePropagation();
             isCommand ? Page.escape() : document.activeElement.blur();
+            document.body.click();
         } else if (isCommand) {
             event.stopImmediatePropagation();
         }
 
-        function doTab() {
+        function doDefaultTab() {
             return document.activeElement.tagName === 'INPUT' &&
                 (!document.activeElement.type || document.activeElement.type === 'text') &&
                 $(document.activeElement).closest('form').find('input[type="password"]').length;
@@ -341,7 +342,6 @@ var Page = {
     },
 
     scrollTop: (offset) => {
-        document.body.click && document.body.click();
         var target = $(Page.target || 'div');
         var targets = target.add(target.parentsUntil('body'))
                             .filter((i, elem) =>
