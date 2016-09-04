@@ -17,13 +17,13 @@ $(window)
 var counter = 0;
 var shouldBlur = true;
 var interval = setInterval(() => {
-    if (shouldBlur && counter < 100 && !Page.target) {
+    if (shouldBlur && counter < 1000 && !Page.target) {
         counter++;
         document.activeElement && document.activeElement.blur && document.activeElement.blur();
     } else {
         clearInterval(interval);
     }
-}, 100);
+}, 10);
 
 $(() => {
     $('input, textarea').map((i, elem) => {
