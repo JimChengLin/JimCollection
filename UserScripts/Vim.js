@@ -91,7 +91,7 @@ function register() {
 }
 
 $(`<style>
-._click{box-shadow: inset 0 0 3px 0 black}
+._click{box-shadow: inset 0 0 1px 1px black}
 ._plus{font-weight: bold}
 ._hint{
     background-color: rgba(173, 216, 230, 0.7);
