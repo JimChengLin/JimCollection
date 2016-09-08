@@ -91,8 +91,12 @@ function register() {
 }
 
 $(`<style>
-._click{box-shadow: inset 0 0 1px 1px black}
 ._plus{font-weight: bold}
+._click{
+    box-shadow: inset 0 0 1px 1px gray;
+    position: fixed;
+    z-index: 2147483648;
+}
 ._hint{
     background-color: rgba(173, 216, 230, 0.7);
     border-radius: 3px;
@@ -334,8 +338,17 @@ var Page = {
                 var element = Page.hintMap[Page.chars];
                 element.tagName === 'A' && Page.isPlus ? GM_openInTab(element.href, true) : Page.click(element);
 
-                element = $(element).addClass('_click');
-                setTimeout(() => element.removeClass('_click'), 500);
+                var rect = element.getClientRects()[0];
+                var style = {
+                    top: Math.max(rect.top - 5, 0),
+                    left: Math.max(rect.left - 5, 0),
+                    height: rect.height + 10,
+                    width: rect.width + 10
+                };
+                $('<div class="_click"></div>')
+                    .css(style)
+                    .appendTo('html');
+                setTimeout(() => $('._click').remove(), 500);
                 Page.escape();
             }
         }
