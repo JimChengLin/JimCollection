@@ -340,10 +340,10 @@ var Page = {
 
                 var rect = element.getClientRects()[0];
                 var style = {
-                    top: Math.max(rect.top - 5, 0),
-                    left: Math.max(rect.left - 5, 0),
-                    height: rect.height + 10,
-                    width: rect.width + 10
+                    top: rect.top,
+                    left: rect.left,
+                    height: rect.height,
+                    width: rect.width
                 };
                 $('<div class="_click"></div>')
                     .css(style)
