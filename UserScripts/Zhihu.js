@@ -74,7 +74,7 @@ function zhihu() {
                         elem = $(elem);
                         elem.addClass('_checked');
                         if (DayDiff.search(elem.attr('href')) > 0.7) {
-                            elem.closest('.feed-item').fadeOut();
+                            elem.closest('.feed-item').find('.expandable, .zm-item-meta').fadeOut();
                         }
                     });
                     $('.goog-scrollfloater-floating').remove();
