@@ -70,8 +70,9 @@ function zhihu() {
 
             setInterval(() => {
                 if (change) {
-                    $('.feed-item > link').map((i, elem) => {
+                    $('.feed-item > link:not(._checked)').map((i, elem) => {
                         elem = $(elem);
+                        elem.addClass('_checked');
                         if (DayDiff.search(elem.attr('href')) > 0.7) {
                             elem.closest('.feed-item').fadeOut();
                         }
