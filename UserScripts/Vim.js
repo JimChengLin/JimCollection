@@ -30,7 +30,6 @@ $(() => {
         elem._focus = elem.focus;
         elem.focus = $.noop;
     });
-    shouldBlur = false;
 });
 
 window ? register() : setTimeout(register);
