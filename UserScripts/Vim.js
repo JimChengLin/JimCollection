@@ -92,8 +92,12 @@ function register() {
 }
 
 $(`<style>
-._click{box-shadow: 0 0 2px 2px gray}
 ._plus{font-weight: bold}
+._click{
+    box-shadow: 0 0 1px 1px gray;
+    position: absolute;
+    z-index: 2147483648;
+}
 ._hint{
     background-color: rgba(173, 216, 230, 0.7);
     border-radius: 3px;
@@ -335,8 +339,17 @@ var Page = {
                 var element = Page.hintMap[Page.chars];
                 element.tagName === 'A' && Page.isPlus ? GM_openInTab(element.href, true) : Page.click(element);
 
-                element = $(element).addClass('_click');
-                setTimeout(() => element.removeClass('_click'), 500);
+                var rect = element.getBoundingClientRect();
+                var style = {
+                    width: rect.width,
+                    height: rect.height,
+                    top: rect.top + window.pageYOffset,
+                    left: rect.left + window.pageXOffset,
+                };
+                $('<div class="_click"></div>')
+                    .css(style)
+                    .appendTo('html');
+                setTimeout(() => $('._click').remove(), 500);
                 Page.escape();
             }
         }
@@ -347,6 +360,7 @@ var Page = {
             $(Page.target).parentsUntil('body').addBack() : $('body, div');
         targets = targets.filter((i, elem) => elem.scrollHeight >= elem.clientHeight)
                          .toArray().sort((a, b) => a.scrollHeight > b.scrollHeight).reverse();
+
         for (var i = 0; i < targets.length; i++) {
             var target = targets[i];
             if ((target.scrollTop += 1) !== 1 || (target.scrollTop += -1) !== -1) {
