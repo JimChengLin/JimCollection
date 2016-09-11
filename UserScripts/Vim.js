@@ -23,7 +23,7 @@ var interval = setInterval(() => {
     } else {
         clearInterval(interval);
     }
-}, 10);
+}, 100);
 
 $(() => {
     $('input, textarea').map((i, elem) => {
