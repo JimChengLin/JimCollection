@@ -383,8 +383,11 @@ var Page = {
             element._focus ? element._focus() : element.focus();
             shouldBlur = false;
             if (element.setSelectionRange) {
-                var len = element.value.length * 2;
-                element.setSelectionRange(len, len);
+                try {
+                    var len = element.value.length * 2;
+                    element.setSelectionRange(len, len);
+                } catch (e) {
+                }
             }
         }
 
