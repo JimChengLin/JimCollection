@@ -343,21 +343,25 @@ var Page = {
     },
 
     scrollTop: (offset) => {
-        var target = $(((document.activeElement.tagName !== 'OBJECT') && Page.target) || 'div');
-        var targets = target.add(target.parentsUntil('body'))
-                            .filter((i, elem) => elem.scrollHeight >= elem.clientHeight
-                            && getComputedStyle(elem).overflow !== 'hidden');
+        var target, targets;
+        if (Page.target && Page.target.tagName !== 'OBJECT') {
+            target = $(Page.target);
+            targets = target.add(target.parentsUntil('body'));
+        } else {
+            targets = $('body, div');
+        }
 
+        targets = targets.filter((i, elem) => elem.scrollHeight > elem.clientHeight)
+                         .toArray().sort((a, b) => a.scrollHeight > b.scrollHeight).reverse();
         for (var i = 0; i < targets.length; i++) {
             target = targets[i];
-            var result = (target.scrollTop += offset);
-            if (result !== offset) {
+            if ((target.scrollTop += 1) !== 1 || (target.scrollTop += -1) !== -1) {
+                target.scrollTop += offset;
                 Page.target = target;
                 return;
             }
         }
         scrollBy(0, offset);
-        Page.target = document.activeElement;
     },
 
     plus: ()=> {
