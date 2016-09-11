@@ -80,7 +80,7 @@ function zhihu() {
                     $('.goog-scrollfloater-floating').remove();
                     change = false;
                 }
-            }, 100);
+            }, 700);
         });
     }
 }
