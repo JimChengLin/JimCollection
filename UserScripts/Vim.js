@@ -20,10 +20,13 @@ var interval = setInterval(() => {
     if (shouldBlur && counter < 1000 && !Page.target) {
         counter++;
         document.activeElement && document.activeElement.blur && document.activeElement.blur();
+        if (document.activeElement && document.activeElement._focus) {
+            shouldBlur = false;
+        }
     } else {
         clearInterval(interval);
     }
-}, 50);
+}, 10);
 
 $(() => {
     $('input, textarea').map((i, elem) => {
@@ -387,7 +390,7 @@ var Page = {
                 try {
                     var len = element.value.length * 2;
                     element.setSelectionRange(len, len);
-                } catch (_) {
+                } catch (e) {
                 }
             }
         }
