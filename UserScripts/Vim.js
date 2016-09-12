@@ -37,20 +37,21 @@ function register() {
     addEventListener('keydown', (event) => {
         var isTab = (event.code === 'Tab');
         var isCommand = Page.isCommand(event);
+        var activeElement = document.activeElement;
 
         if (isTab && !doDefaultTab()) {
             event.preventDefault();
             event.stopImmediatePropagation();
-            isCommand ? Page.escape() : document.activeElement.blur();
+            isCommand ? Page.escape() : activeElement && activeElement.blur();
             document.body.click();
         } else if (isCommand) {
             event.stopImmediatePropagation();
         }
 
         function doDefaultTab() {
-            return document.activeElement.tagName === 'INPUT' &&
-                (!document.activeElement.type || document.activeElement.type === 'text') &&
-                $(document.activeElement).closest('form').find('input[type="password"]').length;
+            return activeElement && activeElement.tagName === 'INPUT' &&
+                (!activeElement.type || activeElement.type === 'text') &&
+                $(activeElement).closest('form').find('input[type="password"]').length;
         }
     }, true);
 
