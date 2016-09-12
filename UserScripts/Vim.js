@@ -356,9 +356,10 @@ var Page = {
 
     scrollTop: (offset) => {
         var targets = Page.target && Page.target.tagName !== 'OBJECT' ?
-            $(Page.target).parentsUntil('body').addBack() : $('body, div');
+            $(Page.target).parentsUntil('body').addBack() : $('div');
         targets = targets.filter((i, elem) => elem.scrollHeight >= elem.clientHeight)
                          .toArray().sort((a, b) => a.scrollHeight > b.scrollHeight).reverse();
+        targets.unshift(document.body);
 
         for (var i = 0; i < targets.length; i++) {
             var target = targets[i];
