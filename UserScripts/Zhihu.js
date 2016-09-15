@@ -22,20 +22,25 @@ function zhihuDaily() {
 
 function zhihu() {
     $('<style>@media screen and (max-width:1120px){.zu-top{display:none;}}</style>').appendTo('html');
-    $(window)
-        .on('copy', () => {
-            GM_setClipboard(getSelection().toString(), 'text');
-        })
-        .on('click', (event) => {
-            let link = event.target;
-            if (link.parentElement && link.parentElement.tagName === 'A') {
-                link = link.parentElement;
+    $(window).on('copy', () => {
+        GM_setClipboard(getSelection().toString(), 'text');
+    });
+
+    $(()=> {
+        let change = true;
+        let observer = new MutationObserver(() => change = true);
+        observer.observe(document.querySelector('body'), {childList: true, subtree: true});
+        setInterval(() => {
+            if (change) {
+                $('a.external').map((i, elem) => {
+                    let sign = 'link.zhihu.com/?target=';
+                    if (elem.href && elem.href.includes(sign)) {
+                        elem.href = decodeURIComponent(elem.href.substr(elem.href.indexOf(sign) + sign.length));
+                    }
+                });
             }
-            let sign = 'link.zhihu.com/?target=';
-            if (link.href && link.href.includes(sign)) {
-                link.href = decodeURIComponent(link.href.substr(link.href.indexOf(sign) + sign.length));
-            }
-        });
+        }, 1000);
+    });
 
     if (location.pathname.endsWith('/topic')) {
         $(window).on('scroll', (event) => {
