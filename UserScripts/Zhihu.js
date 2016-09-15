@@ -43,27 +43,27 @@ function zhihu() {
             event.stopImmediatePropagation();
         });
 
-        $(()=> {
-            let DAY_NOW = () => Date.now() / 1000 / 60 / 60 / 24;
-            let DayDiff = {
-                record: {},
-                load: () => {
-                    for (let url of GM_listValues()) {
-                        let diff = DAY_NOW() - GM_getValue(url);
-                        diff > 14 ? GM_deleteValue(url) : DayDiff.record[url] = diff;
-                    }
-                },
-                search: (url) => {
-                    if (url in DayDiff.record) {
-                        return DayDiff.record[url];
-                    } else {
-                        GM_setValue(url, DAY_NOW());
-                        return DayDiff.record[url] = 0;
-                    }
+        let DAY_NOW = () => Date.now() / 1000 / 60 / 60 / 24;
+        let DayDiff = {
+            record: {},
+            load: () => {
+                for (let url of GM_listValues()) {
+                    let diff = DAY_NOW() - GM_getValue(url);
+                    diff > 14 ? GM_deleteValue(url) : DayDiff.record[url] = diff;
                 }
-            };
-            DayDiff.load();
+            },
+            search: (url) => {
+                if (url in DayDiff.record) {
+                    return DayDiff.record[url];
+                } else {
+                    GM_setValue(url, DAY_NOW());
+                    return DayDiff.record[url] = 0;
+                }
+            }
+        };
+        DayDiff.load();
 
+        $(() => {
             let change = true;
             let observer = new MutationObserver(() => change = true);
             observer.observe(document.querySelector('div.zu-main-content'), {childList: true, subtree: true});
