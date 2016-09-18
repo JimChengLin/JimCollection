@@ -48,22 +48,30 @@ function zhihu() {
             event.stopImmediatePropagation();
         });
 
-        let DAY_NOW = () => Date.now() / 1000 / 60 / 60 / 24;
+        let day = () => Date.now() / 1000 / 60 / 60 / 24;
         let DayDiff = {
             record: {},
             load: () => {
                 for (let url of GM_listValues()) {
-                    let diff = DAY_NOW() - GM_getValue(url);
-                    diff > 14 ? GM_deleteValue(url) : DayDiff.record[url] = diff;
+                    let diff = day() - GM_getValue(url);
+                    DayDiff.record[url] = diff;
+                    if (diff > 14) {
+                        GM_deleteValue(url);
+                    }
                 }
             },
             search: (url) => {
+                let diff;
                 if (url in DayDiff.record) {
-                    return DayDiff.record[url];
+                    diff = DayDiff.record[url];
+                    if (diff > 14) {
+                        GM_setValue(url, day() - 1);
+                    }
                 } else {
-                    GM_setValue(url, DAY_NOW());
-                    return DayDiff.record[url] = 0;
+                    diff = 0;
+                    GM_setValue(url, day());
                 }
+                return diff;
             }
         };
         DayDiff.load();
