@@ -33,9 +33,9 @@ var interval = setInterval(() => {
 $(() => {
     $('input, textarea').map((i, elem) => {
         elem._focus = elem.focus;
-        elem.focus = function (...args) {
+        elem.focus = function (args) {
             if (release) {
-                elem._focus(...args);
+                elem._focus.apply(this, arguments);
             }
         };
     });
