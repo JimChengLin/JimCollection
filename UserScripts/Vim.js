@@ -18,7 +18,7 @@ var counter = 0;
 var shouldBlur = true;
 var interval = setInterval(() => {
     if (shouldBlur && counter < 1000 && !Page.target) {
-        counter++;
+        counter += 10;
         var activeElement = document.activeElement;
         activeElement && activeElement.blur && activeElement.blur();
         if (activeElement && activeElement._focus) {
@@ -138,7 +138,7 @@ var Page = {
 
                 function isDisplayed(element, isClickable) {
                     var style = getComputedStyle(element);
-                    if (style.opacity === '0' || (isClickable && style.cursor.search(/pointer|default/) === -1)) {
+                    if (style.opacity === '0' || (isClickable && style.cursor.search(/pointer|default|auto/) === -1)) {
                         return;
                     }
 
