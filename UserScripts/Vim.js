@@ -15,6 +15,7 @@ $(window)
     .on('click', (event) => Page.target = event.target);
 
 var counter = 0;
+var release = false;
 var shouldBlur = true;
 var interval = setInterval(() => {
     if (shouldBlur && counter < 1000 && !Page.target) {
@@ -32,12 +33,17 @@ var interval = setInterval(() => {
 $(() => {
     $('input, textarea').map((i, elem) => {
         elem._focus = elem.focus;
-        elem.focus = $.noop;
+        elem.focus = function (...args) {
+            if (release) {
+                elem._focus(...args);
+            }
+        };
     });
 });
 
 window ? register() : setTimeout(register);
 function register() {
+    addEventListener('mousedown', () => release = true, true);
     addEventListener('keydown', (event) => {
         var isTab = (event.code === 'Tab');
         var isCommand = Page.isCommand(event);
@@ -382,6 +388,7 @@ var Page = {
     },
 
     click: (element) => {
+        release = true;
         if ((element.tagName === 'INPUT' &&
             element.type.search(/(button|checkbox|file|hidden|image|radio|reset|submit)/i) === -1) ||
             element.hasAttribute('contenteditable') || element.tagName === 'TEXTAREA') {
