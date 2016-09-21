@@ -18,7 +18,7 @@ var counter = 0;
 var release = false;
 var shouldBlur = true;
 var interval = setInterval(() => {
-    if (shouldBlur && counter < 1000 && !Page.target) {
+    if (shouldBlur && counter < 10000 && !Page.target) {
         counter += 10;
         var activeElement = document.activeElement;
         activeElement && activeElement.blur && activeElement.blur();

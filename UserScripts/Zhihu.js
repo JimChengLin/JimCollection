@@ -13,7 +13,7 @@ function zhihuDaily() {
     $(() => {
         if (location.pathname.startsWith('/story')) {
             let target = $('.question:last-child').not(':contains("查看知乎原文")');
-            if (target.length && target.text().length < 100) {
+            if (target.length && target.text().length) {
                 target.remove();
             }
         }
