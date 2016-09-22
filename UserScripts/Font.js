@@ -63,8 +63,8 @@ function travel(element, probe) {
         return fonts;
     }
 
-    if ((probe || probe === undefined) && fontFamily !== cache &&
-        (probe = (element.innerText && element.innerText.search(/[\u4E00-\u9FFF]/) !== -1))) {
+    if ((probe || probe === undefined) &&
+        (probe = (element.innerText && element.innerText.match(/[\u4E00-\u9FFF]/))) && fontFamily !== cache) {
         cache = fontFamily;
         fonts.map(
             (font) => {
@@ -82,7 +82,7 @@ function travel(element, probe) {
         );
     }
 
-    if (isTraditional && probe) {
+    if (probe && isTraditional) {
         simplify(element);
     }
 
