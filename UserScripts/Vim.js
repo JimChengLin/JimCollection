@@ -376,6 +376,7 @@ var Page = {
         for (var i = 0; i < targets.length; i++) {
             var target = targets[i];
             if ((target.scrollTop += 1) !== 1 || (target.scrollTop += -1) !== -1) {
+                Page.target = target;
                 return target.scrollTop += offset;
             }
         }
