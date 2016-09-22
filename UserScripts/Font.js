@@ -17,7 +17,6 @@ function inject(font, defer) {
     } else {
         return code;
     }
-
 }
 
 $(() => {
