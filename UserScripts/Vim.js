@@ -4,7 +4,7 @@
 Element.prototype._addEventListener = Element.prototype.addEventListener;
 Element.prototype.addEventListener = function (type, listener, userCapture) {
     this._addEventListener(type, listener, userCapture);
-    if (this.tagName === 'DIV' && type.match(/(mousedown|mouseup|click)/)) {
+    if (this.tagName === 'DIV' && type.match(/(mouse|click)/)) {
         Page.clickElements.push(this);
     }
 };
@@ -15,15 +15,17 @@ $(window)
     .on('click', (event) => Page.target = event.target);
 
 var counter = 0;
-var release = false;
 var shouldBlur = true;
+var shouldRelease = false;
 var interval = setInterval(() => {
     if (shouldBlur && counter < 10000 && !Page.target) {
         counter += 10;
         var activeElement = document.activeElement;
-        activeElement && activeElement.blur && activeElement.blur();
-        if (activeElement && activeElement._focus) {
-            shouldBlur = false;
+        if (activeElement) {
+            activeElement.blur && activeElement.blur();
+            if (activeElement._focus) {
+                shouldBlur = false;
+            }
         }
     } else {
         clearInterval(interval);
@@ -34,7 +36,7 @@ $(() => {
     $('input, textarea').map((i, elem) => {
         elem._focus = elem.focus;
         elem.focus = function (args) {
-            if (release) {
+            if (shouldRelease) {
                 elem._focus.apply(this, arguments);
             }
         };
@@ -43,7 +45,7 @@ $(() => {
 
 window ? register() : setTimeout(register);
 function register() {
-    addEventListener('mousedown', () => release = true, true);
+    addEventListener('mousedown', () => shouldRelease = true, true);
     addEventListener('keydown', (event) => {
         var isTab = (event.code === 'Tab');
         var isCommand = Page.isCommand(event);
@@ -374,9 +376,7 @@ var Page = {
         for (var i = 0; i < targets.length; i++) {
             var target = targets[i];
             if ((target.scrollTop += 1) !== 1 || (target.scrollTop += -1) !== -1) {
-                target.scrollTop += offset;
-                Page.target = target;
-                return;
+                return target.scrollTop += offset;
             }
         }
         scrollBy(0, offset);
@@ -388,7 +388,7 @@ var Page = {
     },
 
     click: (element) => {
-        release = true;
+        shouldRelease = true;
         if ((element.tagName === 'INPUT' &&
             element.type.search(/(button|checkbox|file|hidden|image|radio|reset|submit)/i) === -1) ||
             element.hasAttribute('contenteditable') || element.tagName === 'TEXTAREA') {
