@@ -21,7 +21,7 @@ var interval = setInterval(() => {
     if (shouldBlur && counter < 10000 && !Page.target) {
         counter += 10;
         var activeElement = document.activeElement;
-        if (activeElement) {
+        if (activeElement && activeElement.tagName !== 'IFRAME') {
             activeElement.blur && activeElement.blur();
             if (activeElement._focus) {
                 shouldBlur = false;
