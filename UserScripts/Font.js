@@ -1,21 +1,26 @@
 'use strict';
 
+var code = '';
 var record = GM_getValue('fontQueue');
 var fontQueue = record ? record.split(',') : [];
 for (var i = 0; i < fontQueue.length; i++) {
-    inject(fontQueue[i]);
+    code += inject(fontQueue[i], 'defer');
+}
+$(`<style>${code}</style>`).appendTo('html');
+
+function inject(font, defer) {
+    var code =
+        `@font-face{font-family:${font};src:local(${font});}` +
+        `@font-face{font-family:${font};unicode-range:u+4e00-9fff;src:local(noto sans cjk sc);}`;
+    if (!defer) {
+        $(`<style>${code}</style>`).appendTo('html');
+    } else {
+        return code;
+    }
+
 }
 
-function inject(font) {
-    var style =
-        '<style>' +
-        '@font-face{font-family:' + font + ';src:local(' + font + ');}' +
-        '@font-face{font-family:' + font + ';unicode-range:U+4E00-9FFF;src:local(Noto Sans CJK SC);}' +
-        '</style>';
-    $(style).appendTo('html');
-}
-
-$(window).on('load', () => {
+$(() => {
     probeLang();
     travel(document.body);
     GM_setValue('fontQueue', fontQueue.slice(0, 50).join(','));
@@ -24,7 +29,7 @@ $(window).on('load', () => {
 var isTraditional;
 function probeLang() {
     var innerText = document.body.innerText.replace(/\s*/g, '');
-    var threshold = Math.min(Math.floor(innerText.length / 10), 100);
+    var threshold = Math.floor(innerText.length / 10);
     for (var i = 0; i < threshold; i++) {
         if (innerText.charAt(i) in dict) {
             document.documentElement.lang = 'zh-CN';
