@@ -10,6 +10,12 @@ class Vertex:
     total_weight = 0
     matrix = OrderedDict()
 
+    @staticmethod
+    def reset():
+        Vertex.dgl_l.clear()
+        Vertex.total_weight = 0
+        Vertex.matrix.clear()
+
     def __init__(self, name: str):
         self.name = name
         if self.name not in Vertex.matrix:
