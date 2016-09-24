@@ -73,17 +73,18 @@ class PageRank:
             pr += (1 - cum - Vertex.total_weight * vpr) * self.spread
             self.temp_pr_a[r_i] = pr
 
-            if self.nth_calc >= 3 and isclose(pr, self.pr_a[r_i], rel_tol=1e-2):
-                self.nth_calc = 0
+            if self.nth_calc >= 3 and isclose(pr, self.pr_a[r_i], rel_tol=1e-3):
                 self.done_num += 1
                 done_l.append(r_name)
                 Vertex.matrix[r_name]['$done'] = True
 
-        for done_name in done_l:
-            Vertex.matrix.move_to_end(done_name)
+        for name in done_l:
+            Vertex.matrix.move_to_end(name)
         self.pr_a, self.temp_pr_a = self.temp_pr_a, self.pr_a
         if self.done_num == len(self.pr_a):
             return True
+        if self.nth_calc >= 3:
+            self.nth_calc = 0
 
     def trans(self, val: float) -> float:
         return val * self.reserve + self.spread

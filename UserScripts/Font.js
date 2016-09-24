@@ -6,7 +6,7 @@ var fontQueue = record ? record.split(',') : [];
 for (var i = 0; i < fontQueue.length; i++) {
     code += inject(fontQueue[i], 'defer');
 }
-$(`<style>${code}</style>`).appendTo('html');
+$(`<style>${code}</style>`).prependTo('html');
 
 function inject(font, defer) {
     var code =
