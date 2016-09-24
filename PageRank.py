@@ -7,8 +7,8 @@ JUMP = 0.15
 
 
 class Vertex:
+    dgl_l = []
     total_weight = 0
-    dangling_s = set()
     matrix = OrderedDict()
 
     def __init__(self, name: str):
@@ -25,32 +25,42 @@ class Vertex:
             for vertex in vertex_l:
                 Vertex.matrix[vertex.name][self.name] = val
         else:
-            Vertex.dangling_s.add(self.name)
+            Vertex.dgl_l.append(self.name)
 
 
 class PageRank:
     def __init__(self):
-        a_num = len(Vertex.matrix) + 1
         total = len(Vertex.matrix) + Vertex.total_weight
         self.average = 1 / total
         self.reserve = 1 - JUMP
         self.spread = JUMP / total
 
-        self.pr_a = np.empty(a_num)
+        a_len = len(Vertex.matrix) + 1
+        self.pr_a = np.empty(a_len)
         self.pr_a.fill(self.average)
-        self.temp_pr_a = np.zeros(a_num)
+        self.temp_pr_a = np.zeros(a_len)
 
-        self.counter = 0
-        Vertex.matrix['_'] = {}
+        self.nth_calc = 0
+        self.done_num = 0
+        Vertex.matrix['_'] = {'$i': a_len - 1, '$weight': 0}
 
     def calc(self):
+        self.nth_calc += 1
+        dgl_pr = 0
+        dgl_cum = 0
+        for name in Vertex.dgl_l:
+            i = Vertex.matrix[name]['$i']
+            dgl_pr += self.pr_a[i] * self.average
+            dgl_cum += self.pr_a[i]
+
+        done_l = []
         for r_name, r_map in Vertex.matrix.items():
             if '$done' in r_map:
-                continue
-            pr = 0
-            cum = 0
-            r_i = r_map.get('$i', -1)
-            weight = r_map.get('$weight', 0)
+                break
+            pr = dgl_pr
+            cum = dgl_cum
+            r_i = r_map['$i']
+            weight = r_map['$weight']
 
             for c_name, c_val in r_map.items():
                 if c_name not in ('$i', '$weight'):
@@ -58,21 +68,21 @@ class PageRank:
                     pr += self.pr_a[c_i] * self.trans(c_val)
                     cum += self.pr_a[c_i]
 
-            for c_name in Vertex.dangling_s:
-                c_i = Vertex.matrix[c_name]['$i']
-                pr += self.pr_a[c_i] * self.average
-                cum += self.pr_a[c_i]
-
             vpr = self.pr_a[-1]
             pr += self.trans(1) * vpr * weight + self.trans(0) * vpr * (Vertex.total_weight - weight)
             pr += (1 - cum - Vertex.total_weight * vpr) * self.spread
             self.temp_pr_a[r_i] = pr
 
-            if isclose(pr, self.pr_a[r_i]):
+            if self.nth_calc >= 3 and isclose(pr, self.pr_a[r_i], rel_tol=1e-2):
+                self.nth_calc = 0
+                self.done_num += 1
+                done_l.append(r_name)
                 Vertex.matrix[r_name]['$done'] = True
-                self.counter += 1
+
+        for done_name in done_l:
+            Vertex.matrix.move_to_end(done_name)
         self.pr_a, self.temp_pr_a = self.temp_pr_a, self.pr_a
-        if self.counter == len(Vertex.matrix):
+        if self.done_num == len(self.pr_a):
             return True
 
     def trans(self, val: float) -> float:
@@ -81,12 +91,13 @@ class PageRank:
 
 if __name__ == '__main__':
     # 预期结果: [ 0.12583295  0.21330472  0.23940615  0.20935905  0.03534952]
+    # [ 0.19613095  0.13916915  0.17757937  0.21598958  0.04518849]
     v_0 = Vertex('v_0')
     v_1 = Vertex('v_1')
     v_2 = Vertex('v_2')
     v_3 = Vertex('v_3')
     v_0.connect(0, v_1, v_2, v_3)
-    v_1.connect(1, v_2, v_3)
+    v_1.connect(1)
     v_2.connect(2, v_0)
     v_3.connect(3)
     pagerank = PageRank()
