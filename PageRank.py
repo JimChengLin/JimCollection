@@ -1,7 +1,6 @@
+from array import array
 from collections import OrderedDict
 from math import isclose
-
-import numpy as np
 
 JUMP = 0.15
 
@@ -36,9 +35,8 @@ class PageRank:
         self.spread = JUMP / total
 
         a_len = len(Vertex.matrix) + 1
-        self.pr_a = np.empty(a_len)
-        self.pr_a.fill(self.average)
-        self.temp_pr_a = np.zeros(a_len)
+        self.pr_a = array('d', [self.average]) * a_len
+        self.temp_pr_a = array('d', [0]) * a_len
 
         self.nth_calc = 0
         self.done_num = 0
