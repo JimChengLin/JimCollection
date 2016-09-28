@@ -6,7 +6,7 @@ var fontQueue = record ? record.split(',') : [];
 for (var i = 0; i < fontQueue.length; i++) {
     code += inject(fontQueue[i], 'defer');
 }
-$(`<style>${code}</style>`).prependTo('html');
+$(`<style>${code}</style>`).prependTo('head');
 
 function inject(font, defer) {
     var code =
@@ -22,7 +22,7 @@ function inject(font, defer) {
 $(() => {
     probeLang();
     travel(document.body);
-    GM_setValue('fontQueue', fontQueue.slice(0, 50).join(','));
+    GM_setValue('fontQueue', fontQueue.slice(0, 100).join(','));
 });
 
 var isTraditional;
