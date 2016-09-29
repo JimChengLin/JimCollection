@@ -6,7 +6,7 @@ var fontQueue = record ? record.split(',') : [];
 for (var i = 0; i < fontQueue.length; i++) {
     code += inject(fontQueue[i], 'defer');
 }
-$(`<style>${code}</style>`).prependTo('html');
+$(`<style>html,body{font-family:noto sans cjk sc!important;}${code}</style>`).prependTo('html');
 
 function inject(font, defer) {
     var code =
@@ -19,7 +19,6 @@ function inject(font, defer) {
     }
 }
 
-setTimeout(() => travel(document.body), 100);
 $(() => {
     probeLang();
     travel(document.body);
