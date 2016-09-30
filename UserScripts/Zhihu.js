@@ -88,14 +88,14 @@ function zhihu() {
                     $('.feed-item > link:not(._checked)').map((i, elem) => {
                         elem = $(elem);
                         elem.addClass('_checked');
-                        if (DayDiff.search(elem.attr('href')) > 0.7) {
+                        if (DayDiff.search(elem.attr('href')) > 0.5) {
                             elem.closest('.feed-item').find('.expandable, .zm-item-meta').fadeOut();
                         }
                     });
                     $('.goog-scrollfloater-floating').remove();
                     change = false;
                 }
-            }, 700);
+            }, 500);
         });
     }
 }
