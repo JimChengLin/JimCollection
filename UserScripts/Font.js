@@ -53,6 +53,8 @@ function travel(element, probe) {
                 isModified = (fonts[i] = 'open sans');
             } else if (font.match('monospace')) {
                 isModified = (fonts[i] = 'consolas');
+            } else {
+                break;
             }
         }
 

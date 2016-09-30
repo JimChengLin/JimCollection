@@ -49,7 +49,6 @@ function zhihu() {
             $('._hint').remove();
             event.stopImmediatePropagation();
         });
-
         let day = () => Date.now() / 1000 / 60 / 60 / 24;
         let DayDiff = {
             record: {},
@@ -82,7 +81,6 @@ function zhihu() {
             let change = true;
             let observer = new MutationObserver(() => change = true);
             observer.observe(document.querySelector('div.zu-main-content'), {childList: true, subtree: true});
-
             setInterval(() => {
                 if (change) {
                     $('.feed-item > link:not(._checked)').map((i, elem) => {
@@ -95,7 +93,7 @@ function zhihu() {
                     $('.goog-scrollfloater-floating').remove();
                     change = false;
                 }
-            }, 500);
+            }, 1000);
         });
     }
 }
