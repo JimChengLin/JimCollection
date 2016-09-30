@@ -107,6 +107,7 @@ $(`<style>
 ._plus{font-weight: bold}
 ._click{
     box-shadow: 0 0 1px 1px gray;
+    pointer-events: none;
     position: absolute;
     z-index: 2147483648;
 }
