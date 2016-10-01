@@ -3,7 +3,7 @@
 $('<style>html,body{font-family:open sans!important;}</style>').prependTo('html');
 var record = GM_getValue('fontQueue');
 var fontQueue = record ? record.split(',') : [];
-$(`<style>${fontQueue.map((i)=>inject(i, 'defer')).join()}</style>`).prependTo('html');
+$(`<style>${fontQueue.map((i) => inject(i, 'defer')).join()}</style>`).prependTo('html');
 
 function inject(font, defer) {
     var code =
@@ -44,7 +44,7 @@ function travel(element, probe) {
         var isModified;
         for (var i = 0; i < fonts.length; i++) {
             var font = fonts[i];
-            if (font.match(/(sans-serif|serif)/)) {
+            if (font.match(/sans-serif|serif/)) {
                 isModified = (fonts[i] = 'open sans');
             } else if (font.match('monospace')) {
                 isModified = (fonts[i] = 'consolas');

@@ -138,7 +138,7 @@ var Page = {
         Page.hintMap = popupHints(elements, hints);
 
         function getElements() {
-            var elements = $('a, button, select, input, textarea, [role="button"], [contenteditable], [onclick]');
+            var elements = $('a, a > *,button, select, input, textarea, [role="button"], [contenteditable], [onclick]');
             var clickElements = $(Page.clickElements);
             return purify(elements, clickElements.add(clickElements.find('div')));
 
@@ -157,9 +157,9 @@ var Page = {
 
                         element._left = rect.left;
                         element._top = rect.top;
-                        var positions = [[element._left + rect.width / 3, element._top + rect.height / 3], [
-                            Math.min(element._left + rect.width - 1, element._left + length),
-                            Math.min(element._top + rect.height - 1, element._top + length)]];
+                        var positions = [[element._left + rect.width / 3, element._top + rect.height / 3],
+                            [Math.min(element._left + rect.width - 1, element._left + length),
+                                Math.min(element._top + rect.height - 1, element._top + length)]];
 
                         for (var i = 0; i < positions.length; i++) {
                             var targetElement = document.elementFromPoint(positions[i][0], positions[i][1]);
@@ -175,7 +175,6 @@ var Page = {
 
                 var xTree = Tree.create(0, innerWidth);
                 var yTree = Tree.create(0, innerHeight);
-
                 elements = elements.get().reverse().filter(isExclusive);
                 clickElements = clickElements.get().reverse().filter(isExclusive);
 
