@@ -1,9 +1,9 @@
 'use strict';
 
-$('<style>html,body{font-family:open sans!important;}</style>').prependTo('html');
+$('<style>html,body{font-family:open sans!important;}</style>').appendTo('html');
 var record = GM_getValue('fontQueue');
 var fontQueue = record ? record.split(',') : [];
-$(`<style>${fontQueue.map((i) => inject(i, 'defer')).join()}</style>`).prependTo('html');
+$(`<style>${fontQueue.map((i) => inject(i, 'defer')).join()}</style>`).appendTo('html');
 
 function inject(font, defer) {
     var code =
@@ -19,7 +19,7 @@ function inject(font, defer) {
 $(() => {
     probeLang();
     travel(document.body);
-    GM_setValue('fontQueue', fontQueue.slice(0, 50).join(','));
+    GM_setValue('fontQueue', fontQueue.slice(0, 30).join(','));
 });
 
 var isTraditional;

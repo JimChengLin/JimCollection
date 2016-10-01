@@ -18,8 +18,8 @@ var counter = 0;
 var shouldBlur = true;
 var shouldRelease = false;
 var interval = setInterval(() => {
-    if (shouldBlur && counter < 10000 && !Page.target) {
-        counter += 10;
+    if (shouldBlur && counter < 3000 && !Page.target) {
+        counter += 1;
         var activeElement = document.activeElement;
         if (activeElement && activeElement.tagName !== 'IFRAME') {
             activeElement.blur && activeElement.blur();
@@ -30,7 +30,7 @@ var interval = setInterval(() => {
     } else {
         clearInterval(interval);
     }
-}, 10);
+}, 1);
 
 $(() => {
     $('input, textarea').map((i, elem) => {
@@ -138,9 +138,9 @@ var Page = {
         Page.hintMap = popupHints(elements, hints);
 
         function getElements() {
-            var elements = $('a, a > *,button, select, input, textarea, [role="button"], [contenteditable], [onclick]');
+            var elements = $('a, button, select, input, textarea, [role="button"], [contenteditable], [onclick]');
             var clickElements = $(Page.clickElements);
-            return purify(elements, clickElements.add(clickElements.find('div')));
+            return purify(elements, clickElements.add(clickElements.find('div')).add('a > *'));
 
             function purify(elements, clickElements) {
                 const length = 16;
@@ -348,7 +348,7 @@ var Page = {
 
             if (hints.length === 1) {
                 var element = Page.hintMap[Page.chars];
-                element.tagName === 'A' && Page.isPlus ? GM_openInTab(element.href, true) : Page.click(element);
+                element.tagName === 'A' && element.href && Page.isPlus ? GM_openInTab(element.href, true) : Page.click(element);
 
                 var rect = element.getBoundingClientRect();
                 var style = {
@@ -422,7 +422,7 @@ var Page = {
             element.hasAttribute('contenteditable'));
 
         var char = String.fromCharCode(event.keyCode).toUpperCase();
-        var isUseful = $('._hint').length || 'FJK'.includes(char);
+        var isUseful = $('._hint, ._click').length || 'FJK'.includes(char);
         return !event.ctrlKey && !isInput && isUseful;
     }
 };
