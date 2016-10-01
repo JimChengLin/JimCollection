@@ -1,13 +1,11 @@
 'use strict';
 
-$('<style>body{font-family:open sans!important;}</style>').prependTo('head');
-var code = '';
 var record = GM_getValue('fontQueue');
 var fontQueue = record ? record.split(',') : [];
-for (var i = 0; i < fontQueue.length; i++) {
-    code += inject(fontQueue[i], 'defer');
-}
-$(`<style>${code}</style>`).prependTo('head');
+var code = 'html,body{font-family:noto sans cjk sc!important;}' + fontQueue.map((i) => inject(i, 'defer')).join();
+var style = document.createElement('style');
+style.innerHTML = code;
+document.querySelector('html').appendChild(style);
 
 function inject(font, defer) {
     var code =
@@ -49,7 +47,7 @@ function travel(element, probe) {
 
         for (var i = 0; i < fonts.length; i++) {
             var font = fonts[i];
-            if (font.match(/sans-serif|serif/)) {
+            if (font.match(/(sans-serif|serif)/)) {
                 isModified = (fonts[i] = 'open sans');
             } else if (font.match('monospace')) {
                 isModified = (fonts[i] = 'consolas');
