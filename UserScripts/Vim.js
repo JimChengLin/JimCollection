@@ -140,10 +140,11 @@ var Page = {
         function getElements() {
             var elements = $('a, button, select, input, textarea, [role="button"], [contenteditable], [onclick]');
             var clickElements = $(Page.clickElements);
-            return purify(elements, clickElements.add(clickElements.find('div').addClass('_strict')).add('a > *'));
+            return purify(elements, clickElements.add(clickElements.find('div').addClass('_strict')));
 
             function purify(elements, clickElements) {
                 const length = 16;
+                var substitutes = [];
 
                 function isDisplayed(element, clickable) {
                     var style = getComputedStyle(element);
@@ -169,11 +170,15 @@ var Page = {
                                 return true;
                             }
                         }
+                        if (element.tagName === 'A') {
+                            substitutes.push(element);
+                        }
                     }
                 }
 
                 elements = elements.filter((i, elem) => isDisplayed(elem));
                 clickElements = clickElements.filter((i, elem) => isDisplayed(elem, 'clickable'));
+                clickElements.add($(substitutes).find('*').filter((i, elem) => isDisplayed(elem, 'clickable')));
 
                 var xTree = Tree.create(0, innerWidth);
                 var yTree = Tree.create(0, innerHeight);
