@@ -140,14 +140,16 @@ var Page = {
         function getElements() {
             var elements = $('a, button, select, input, textarea, [role="button"], [contenteditable], [onclick]');
             var clickElements = $(Page.clickElements);
-            return purify(elements, clickElements.add(clickElements.find('div')).add('a > *'));
+            return purify(elements, clickElements.add(clickElements.find('div').addClass('_strict')).add('a > *'));
 
             function purify(elements, clickElements) {
                 const length = 16;
 
-                function isDisplayed(element, isClickable) {
+                function isDisplayed(element, clickable) {
                     var style = getComputedStyle(element);
-                    if (style.opacity === '0' || (isClickable && style.cursor.search(/pointer|default|auto/) === -1)) {
+                    if (style.opacity === '0'
+                        || (clickable && style.cursor.search(/pointer|default|auto/) === -1)
+                        || (element.classList.contains('_strict') && style.cursor.search('pointer') === -1)) {
                         return;
                     }
 
