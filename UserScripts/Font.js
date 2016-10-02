@@ -19,7 +19,7 @@ function inject(font, defer) {
 $(() => {
     probeLang();
     travel(document.body);
-    GM_setValue('fontQueue', fontQueue.slice(0, 30).join(','));
+    GM_setValue('fontQueue', fontQueue.slice(0, 50).join(','));
 });
 
 var isTraditional;
@@ -38,12 +38,12 @@ var cache;
 function travel(element, probe) {
     var $element = $(element);
     var fontFamily = $element.css('font-family').replace(/'|"/g, '').toLowerCase();
-    var fonts = redirect(fontFamily.split(', '));
+    var fonts = redirect(fontFamily.split(','));
 
     function redirect(fonts) {
         var isModified;
         for (var i = 0; i < fonts.length; i++) {
-            var font = fonts[i];
+            var font = fonts[i].trim();
             if (font.match(/sans-serif|serif/)) {
                 isModified = (fonts[i] = 'open sans');
             } else if (font.match('monospace')) {
