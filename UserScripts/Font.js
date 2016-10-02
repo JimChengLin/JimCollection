@@ -1,6 +1,5 @@
 'use strict';
 
-$('<style>html,body{font-family:open sans!important;}</style>').appendTo('html');
 var record = GM_getValue('fontQueue');
 var fontQueue = record ? record.split(',') : [];
 $(`<style>${fontQueue.map((i) => inject(i, 'defer')).join()}</style>`).appendTo('html');
