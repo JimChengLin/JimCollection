@@ -1,14 +1,13 @@
 'use strict';
 
-$('<style>html,body{font-family:open sans!important;}</style>').appendTo('html');
 var record = GM_getValue('fontQueue');
 var fontQueue = record ? record.split(',') : [];
 $(`<style>${fontQueue.map((i) => inject(i, 'defer')).join()}</style>`).appendTo('html');
 
 function inject(font, defer) {
     var code =
-        `@font-face{font-family:${font};src:local(${font});}` +
-        `@font-face{font-family:${font};unicode-range:u+4e00-9fff;src:local(noto sans cjk sc);}`;
+        `@font-face{font-family:${font};unicode-range:u+4e00-9fff;src:local(noto sans cjk sc);}` +
+        `@font-face{font-family:${font};unicode-range:u+0-4dff,u+a000-10ffff;src:local(${font});}`;
     if (!defer) {
         $(`<style>${code}</style>`).appendTo('html');
     } else {
@@ -38,22 +37,18 @@ var cache;
 function travel(element, probe) {
     var $element = $(element);
     var fontFamily = $element.css('font-family').replace(/'|"/g, '').toLowerCase();
-    var fonts = redirect(fontFamily.split(','));
+    var fonts = redirect(fontFamily.split(',').map((f) => f.trim()).filter(Boolean));
 
     function redirect(fonts) {
         var isModified;
         for (var i = 0; i < fonts.length; i++) {
-            var font = fonts[i].trim();
+            var font = fonts[i];
             if (font.match(/sans-serif|serif/)) {
                 isModified = (fonts[i] = 'open sans');
             } else if (font.match('monospace')) {
                 isModified = (fonts[i] = 'consolas');
-            } else {
-                isModified = false;
-                break;
             }
         }
-        fonts = fonts.filter(Boolean);
         if (isModified) {
             $element.css('font-family', fonts.join());
         }
