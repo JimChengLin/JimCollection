@@ -6,7 +6,8 @@ $(`<style>${fontQueue.map((i) => inject(i, 'defer')).join()}</style>`).appendTo(
 
 function inject(font, defer) {
     var code = `@font-face{font-family:${font};src:local(${font});}` +
-        `@font-face{font-family:${font};unicode-range:u+4e00-9fff;src:local(noto sans cjk sc);}`;
+        `@font-face{font-family:${font};unicode-range:u+4e00-9fff;src:local(noto sans cjk sc);}` +
+        `@font-face{font-family:${font};unicode-range:u+0-4dff,u+a000-10ffff;src:local(${font});}`;
     if (!defer) {
         $(`<style>${code}</style>`).appendTo('html');
     } else {
@@ -17,7 +18,7 @@ function inject(font, defer) {
 $(() => {
     probeLang();
     travel(document.body);
-    GM_setValue('fontQueue', fontQueue.slice(0, 50).join(','));
+    GM_setValue('fontQueue', fontQueue.slice(0, 100).join(','));
 });
 
 var isTraditional;
