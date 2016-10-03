@@ -10,15 +10,13 @@ Element.prototype.addEventListener = function (type, listener, userCapture) {
 };
 
 // Event
-$(window)
-    .on('click resize scroll', () => Page.escape())
-    .on('click', (event) => Page.target = event.target);
+$(window).on('click resize scroll', () => Page.escape());
 
 var counter = 0;
 var shouldBlur = true;
 var shouldRelease = false;
 var interval = setInterval(() => {
-    if (shouldBlur && counter < 3000 && !Page.target) {
+    if (shouldBlur && counter < 3000) {
         counter += 1;
         var activeElement = document.activeElement;
         if (activeElement && activeElement.tagName !== 'IFRAME') {
@@ -123,9 +121,7 @@ $(`<style>
 }</style>`).appendTo('html');
 
 var Page = {
-    target: null,
     clickElements: [],
-
     chars: '',
     hintMap: {},
     isPlus: false,
@@ -374,20 +370,7 @@ var Page = {
     },
 
     scrollTop: (offset) => {
-        var targets = Page.target && Page.target.tagName !== 'OBJECT' ?
-            $(Page.target).parentsUntil('body').addBack() : $('div');
-        targets = targets.filter((i, elem) => elem.scrollHeight >= elem.clientHeight)
-                         .toArray().sort((a, b) => a.scrollHeight > b.scrollHeight).reverse();
-        targets.unshift(document.body);
-
-        for (var i = 0; i < targets.length; i++) {
-            var target = targets[i];
-            if ((target.scrollTop += 1) !== 1 || (target.scrollTop += -1) !== -1) {
-                Page.target = target;
-                return target.scrollTop += offset;
-            }
-        }
-        scrollBy(0, offset);
+        document.scrollingElement.scrollTop += offset;
     },
 
     plus: ()=> {
