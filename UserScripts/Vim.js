@@ -174,7 +174,7 @@ var Page = {
 
                 elements = elements.filter((i, elem) => isDisplayed(elem));
                 clickElements = clickElements.filter((i, elem) => isDisplayed(elem, 'clickable'));
-                clickElements = clickElements.add($(substitutes).find('*').filter((i, elem) => isDisplayed(elem)));
+                clickElements = clickElements.add($(substitutes).find('>*').filter((i, elem) => isDisplayed(elem)));
 
                 var xTree = Tree.create(0, innerWidth);
                 var yTree = Tree.create(0, innerHeight);
@@ -313,7 +313,9 @@ var Page = {
                 var element = elements[i];
                 var hint = hints[i];
                 map[hint] = element;
-
+                if (hint === 'X') {
+                    debugger;
+                }
                 var style = {
                     top: element._top,
                     left: element._left
