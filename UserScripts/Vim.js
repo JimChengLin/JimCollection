@@ -173,8 +173,8 @@ var Page = {
                 }
 
                 elements = elements.filter((i, elem) => isDisplayed(elem));
-                clickElements = clickElements.filter((i, elem) => isDisplayed(elem, 'clickable'))
-                                             .add($(substitutes).find('*').filter((i, elem) => isDisplayed(elem)));
+                clickElements = clickElements.filter((i, elem) => isDisplayed(elem, 'clickable'));
+                clickElements = clickElements.add($(substitutes).find('*').filter((i, elem) => isDisplayed(elem)));
 
                 var xTree = Tree.create(0, innerWidth);
                 var yTree = Tree.create(0, innerHeight);
