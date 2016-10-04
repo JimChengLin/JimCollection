@@ -5,7 +5,7 @@ var fontQueue = record ? record.split(',') : [];
 $(`<style>${fontQueue.map((i) => inject(i, 'defer')).join()}</style>`).appendTo('html');
 
 function inject(font, defer) {
-    var code = `@font-face{font-family:${font};src:local(☺);}` +
+    var code = `@font-face{font-family:${font};src:local('');}` +
         `@font-face{font-family:${font};unicode-range:u+4e00-9fff;src:local(noto sans cjk sc);}` +
         `@font-face{font-family:${font};unicode-range:u+0-4dff,u+a000-10ffff;src:local(${font});}`;
     if (!defer) {
@@ -18,7 +18,7 @@ function inject(font, defer) {
 $(() => {
     probeLang();
     travel(document.body);
-    GM_setValue('fontQueue', fontQueue.slice(0, 100).join(','));
+    GM_setValue('fontQueue', fontQueue.slice(0, 50).join(','));
 });
 
 var isTraditional;
