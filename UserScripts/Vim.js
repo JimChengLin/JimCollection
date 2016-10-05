@@ -16,7 +16,7 @@ var counter = 0;
 var shouldBlur = true;
 var shouldRelease = false;
 var interval = setInterval(() => {
-    if (shouldBlur && counter < 3000) {
+    if (shouldBlur && counter < 3000 && !shouldRelease) {
         counter += 1;
         var activeElement = document.activeElement;
         if (activeElement && activeElement.tagName !== 'IFRAME') {
