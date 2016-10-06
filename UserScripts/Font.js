@@ -37,7 +37,7 @@ var cache;
 function travel(element, probe) {
     var $element = $(element);
     var fontFamily = $element.css('font-family').replace(/'|"/g, '').toLowerCase();
-    var fonts = redirect(fontFamily.split(',').map((f) => f.trim()).filter(Boolean));
+    var fonts = redirect(fontFamily.split(',').map((f) => f.trim()).filter(/[a-zA-Z\u4E00-\u9FFF]/.test));
 
     function redirect(fonts) {
         var isModified;
