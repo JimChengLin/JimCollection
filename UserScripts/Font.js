@@ -37,7 +37,7 @@ var cache;
 function travel(element, probe) {
     var $element = $(element);
     var fontFamily = $element.css('font-family').replace(/'|"/g, '').toLowerCase();
-    var fonts = redirect(fontFamily.split(',').map((f) => f.trim()).filter(/^[a-zA-Z\u4E00-\u9FFF]+$/.test));
+    var fonts = redirect(fontFamily.split(',').map((f)=>f.trim()).filter((f)=>/^[\sa-zA-Z\u4E00-\u9FFF]+$/.test(f)));
 
     function redirect(fonts) {
         var isModified;
@@ -77,7 +77,6 @@ function travel(element, probe) {
     if (probe && isTraditional) {
         simplify(element);
     }
-
     var children = element.children;
     for (var i = 0; i < children.length; i++) {
         var child = children[i];
