@@ -55,8 +55,8 @@ function travel(element, probe) {
         return fonts;
     }
 
-    if ((probe || probe === undefined) &&
-        (probe = (element.innerText && element.innerText.match(/[\u4E00-\u9FFF]/))) && fontFamily !== cache) {
+    if (element.tagName === 'INPUT' || ((probe || probe === undefined) &&
+        (probe = (element.innerText && element.innerText.match(/[\u4E00-\u9FFF]/))) && fontFamily !== cache)) {
         cache = fontFamily;
         fonts.map(
             (font) => {
