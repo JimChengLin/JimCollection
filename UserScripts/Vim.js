@@ -308,14 +308,10 @@ var Page = {
 
         function popupHints(elements, hints) {
             var map = {};
-
             for (var i = 0; i < elements.length; i++) {
                 var element = elements[i];
                 var hint = hints[i];
                 map[hint] = element;
-                if (hint === 'X') {
-                    debugger;
-                }
                 var style = {
                     top: element._top,
                     left: element._left
@@ -372,7 +368,18 @@ var Page = {
     },
 
     scrollTop: (offset) => {
-        document.scrollingElement.scrollTop += offset;
+        if ((document.scrollingElement.scrollTop += offset) === offset) {
+            var targets = $('div').filter((i, elem) => elem.scrollHeight >= elem.clientHeight)
+                                  .toArray()
+                                  .sort((a, b) => a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth)
+                                  .reverse();
+            for (var i = 0; i < targets.length; i++) {
+                var target = targets[i];
+                if ((target.scrollTop += 1) !== 1 || (target.scrollTop += -1) !== -1) {
+                    return target.scrollTop += offset;
+                }
+            }
+        }
     },
 
     plus: ()=> {
