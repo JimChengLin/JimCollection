@@ -142,11 +142,10 @@ var Page = {
                 const length = 16;
                 var substitutes = [];
 
-                function isDisplayed(element, clickable) {
+                function isDisplayed(element) {
                     var style = getComputedStyle(element);
                     if (style.opacity === '0'
-                        || (clickable && style.cursor.search(/pointer|default|auto/) === -1)
-                        || (element.classList.contains('_strict') && style.cursor.search('pointer') === -1)) {
+                        || (element.classList.contains('_strict') && style.cursor.search(/pointer|text/) === -1)) {
                         return;
                     }
 
@@ -173,7 +172,7 @@ var Page = {
                 }
 
                 elements = elements.filter((i, elem) => isDisplayed(elem));
-                clickElements = clickElements.filter((i, elem) => isDisplayed(elem, 'clickable'));
+                clickElements = clickElements.filter((i, elem) => isDisplayed(elem));
                 clickElements = clickElements.add($(substitutes).find('>*').filter((i, elem) => isDisplayed(elem)));
 
                 var xTree = Tree.create(0, innerWidth);
