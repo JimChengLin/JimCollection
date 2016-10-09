@@ -173,7 +173,7 @@ var Page = {
 
                 elements = elements.filter((i, elem) => isDisplayed(elem));
                 clickElements = clickElements.filter((i, elem) => isDisplayed(elem));
-                clickElements = clickElements.add($(substitutes).find('>*').filter((i, elem) => isDisplayed(elem)));
+                clickElements = clickElements.add($(substitutes).find('> *').filter((i, elem) => isDisplayed(elem)));
 
                 var xTree = Tree.create(0, innerWidth);
                 var yTree = Tree.create(0, innerHeight);
@@ -347,8 +347,23 @@ var Page = {
             $(removeElements).remove();
 
             if (hints.length === 1) {
+                var done;
                 var element = Page.hintMap[Page.chars];
-                element.tagName === 'A' && element.href && Page.isPlus ? GM_openInTab(element.href, true) : Page.click(element);
+                if (Page.isPlus) {
+                    if (element.tagName === 'A' && element.href) {
+                        done = GM_openInTab(element.href, true);
+                    } else {
+                        for (var parent of $(element).parentsUntil(document.body)) {
+                            if (parent.tagName === 'A' && parent.href) {
+                                done = GM_openInTab(parent.href, true);
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (!done) {
+                    Page.click(element);
+                }
 
                 var rect = element.getBoundingClientRect();
                 var style = {
