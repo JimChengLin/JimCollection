@@ -30,7 +30,9 @@ var interval = setInterval(() => {
     }
 }, 1);
 
+var canScroll = false;
 $(() => {
+    canScroll = true;
     $('input, textarea').map((i, elem) => {
         elem._focus = elem.focus;
         elem.focus = function (args) {
@@ -382,7 +384,7 @@ var Page = {
     },
 
     scrollTop: (offset) => {
-        if ((document.scrollingElement.scrollTop += offset) === offset) {
+        if ((document.scrollingElement.scrollTop += offset) === offset && canScroll) {
             var targets = $('div').filter((i, elem) => elem.scrollHeight >= elem.clientHeight)
                                   .toArray()
                                   .sort((a, b) => a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth)
