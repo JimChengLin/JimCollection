@@ -385,9 +385,11 @@ var Page = {
 
     scrollTop: (offset) => {
         if ((document.scrollingElement.scrollTop += offset) === offset && canScroll) {
-            var targets = $('div:visible').filter((i, elem) => elem.scrollHeight >= elem.clientHeight).toArray()
-                                          .sort((a, b) =>
-                                          a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth).reverse();
+            var targets = $('div:visible')
+                .filter((i, elem) =>
+                elem.scrollHeight >= elem.clientHeight && getComputedStyle(elem).overflow !== 'hidden').toArray()
+                .sort((a, b) =>
+                a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth).reverse();
             for (var i = 0; i < targets.length; i++) {
                 var target = targets[i];
                 if ((target.scrollTop += 1) !== 1 || (target.scrollTop += -1) !== -1) {
