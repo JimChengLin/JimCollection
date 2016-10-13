@@ -434,8 +434,8 @@ var Page = {
 
     isCommand: (event) => {
         var element = document.activeElement;
-        var isInput = element && !element.hasAttribute('readonly') && (element.tagName.match(/INPUT|TEXTAREA/) ||
-            element.hasAttribute('contenteditable'));
+        var isInput = element && !element.hasAttribute('readonly') && element.type !== 'checkbox' &&
+            (element.tagName.match(/INPUT|TEXTAREA/) || element.hasAttribute('contenteditable'));
 
         var char = String.fromCharCode(event.keyCode).toUpperCase();
         var isUseful = $('._hint, ._click').length || 'FJK'.includes(char);
