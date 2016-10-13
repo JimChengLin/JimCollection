@@ -2,7 +2,7 @@
 
 var record = GM_getValue('fontQueue');
 var fontQueue = record ? record.split(',') : [];
-$(`<style>${fontQueue.map((i) => inject(i, 'defer')).join()}</style>`).appendTo('html');
+$(`<style>${fontQueue.map((i) => inject(i, 'defer')).join()}</style>`).prependTo('html');
 
 function inject(font, defer) {
     var code = `@font-face{font-family:${font};src:local('');}` +
@@ -18,7 +18,7 @@ function inject(font, defer) {
 $(() => {
     probeLang();
     travel(document.body);
-    GM_setValue('fontQueue', fontQueue.slice(0, 50).join(','));
+    GM_setValue('fontQueue', fontQueue.slice(0, 100).join(','));
 });
 
 var isTraditional;
