@@ -157,6 +157,9 @@ var Page = {
 
                         element._left = rect.left;
                         element._top = rect.top;
+                        if (element.tagName.match(/INPUT|TEXTAREA/)) {
+                            return true;
+                        }
                         var positions = [[element._left + rect.width / 3, element._top + rect.height / 3],
                             [Math.min(element._left + rect.width - 1, element._left + length),
                                 Math.min(element._top + rect.height - 1, element._top + length)]];
