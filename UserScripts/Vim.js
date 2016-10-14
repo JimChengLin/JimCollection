@@ -166,10 +166,6 @@ var Page = {
                             if (targetElement === element || element.contains(targetElement)) {
                                 return true;
                             }
-                            if (element.tagName.match(/INPUT|TEXTAREA/) &&
-                                targetElement.clientHeight * targetElement.clientWidth < innerHeight * innerWidth / 45) {
-                                return true;
-                            }
                         }
                         if (element.tagName === 'A') {
                             substitutes.push(element);
