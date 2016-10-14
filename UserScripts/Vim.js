@@ -157,9 +157,6 @@ var Page = {
 
                         element._left = rect.left;
                         element._top = rect.top;
-                        if (element.tagName.match(/INPUT|TEXTAREA/)) {
-                            return true;
-                        }
                         var positions = [[element._left + rect.width / 3, element._top + rect.height / 3],
                             [Math.min(element._left + rect.width - 1, element._left + length),
                                 Math.min(element._top + rect.height - 1, element._top + length)]];
@@ -167,6 +164,10 @@ var Page = {
                         for (var i = 0; i < positions.length; i++) {
                             var targetElement = document.elementFromPoint(positions[i][0], positions[i][1]);
                             if (targetElement === element || element.contains(targetElement)) {
+                                return true;
+                            }
+                            if (element.tagName.match(/INPUT|TEXTAREA/) &&
+                                targetElement.clientHeight * targetElement.clientWidth < innerHeight * innerWidth / 45) {
                                 return true;
                             }
                         }
