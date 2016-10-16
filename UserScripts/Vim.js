@@ -163,14 +163,13 @@ var Page = {
                                 Math.min(element._top + rect.height - 1, element._top + length)
                             ]];
 
-                        var elementPath;
                         for (var i = 0; i < positions.length; i++) {
                             var targetElement = document.elementFromPoint(positions[i][0], positions[i][1]);
                             if (targetElement === element || element.contains(targetElement)) {
                                 return true;
                             }
                             if (element.tagName === 'INPUT') {
-                                elementPath = elementPath | xPath(element);
+                                var elementPath = xPath(element);
                                 var targetPath = xPath(targetElement);
                                 if (intersection(elementPath, targetPath).length > Math.min(
                                         elementPath.length, targetPath.length) * 0.7) {
