@@ -168,13 +168,12 @@ var Page = {
                             if (targetElement === element || element.contains(targetElement)) {
                                 return true;
                             }
-                            if (element.tagName === 'INPUT') {
-                                var elementPath = xPath(element);
-                                var targetPath = xPath(targetElement);
-                                if (intersection(elementPath, targetPath).length > Math.min(
-                                        elementPath.length, targetPath.length) * 0.7) {
-                                    return true;
-                                }
+                        }
+                        if (element.tagName === 'INPUT' && targetElement.tagName !== 'INPUT') {
+                            var a = xPath(element);
+                            var b = xPath(targetElement);
+                            if (a.substr(0, a.lastIndexOf('/')) === b.substr(0, b.lastIndexOf('/'))) {
+                                return true;
                             }
                         }
                         if (element.tagName === 'A') {
@@ -548,22 +547,4 @@ function xPath(node) {
     }
     var suffix = count > 1 ? '[' + count + ']' : '';
     return xPath(node.parentNode) + '/' + node.tagName + suffix;
-}
-
-function intersection(a, b) {
-    var big, small;
-    if (a.length > b.length) {
-        big = a;
-        small = b;
-    } else {
-        big = b;
-        small = a;
-    }
-    for (var i = 0; i < small.length; i++) {
-        if (small[i] !== big[i]) {
-            break;
-        }
-    }
-    small = small.substr(0, i);
-    return small.substr(0, small.lastIndexOf('/'));
 }
