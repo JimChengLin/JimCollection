@@ -163,10 +163,19 @@ var Page = {
                                 Math.min(element._top + rect.height - 1, element._top + length)
                             ]];
 
+                        var elementPath;
                         for (var i = 0; i < positions.length; i++) {
                             var targetElement = document.elementFromPoint(positions[i][0], positions[i][1]);
                             if (targetElement === element || element.contains(targetElement)) {
                                 return true;
+                            }
+                            if (element.tagName === 'INPUT') {
+                                elementPath = elementPath | xPath(element);
+                                var targetPath = xPath(targetElement);
+                                if (intersection(elementPath, targetPath).length > Math.min(
+                                        elementPath.length, targetPath.length) * 0.7) {
+                                    return true;
+                                }
                             }
                         }
                         if (element.tagName === 'A') {
@@ -522,3 +531,40 @@ var Tree = {
         }
     }
 };
+
+function xPath(node) {
+    if (!(node && node.nodeType === 1)) {
+        return '';
+    }
+    var count = 0;
+    var siblings = node.parentNode.childNodes;
+    for (var i = 0; i < siblings.length; i++) {
+        var sibling = siblings[i];
+        if (sibling.tagName === node.tagName) {
+            count += 1;
+        }
+        if (sibling === node) {
+            break;
+        }
+    }
+    var suffix = count > 1 ? '[' + count + ']' : '';
+    return xPath(node.parentNode) + '/' + node.tagName + suffix;
+}
+
+function intersection(a, b) {
+    var big, small;
+    if (a.length > b.length) {
+        big = a;
+        small = b;
+    } else {
+        big = b;
+        small = a;
+    }
+    for (var i = 0; i < small.length; i++) {
+        if (small[i] !== big[i]) {
+            break;
+        }
+    }
+    small = small.substr(0, i);
+    return small.substr(0, small.lastIndexOf('/'));
+}
