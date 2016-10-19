@@ -4,7 +4,7 @@
 Element.prototype._addEventListener = Element.prototype.addEventListener;
 Element.prototype.addEventListener = function (type, listener, userCapture) {
     this._addEventListener(type, listener, userCapture);
-    if (this.tagName === 'DIV' && type.match(/(mouse|click)/)) {
+    if (this.tagName.match(/DIV|I/) && type.match(/(mouse|click)/)) {
         Page.clickElements.push(this);
     }
 };
