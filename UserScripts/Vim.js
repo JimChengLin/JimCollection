@@ -30,9 +30,7 @@ var interval = setInterval(() => {
     }
 }, 1);
 
-var canScroll = false;
 $(() => {
-    canScroll = true;
     $('input, textarea').map((i, elem) => {
         elem._focus = elem.focus;
         elem.focus = function (args) {
@@ -393,19 +391,17 @@ var Page = {
     },
 
     scrollTop: (offset) => {
-        if (canScroll) {
-            var targets = $('div:visible')
-                .filter((i, elem) =>
-                elem.scrollHeight >= elem.clientHeight && getComputedStyle(elem).overflow !== 'hidden').toArray()
-                .sort((a, b) =>
-                a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth).reverse();
-            targets.unshift(document.scrollingElement);
+        var targets = $('div:visible')
+            .filter((i, elem) =>
+            elem.scrollHeight >= elem.clientHeight && getComputedStyle(elem).overflow !== 'hidden').toArray()
+            .sort((a, b) =>
+            a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth).reverse();
+        targets.unshift(document.scrollingElement);
 
-            for (var i = 0; i < targets.length; i++) {
-                var target = targets[i];
-                if ((target.scrollTop += 1) !== 1 || (target.scrollTop += -1) !== -1) {
-                    return target.scrollTop += offset;
-                }
+        for (var i = 0; i < targets.length; i++) {
+            var target = targets[i];
+            if ((target.scrollTop += 1) !== 1 || (target.scrollTop += -1) !== -1) {
+                return target.scrollTop += offset;
             }
         }
     },
