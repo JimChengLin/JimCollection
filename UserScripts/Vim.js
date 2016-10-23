@@ -136,7 +136,7 @@ var Page = {
         function getElements() {
             var elements = $('a, button, select, input, textarea, [role="button"], [contenteditable], [onclick]');
             var clickElements = $(Page.clickElements);
-            return purify(elements, clickElements.add(clickElements.find('div').addClass('_strict')));
+            return purify(elements, clickElements.add(clickElements.find('div')).addClass('_strict'));
 
             function purify(elements, clickElements) {
                 const length = 16;
