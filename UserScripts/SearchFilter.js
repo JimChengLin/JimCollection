@@ -77,7 +77,7 @@ function main() {
         }, 1000);
     }
 
-    else if (href.includes('baidu.com/link?')) {
+    else if (href.includes('www.baidu.com/link?')) {
         var url = $('head > noscript').text().match(/URL='(.+)'/).pop();
         mapMain = JSON.parse(GM_getValue('mapMain'));
         mapBackup = JSON.parse(GM_getValue('mapBackup'));
