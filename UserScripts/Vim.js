@@ -396,7 +396,7 @@ var Page = {
             elem.scrollHeight >= elem.clientHeight && getComputedStyle(elem).overflow !== 'hidden').toArray()
             .sort((a, b) =>
             a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth).reverse();
-        targets.unshift(document.scrollingElement);
+        targets.splice(0, 0, document.activeElement, document.scrollingElement);
 
         for (var i = 0; i < targets.length; i++) {
             var target = targets[i];
