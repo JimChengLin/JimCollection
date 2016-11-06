@@ -17,7 +17,6 @@ var shouldBlur = true;
 var shouldRelease = false;
 var interval = setInterval(() => {
     if (shouldBlur && counter < 3000 && !shouldRelease) {
-        focus(top);
         counter += 10;
         var activeElement = document.activeElement;
         if (activeElement && activeElement.tagName.match(/INPUT|TEXTAREA/)) {
@@ -26,6 +25,7 @@ var interval = setInterval(() => {
                 shouldBlur = false;
             }
         }
+        activeElement && activeElement.tagName === 'IFRAME' && focus(top);
     } else {
         clearInterval(interval);
     }
