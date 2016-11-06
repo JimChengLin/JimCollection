@@ -17,9 +17,10 @@ var shouldBlur = true;
 var shouldRelease = false;
 var interval = setInterval(() => {
     if (shouldBlur && counter < 3000 && !shouldRelease) {
-        counter += 1;
+        focus(top);
+        counter += 10;
         var activeElement = document.activeElement;
-        if (activeElement && activeElement.tagName !== 'IFRAME') {
+        if (activeElement && activeElement.tagName.match(/INPUT|TEXTAREA/)) {
             activeElement.blur && activeElement.blur();
             if (activeElement._focus) {
                 shouldBlur = false;
@@ -28,7 +29,7 @@ var interval = setInterval(() => {
     } else {
         clearInterval(interval);
     }
-}, 1);
+}, 10);
 
 $(() => {
     $('input, textarea').map((i, elem) => {
