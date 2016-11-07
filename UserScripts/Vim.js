@@ -391,6 +391,7 @@ var Page = {
     },
 
     scrollTop: (offset) => {
+        !shouldRelease && self !== top && top.focus();
         var targets = $('div:visible')
             .filter((i, elem) =>
             elem.scrollHeight >= elem.clientHeight && getComputedStyle(elem).overflow !== 'hidden').toArray()
