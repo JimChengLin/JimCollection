@@ -90,6 +90,7 @@ function zhihu() {
                             elem.closest('.feed-item').find('.expandable, .zm-item-meta').fadeOut();
                         }
                     });
+                    $('.goog-scrollfloater-floating').remove();
                     change = false;
                 }
             }, 1000);

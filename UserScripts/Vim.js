@@ -16,10 +16,10 @@ var counter = 0;
 var shouldBlur = true;
 var shouldRelease = false;
 var interval = setInterval(() => {
-    if (shouldBlur && counter < 3000 && !shouldRelease) {
+    if (counter < 3000 && shouldBlur && !shouldRelease) {
         counter += 10;
         var activeElement = document.activeElement;
-        if (activeElement && activeElement.tagName.match(/INPUT|TEXTAREA/)) {
+        if (activeElement && activeElement.tagName.match(/(INPUT|TEXTAREA)/)) {
             activeElement.blur && activeElement.blur();
             if (activeElement._focus) {
                 shouldBlur = false;
@@ -34,7 +34,7 @@ var interval = setInterval(() => {
 $(() => {
     $('input, textarea').map((i, elem) => {
         elem._focus = elem.focus;
-        elem.focus = function (args) {
+        elem.focus = function () {
             if (shouldRelease) {
                 elem._focus.apply(this, arguments);
             }
@@ -50,7 +50,7 @@ function register() {
         var isCommand = Page.isCommand(event);
         var activeElement = document.activeElement;
 
-        if (isTab && !doDefaultTab()) {
+        if (isTab && !tab()) {
             event.preventDefault();
             event.stopImmediatePropagation();
             isCommand ? Page.escape() : activeElement && activeElement.blur();
@@ -59,7 +59,7 @@ function register() {
             event.stopImmediatePropagation();
         }
 
-        function doDefaultTab() {
+        function tab() {
             return activeElement && activeElement.tagName === 'INPUT' &&
                 (!activeElement.type || activeElement.type === 'text') &&
                 $(activeElement).closest('form').find('input[type="password"]').length;
@@ -156,7 +156,7 @@ var Page = {
 
                         element._left = rect.left;
                         element._top = rect.top;
-                        var positions = [[element._left + rect.width / 3, element._top + rect.height / 3],
+                        var positions = [[element._left + rect.width / 2, element._top + rect.height / 2],
                             [
                                 Math.min(element._left + rect.width - 1, element._left + length),
                                 Math.min(element._top + rect.height - 1, element._top + length)
@@ -397,7 +397,7 @@ var Page = {
             elem.scrollHeight >= elem.clientHeight && getComputedStyle(elem).overflow !== 'hidden').toArray()
             .sort((a, b) =>
             a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth).reverse();
-        targets.splice(0, 0, document.activeElement, document.scrollingElement);
+        targets.unshift(document.scrollingElement);
 
         for (var i = 0; i < targets.length; i++) {
             var target = targets[i];
@@ -413,12 +413,12 @@ var Page = {
     },
 
     click: (element) => {
+        shouldBlur = false;
         shouldRelease = true;
         if ((element.tagName === 'INPUT' &&
             element.type.search(/(button|checkbox|file|hidden|image|radio|reset|submit)/i) === -1) ||
             element.hasAttribute('contenteditable') || element.tagName === 'TEXTAREA') {
             element._focus ? element._focus() : element.focus();
-            shouldBlur = false;
             if (element.setSelectionRange) {
                 try {
                     var len = element.value.length * 2;
