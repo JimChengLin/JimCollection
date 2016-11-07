@@ -40,6 +40,7 @@ $(() => {
             }
         };
     });
+    $('iframe').map((i, elem) => elem.focus = $.noop);
 });
 
 window ? register() : setTimeout(register);
