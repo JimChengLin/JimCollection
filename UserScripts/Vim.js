@@ -25,7 +25,6 @@ var interval = setInterval(() => {
                 shouldBlur = false;
             }
         }
-        activeElement && activeElement.tagName === 'IFRAME' && focus(top);
     } else {
         clearInterval(interval);
     }
@@ -40,7 +39,6 @@ $(() => {
             }
         };
     });
-    $('iframe').map((i, elem) => elem.focus = $.noop);
 });
 
 window ? register() : setTimeout(register);
