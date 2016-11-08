@@ -35,7 +35,7 @@ function main() {
     else if (isEngine = (href.includes('baidu.com/s?'))) {
         $('<style>#content_right{visibility:hidden}</style>').appendTo('html');
         update = function () {
-            $('span:contains("商业推广")').closest('div').remove();
+            $('span:contains("商业推广"), span:contains("广告")').closest('div').remove();
             var result = $('.c-container');
             result.map((i, element) => {
                 element = $(element);
