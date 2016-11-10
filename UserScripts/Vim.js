@@ -393,10 +393,8 @@ var Page = {
     scrollTop: (offset) => {
         !shouldRelease && self !== top && top.focus();
         var targets = $('div:visible')
-            .filter((i, elem) =>
-            elem.scrollHeight >= elem.clientHeight && getComputedStyle(elem).overflow !== 'hidden').toArray()
-            .sort((a, b) =>
-            a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth).reverse();
+            .filter((i, elem) => elem.scrollHeight >= elem.clientHeight).toArray()
+            .sort((a, b) => a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth).reverse();
         targets.unshift(document.scrollingElement);
 
         for (var i = 0; i < targets.length; i++) {
