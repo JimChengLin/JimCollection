@@ -81,7 +81,7 @@ def insert(char: str):
     else:
         collapse_node = active_node.sub_d[target[active_direction]]
 
-        # 是否坍缩能扩大?
+        # 是否坍缩能扩大? 可以
         if char == str(collapse_node)[active_len]:
             active_len += 1
 
@@ -90,33 +90,41 @@ def insert(char: str):
             # while remaining >= 0:
             # 没有 suffix link 的爆炸, 需要手动计算偏移量
             if collapse_node.suffix_link_to is None:
-                # while remaining > 0:
-                # 原坍缩点退化成共有部分
-                collapse_node.ed = collapse_node.op + active_len
+                while True:
+                    # 原坍缩点退化成共有部分
+                    collapse_node.ed = collapse_node.op + active_len
 
-                # 新建一个继承原有的点
-                inherit_node = Node()
-                inherit_node.op = collapse_node.ed
-                inherit_node.ed = 'END'
-                collapse_node.sub_d[target[inherit_node.op]] = inherit_node
+                    # 新建一个继承原有的点
+                    inherit_node = Node()
+                    inherit_node.op = collapse_node.ed
+                    inherit_node.ed = 'END'
+                    collapse_node.sub_d[target[inherit_node.op]] = inherit_node
 
-                # 再新建一个点用于当前的 char
-                new_char_node = Node()
-                new_char_node.op = end
-                new_char_node.ed = 'END'
-                collapse_node.sub_d[target[new_char_node.op]] = new_char_node
+                    # 再新建一个点用于当前的 char
+                    new_char_node = Node()
+                    new_char_node.op = end
+                    new_char_node.ed = 'END'
+                    collapse_node.sub_d[target[new_char_node.op]] = new_char_node
+                    remaining -= 1
 
-                # # 状态转移
-                # if active_len > 0:
-                #     active_direction += 1
-                #     active_len -= 1
-                #     collapse_node = active_node.sub_d[target[active_direction]]
-                #
-                # # active_len == 0 表明需要直接检测 sub_d
-                # else:
-                #     break
+                    # 状态转移
+                    active_len -= 1
+                    if active_len > 0:
+                        active_direction += 1
+                        collapse_node = active_node.sub_d[target[active_direction]]
 
-                remaining -= 1
+                    # active_len == 0 表明需要直接检测 sub_d
+                    else:
+                        assert active_node is root
+                        if char in root.sub_d:
+                            pass
+                        else:
+                            new_char_node = Node()
+                            new_char_node.op = end
+                            new_char_node.ed = 'END'
+                            root.sub_d[char] = new_char_node
+                            remaining -= 1
+                        break
 
     # 任何情况 end 都会 +1
     end += 1
