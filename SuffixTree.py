@@ -1,4 +1,4 @@
-def print_tree(node, fn_sub, fn_str, level=0):
+def print_tree(node, sub_fn, str_fn, level=0):
     '''
     图形化打印
     '''
@@ -8,10 +8,10 @@ def print_tree(node, fn_sub, fn_str, level=0):
         prefix = '-- '
     else:
         prefix = '  ' * (level - 1) + '-- '
-    print(prefix + fn_str(node))
+    print(prefix + str_fn(node))
 
-    for child in fn_sub(node):
-        print_tree(child, fn_sub, fn_str, level + 1)
+    for child in sub_fn(node):
+        print_tree(child, sub_fn, str_fn, level + 1)
 
 
 target = 'xyzxyaxyz$'
@@ -50,7 +50,7 @@ root = Node()
 
 remaining = 0
 active_node = root
-active_direction = -1
+active_direction = 0
 active_len = 0
 end = 0
 
@@ -91,7 +91,7 @@ def insert(char: str):
             # 没有 suffix link 的爆炸, 需要手动计算偏移量
             if collapse_node.suffix_link_to is None:
                 while True:
-                    # 原坍缩点退化成共有部分
+                    # 原坍缩点退化成共有部分, 但又进化成 internal node
                     collapse_node.ed = collapse_node.op + active_len
 
                     # 新建一个继承原有的点
@@ -111,10 +111,13 @@ def insert(char: str):
                     active_len -= 1
                     if active_len > 0:
                         active_direction += 1
-                        collapse_node = active_node.sub_d[target[active_direction]]
+                        new_collapse_node = active_node.sub_d[target[active_direction]]
+                        collapse_node.suffix_link_to = new_collapse_node
+                        collapse_node = new_collapse_node
 
                     # active_len == 0 表明需要直接检测 sub_d
                     else:
+                        collapse_node.suffix_link_to = root
                         assert active_node is root
                         if char in root.sub_d:
                             pass
@@ -125,8 +128,6 @@ def insert(char: str):
                             root.sub_d[char] = new_char_node
                             remaining -= 1
                         break
-
-    # 任何情况 end 都会 +1
     end += 1
 
 
