@@ -104,26 +104,28 @@ class SuffixTree:
 
             # 2.2. 无法继续坍缩, 炸开累积的后缀
             else:
-                while self.remainder > 0:
+                def split_grow():
+                    # 原坍缩点成为 inner_node
+                    collapse_node.ed = collapse_node.op + self.ac_offset
 
+                    # 新节点继承 :ed
+                    inherit_node = Node()
+                    inherit_node.op = collapse_node.ed
+                    inherit_node.ed = ':ed'
+                    # 回连
+                    collapse_node.sub[g_target[inherit_node.op]] = inherit_node
+
+                    # 新节点记录 char
+                    leaf_node = Node()
+                    leaf_node.op = self.cursor
+                    leaf_node.ed = ':ed'
+                    collapse_node.sub[g_target[leaf_node.op]] = leaf_node
+                    self.remainder -= 1
+
+                while self.remainder > 0:
                     # 2.2.1. 没有 suffix link 用于状态转移
                     if self.ac_node.link_to is None:
-                        # 原坍缩点成为 inner_node
-                        collapse_node.ed = collapse_node.op + self.ac_offset
-
-                        # 新节点继承 :ed
-                        inherit_node = Node()
-                        inherit_node.op = collapse_node.ed
-                        inherit_node.ed = ':ed'
-                        # 回连
-                        collapse_node.sub[g_target[inherit_node.op]] = inherit_node
-
-                        # 新节点记录 char
-                        leaf_node = Node()
-                        leaf_node.op = self.cursor
-                        leaf_node.ed = ':ed'
-                        collapse_node.sub[g_target[leaf_node.op]] = leaf_node
-                        self.remainder -= 1
+                        split_grow()
 
                         # 状态转移, 继续爆炸
                         self.ac_offset -= 1
@@ -136,14 +138,19 @@ class SuffixTree:
 
                         # 累积后缀已炸完
                         else:
-                            # 回到状态 1.
+                            # 进入 case 1
                             collapse_node.link_to = self.root
                             case_1()
 
                     # 2.2.2. 需要运用 suffix link
                     else:
-                        print()
-                        pass
+                        split_grow()
+                        # todo 跳转校正
+                        # 状态转移
+                        self.ac_node = self.ac_node.link_to
+                        next_collapse_node = self.ac_node.sub[g_target[self.ac_direction]]
+                        collapse_node.link_to = next_collapse_node
+                        collapse_node = next_collapse_node
         self.cursor += 1
 
 
