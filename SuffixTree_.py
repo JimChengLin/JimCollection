@@ -54,7 +54,7 @@ class SuffixTree:
                 prefix = '  ' * (level - 1) + '-- '
             print(prefix + str(node))
 
-            for child in reversed(sorted(node.sub.values())):
+            for child in sorted(node.sub.values()):
                 print_tree(child, level + 1)
 
         print_tree(self.root)
@@ -91,13 +91,16 @@ class SuffixTree:
 
             # 2.1. 能否扩大坍缩? 可以
             if char == g_target[collapse_node.op + self.ac_offset]:
-                self.ac_offset += 1
-
-                # 2.1.1. 如果是 inner_node, 坍缩是否达到极限? 是
+                # 2.1.1. 如果是 inner_node, 坍缩是否达已经到极限? 是
                 if collapse_node.is_inner \
                         and collapse_node.op + self.ac_offset == collapse_node.ed:
-                    # todo: implement
-                    pass
+                    # 推移 ac_node
+                    self.ac_node = collapse_node
+                    self.ac_direction = collapse_node.op + self.ac_offset
+                    self.ac_offset = 1
+                # 2.1.2. 一般情况
+                else:
+                    self.ac_offset += 1
 
             # 2.2. 无法继续坍缩, 炸开累积的后缀
             else:
@@ -134,7 +137,12 @@ class SuffixTree:
                         # 累积后缀已炸完
                         else:
                             # 回到状态 1.
+                            collapse_node.link_to = self.root
                             case_1()
+
+                    # 2.2.2. 需要运用 suffix link
+                    else:
+                        pass
         self.cursor += 1
 
 
@@ -146,4 +154,7 @@ if __name__ == '__main__':
     t.insert('x')
     t.insert('y')
     t.insert('a')
+    t.insert('x')
+    t.insert('y')
+    t.insert('z')
     t.repr()
