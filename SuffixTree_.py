@@ -138,7 +138,7 @@ class SuffixTree:
 
                         # 累积后缀已炸完
                         else:
-                            # 进入 case 1
+                            # 进入 case 1.
                             collapse_node.link_to = self.root
                             case_1()
 
@@ -151,6 +151,7 @@ class SuffixTree:
                         next_collapse_node = self.ac_node.sub[g_target[self.ac_direction]]
                         collapse_node.link_to = next_collapse_node
                         collapse_node = next_collapse_node
+                        # suffix link 消耗完之后. 进入 case 2.2.1.
         self.cursor += 1
 
 
