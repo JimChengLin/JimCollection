@@ -106,8 +106,8 @@ class SuffixTree:
             else:
                 while self.remainder > 0:
 
-                    # 2.2.1. 没有 suffix link 用于状态转移(坍缩点直连 root)
-                    if collapse_node.link_to is None:
+                    # 2.2.1. 没有 suffix link 用于状态转移
+                    if self.ac_node.link_to is None:
                         # 原坍缩点成为 inner_node
                         collapse_node.ed = collapse_node.op + self.ac_offset
 
@@ -142,6 +142,7 @@ class SuffixTree:
 
                     # 2.2.2. 需要运用 suffix link
                     else:
+                        print()
                         pass
         self.cursor += 1
 
@@ -157,4 +158,5 @@ if __name__ == '__main__':
     t.insert('x')
     t.insert('y')
     t.insert('z')
+    t.insert('$')
     t.repr()
