@@ -1,148 +1,170 @@
-def print_tree(node, sub_fn, str_fn, level=0):
-    '''
-    图形化打印
-    '''
-    if level == 0:
-        prefix = ''
-    elif level == 1:
-        prefix = '-- '
-    else:
-        prefix = '  ' * (level - 1) + '-- '
-    print(prefix + str_fn(node))
-
-    for child in sub_fn(node):
-        print_tree(child, sub_fn, str_fn, level + 1)
-
-
-target = 'xyzxyaxyz$'
+g_target = ''
 
 
 class Node:
-    '''
-    后缀树节点
-    '''
-
     def __init__(self):
-        self.sub_d = {}
+        self.sub = {}
 
-        # None 表示 root
-        self.op = None
-        self.ed = None
+        self.op = self.ed = None
+        self.link_to = None
 
-        # 可升级成 internal node
-        self.suffix_link_to = None
+    @property
+    def is_root(self):
+        return self.op is None and self.ed is None
+
+    @property
+    def is_leaf(self):
+        return not self.is_root and self.link_to is None
+
+    @property
+    def is_inner(self):
+        return not self.is_root and self.link_to is not None
 
     def __repr__(self):
-        if self.op is None:
-            return ':root'
-
-        if self.ed == 'END':
-            ed = end
+        if self.is_root:
+            return '<root>'
         else:
-            ed = self.ed
-        return target[self.op:ed] + ' {} {}'.format(self.op, ed)
+            op, ed = self.op, self.ed
+            if ed == ':ed':
+                ed = len(g_target)
+            return g_target[op:ed] + ' {}:{}'.format(op, ed)
 
-    def __lt__(self, other):
+    def __lt__(self, other: 'Node'):
         return str(self) < str(other)
 
 
-root = Node()
+class SuffixTree:
+    def __init__(self):
+        self.root = Node()
 
-remaining = 0
-active_node = root
-active_direction = 0
-active_len = 0
-end = 0
+        self.remainder = 0
+        self.cursor = 0
 
+        self.ac_node = self.root
+        self.ac_direction = 0
+        self.ac_offset = 0
 
-def insert(char: str):
-    global remaining, active_node, active_direction, active_len, end
+    def repr(self):
+        def print_tree(node: 'Node', level=0):
+            if level == 0:
+                prefix = ''
+            elif level == 1:
+                prefix = '-- '
+            else:
+                prefix = '  ' * (level - 1) + '-- '
+            print(prefix + str(node))
 
-    # 任何情况 remaining 都要+1
-    remaining += 1
+            for child in sorted(node.sub.values()):
+                print_tree(child, level + 1)
 
-    # 可以直接从 sub_d 比较
-    if active_len == 0:
-        # 最简单的, 不重复, 新添加一个 Node 的情况
-        if char not in active_node.sub_d:
-            new_node = Node()
-            new_node.op = end
-            new_node.ed = 'END'
-            active_node.sub_d[char] = new_node
-            remaining -= 1
+        print_tree(self.root)
+        print(self.__dict__)
 
-        # 可以陷入坍缩
+    def insert(self, char: str):
+        global g_target
+        g_target += char
+
+        self.remainder += 1
+
+        def case_1():
+            # 1.1. 无法坍缩, 建立新的叶节点
+            if char not in self.ac_node.sub:
+                leaf_node = Node()
+                leaf_node.op = self.cursor
+                leaf_node.ed = ':ed'
+                self.ac_node.sub[char] = leaf_node
+                self.remainder -= 1
+
+            # 1.2. 开始坍缩
+            else:
+                collapse_node = self.ac_node.sub[char]
+                self.ac_direction = collapse_node.op
+                self.ac_offset += 1
+
+        # 1. ac_node 是 root 的初始状态
+        if self.ac_node.is_root and self.ac_offset == 0:
+            case_1()
+
+        # 2. 已经坍缩
         else:
-            collapse_node = active_node.sub_d[char]
-            active_direction = collapse_node.op
-            active_len += 1
+            collapse_node = self.ac_node.sub[g_target[self.ac_direction]]
 
-    # 已经陷入坍缩, 进入坍缩点匹配
-    else:
-        collapse_node = active_node.sub_d[target[active_direction]]
+            # 2.1. 能否扩大坍缩? 可以
+            if char == g_target[collapse_node.op + self.ac_offset]:
+                # 2.1.1. 如果是 inner_node, 坍缩是否达已经到极限? 是
+                if collapse_node.is_inner \
+                        and collapse_node.op + self.ac_offset == collapse_node.ed:
+                    # 推移 ac_node
+                    self.ac_node = collapse_node
+                    self.ac_direction = collapse_node.op + self.ac_offset
+                    self.ac_offset = 1
+                # 2.1.2. 一般情况
+                else:
+                    self.ac_offset += 1
 
-        # 是否坍缩能扩大? 可以
-        if char == str(collapse_node)[active_len]:
-            active_len += 1
+            # 2.2. 无法继续坍缩, 炸开累积的后缀
+            else:
+                def split_grow():
+                    # 原坍缩点成为 inner_node
+                    collapse_node.ed = collapse_node.op + self.ac_offset
 
-        # 无法坍缩, 把已有的后缀炸开
-        else:
-            # while remaining >= 0:
-            # 没有 suffix link 的爆炸, 需要手动计算偏移量
-            if collapse_node.suffix_link_to is None:
-                while True:
-                    # 原坍缩点退化成共有部分, 但又进化成 internal node
-                    collapse_node.ed = collapse_node.op + active_len
-
-                    # 新建一个继承原有的点
+                    # 新节点继承 :ed
                     inherit_node = Node()
                     inherit_node.op = collapse_node.ed
-                    inherit_node.ed = 'END'
-                    collapse_node.sub_d[target[inherit_node.op]] = inherit_node
+                    inherit_node.ed = ':ed'
+                    # 回连
+                    collapse_node.sub[g_target[inherit_node.op]] = inherit_node
 
-                    # 再新建一个点用于当前的 char
-                    new_char_node = Node()
-                    new_char_node.op = end
-                    new_char_node.ed = 'END'
-                    collapse_node.sub_d[target[new_char_node.op]] = new_char_node
-                    remaining -= 1
+                    # 新节点记录 char
+                    leaf_node = Node()
+                    leaf_node.op = self.cursor
+                    leaf_node.ed = ':ed'
+                    collapse_node.sub[g_target[leaf_node.op]] = leaf_node
+                    self.remainder -= 1
 
-                    # 状态转移
-                    active_len -= 1
-                    if active_len > 0:
-                        active_direction += 1
-                        new_collapse_node = active_node.sub_d[target[active_direction]]
-                        collapse_node.suffix_link_to = new_collapse_node
-                        collapse_node = new_collapse_node
+                while self.remainder > 0:
+                    # 2.2.1. 没有 suffix link 用于状态转移
+                    if self.ac_node.link_to is None:
+                        split_grow()
 
-                    # active_len == 0 表明需要直接检测 sub_d
-                    else:
-                        collapse_node.suffix_link_to = root
-                        assert active_node is root
-                        if char in root.sub_d:
-                            pass
+                        # 状态转移, 继续爆炸
+                        self.ac_offset -= 1
+                        self.ac_direction += 1
+
+                        if self.ac_offset > 0:
+                            next_collapse_node = self.ac_node.sub[g_target[self.ac_direction]]
+                            collapse_node.link_to = next_collapse_node
+                            collapse_node = next_collapse_node
+
+                        # 累积后缀已炸完
                         else:
-                            new_char_node = Node()
-                            new_char_node.op = end
-                            new_char_node.ed = 'END'
-                            root.sub_d[char] = new_char_node
-                            remaining -= 1
-                        break
-    end += 1
+                            # 进入 case 1.
+                            collapse_node.link_to = self.root
+                            case_1()
+
+                    # 2.2.2. 需要运用 suffix link
+                    else:
+                        split_grow()
+                        # todo 跳转校正
+                        # 状态转移
+                        self.ac_node = self.ac_node.link_to
+                        next_collapse_node = self.ac_node.sub[g_target[self.ac_direction]]
+                        collapse_node.link_to = next_collapse_node
+                        collapse_node = next_collapse_node
+                        # suffix link 消耗完之后. 进入 case 2.2.1.
+        self.cursor += 1
 
 
 if __name__ == '__main__':
-    insert('x')
-    insert('y')
-    insert('z')
-    insert('x')
-    insert('y')
-    insert('a')
-
-    print_tree(root, lambda node: sorted(node.sub_d.values()), str)
-    print()
-    print('remaining -', remaining)
-    print('active_node -', active_node)
-    print('active_direction -', active_direction)
-    print('active_len -', active_len)
-    print('end -', end)
+    t = SuffixTree()
+    t.insert('x')
+    t.insert('y')
+    t.insert('z')
+    t.insert('x')
+    t.insert('y')
+    t.insert('a')
+    t.insert('x')
+    t.insert('y')
+    t.insert('z')
+    t.insert('$')
+    t.repr()
