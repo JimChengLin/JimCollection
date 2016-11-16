@@ -45,20 +45,25 @@ class SuffixTree:
         self.ac_offset = 0
 
     def repr(self):
+        repr_str = ''
+
         def print_tree(node: 'Node', level=0):
+            nonlocal repr_str
             if level == 0:
                 prefix = ''
             elif level == 1:
                 prefix = '-- '
             else:
                 prefix = '  ' * (level - 1) + '-- '
-            print(prefix + str(node))
+            repr_str += prefix + str(node) + '\n'
 
             for child in sorted(node.sub.values()):
                 print_tree(child, level + 1)
 
         print_tree(self.root)
-        print(self.__dict__)
+        print(repr_str, end='')
+        print(', '.join(sorted('{}: {}'.format(k, v) for k, v in self.__dict__.items() if k != 'root')))
+        return repr_str
 
     def insert(self, char: str):
         global g_target
@@ -161,16 +166,34 @@ class SuffixTree:
 
 if __name__ == '__main__':
     t = SuffixTree()
-    # t.insert('x')
-    # t.insert('y')
-    # t.insert('z')
-    # t.insert('x')
-    # t.insert('y')
-    # t.insert('a')
-    # t.insert('x')
-    # t.insert('y')
-    # t.insert('z')
-    # t.insert('$')
-    for char in 'mississi$':
-        t.insert(char)
-        t.repr()
+    t.insert('x')
+    t.insert('y')
+    t.insert('z')
+    t.insert('x')
+    t.insert('y')
+    t.insert('a')
+    t.insert('x')
+    t.insert('y')
+    t.insert('z')
+    t.insert('$')
+    expect = '''<root>
+-- $ 9:10
+-- axyz$ 5:10
+-- xy 0:2
+  -- axyz$ 5:10
+  -- z 2:3
+    -- $ 9:10
+    -- xyaxyz$ 3:10
+-- y 1:2
+  -- axyz$ 5:10
+  -- z 2:3
+    -- $ 9:10
+    -- xyaxyz$ 3:10
+-- z 2:3
+  -- $ 9:10
+  -- xyaxyz$ 3:10'''
+    assert t.repr().strip() == expect.strip()
+
+    # for char in 'mississi$':
+    #     t.insert(char)
+    #     t.repr()
