@@ -391,7 +391,7 @@ var Page = {
     },
 
     scrollTop: (offset) => {
-        !shouldRelease && self !== top && top.focus();
+        !shouldRelease && self !== top && top.document.body.focus();
         var targets = $('div:visible')
             .filter((i, elem) => elem.scrollHeight >= elem.clientHeight).toArray()
             .sort((a, b) => a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth).reverse();

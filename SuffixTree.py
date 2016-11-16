@@ -132,6 +132,8 @@ class SuffixTree:
                         self.ac_direction += 1
 
                         if self.ac_offset > 0:
+                            # todo: fix func
+
                             next_collapse_node = self.ac_node.sub[g_target[self.ac_direction]]
                             collapse_node.link_to = next_collapse_node
                             collapse_node = next_collapse_node
@@ -141,30 +143,34 @@ class SuffixTree:
                             # 进入 case 1.
                             collapse_node.link_to = self.root
                             case_1()
+                            break
 
                     # 2.2.2. 需要运用 suffix link
                     else:
                         split_grow()
-                        # todo 跳转校正
                         # 状态转移
                         self.ac_node = self.ac_node.link_to
+                        # todo: fix func
+
                         next_collapse_node = self.ac_node.sub[g_target[self.ac_direction]]
                         collapse_node.link_to = next_collapse_node
                         collapse_node = next_collapse_node
-                        # suffix link 消耗完之后. 进入 case 2.2.1.
+                        # suffix link 消耗完之后. 自动进入 case 2.2.1.
         self.cursor += 1
 
 
 if __name__ == '__main__':
     t = SuffixTree()
-    t.insert('x')
-    t.insert('y')
-    t.insert('z')
-    t.insert('x')
-    t.insert('y')
-    t.insert('a')
-    t.insert('x')
-    t.insert('y')
-    t.insert('z')
-    t.insert('$')
-    t.repr()
+    # t.insert('x')
+    # t.insert('y')
+    # t.insert('z')
+    # t.insert('x')
+    # t.insert('y')
+    # t.insert('a')
+    # t.insert('x')
+    # t.insert('y')
+    # t.insert('z')
+    # t.insert('$')
+    for char in 'mississi$':
+        t.insert(char)
+        t.repr()
