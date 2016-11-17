@@ -61,15 +61,23 @@ class SuffixTree:
                 print_tree(child, level + 1)
 
         print_tree(self.root)
-        print(repr_str, end='')
-        print(', '.join(sorted('{}: {}'.format(k, v) for k, v in self.__dict__.items() if k != 'root')))
+        repr_str += ', '.join(sorted('{}: {}'.format(k, v) for k, v in self.__dict__.items() if k != 'root'))
+        print(repr_str)
         return repr_str
 
     def insert(self, char: str):
         global g_target
         g_target += char
-
         self.remainder += 1
+
+        # offset 有可能超过边长
+        def overflow_fix():
+            curr_collapse_node = self.ac_node.sub[g_target[self.ac_direction]]
+            if not curr_collapse_node.is_leaf and self.ac_offset > curr_collapse_node.ed - curr_collapse_node.op:
+                self.ac_node = curr_collapse_node
+                self.ac_direction += 1
+                self.ac_offset -= (curr_collapse_node.ed - curr_collapse_node.op)
+                return overflow_fix()
 
         def case_1():
             # 1.1. 无法坍缩, 建立新的叶节点
@@ -110,15 +118,15 @@ class SuffixTree:
             # 2.2. 无法继续坍缩, 炸开累积的后缀
             else:
                 def split_grow():
-                    # 原坍缩点成为 inner_node
-                    collapse_node.ed = collapse_node.op + self.ac_offset
-
-                    # 新节点继承 :ed
+                    # 新节点继承 :ed, sub
                     inherit_node = Node()
-                    inherit_node.op = collapse_node.ed
-                    inherit_node.ed = ':ed'
-                    # 回连
-                    collapse_node.sub[g_target[inherit_node.op]] = inherit_node
+                    inherit_node.op = collapse_node.op + self.ac_offset
+                    inherit_node.ed = collapse_node.ed
+                    inherit_node.sub = collapse_node.sub
+
+                    # 原坍缩点成为 inner_node
+                    collapse_node.ed = inherit_node.op
+                    collapse_node.sub = {g_target[inherit_node.op]: inherit_node}
 
                     # 新节点记录 char
                     leaf_node = Node()
@@ -128,16 +136,16 @@ class SuffixTree:
                     self.remainder -= 1
 
                 while self.remainder > 0:
-                    # 2.2.1. 没有 suffix link 用于状态转移
+                    # 2.2.1. 没有 suffix link
                     if self.ac_node.link_to is None:
                         split_grow()
 
-                        # 状态转移, 继续爆炸
+                        # 状态转移
                         self.ac_offset -= 1
                         self.ac_direction += 1
 
                         if self.ac_offset > 0:
-                            # todo: fix func
+                            overflow_fix()
 
                             next_collapse_node = self.ac_node.sub[g_target[self.ac_direction]]
                             collapse_node.link_to = next_collapse_node
@@ -155,7 +163,7 @@ class SuffixTree:
                         split_grow()
                         # 状态转移
                         self.ac_node = self.ac_node.link_to
-                        # todo: fix func
+                        overflow_fix()
 
                         next_collapse_node = self.ac_node.sub[g_target[self.ac_direction]]
                         collapse_node.link_to = next_collapse_node
@@ -165,18 +173,20 @@ class SuffixTree:
 
 
 if __name__ == '__main__':
-    t = SuffixTree()
-    t.insert('x')
-    t.insert('y')
-    t.insert('z')
-    t.insert('x')
-    t.insert('y')
-    t.insert('a')
-    t.insert('x')
-    t.insert('y')
-    t.insert('z')
-    t.insert('$')
-    expect = '''<root>
+    def test_0():
+        t = SuffixTree()
+        t.insert('x')
+        t.insert('y')
+        t.insert('z')
+        t.insert('x')
+        t.insert('y')
+        t.insert('a')
+        t.insert('x')
+        t.insert('y')
+        t.insert('z')
+        t.insert('$')
+        expect = '''
+<root>
 -- $ 9:10
 -- axyz$ 5:10
 -- xy 0:2
@@ -191,9 +201,38 @@ if __name__ == '__main__':
     -- xyaxyz$ 3:10
 -- z 2:3
   -- $ 9:10
-  -- xyaxyz$ 3:10'''
-    assert t.repr().strip() == expect.strip()
+  -- xyaxyz$ 3:10
+ac_direction: 3, ac_node: <root>, ac_offset: 0, cursor: 10, remainder: 0
+'''
+        assert t.repr() == expect.strip()
 
-    # for char in 'mississi$':
-    #     t.insert(char)
-    #     t.repr()
+
+    def test_1():
+        global g_target
+        g_target = ''
+
+        t = SuffixTree()
+        for char in 'mississi$':
+            t.insert(char)
+        expect = '''
+<root>
+-- $ 8:9
+-- i 1:2
+  -- $ 8:9
+  -- ssi 2:5
+    -- $ 8:9
+    -- ssi$ 5:9
+-- mississi$ 0:9
+-- s 2:3
+  -- i 4:5
+    -- $ 8:9
+    -- ssi$ 5:9
+  -- si 3:5
+    -- $ 8:9
+    -- ssi$ 5:9
+ac_direction: 5, ac_node: <root>, ac_offset: 0, cursor: 9, remainder: 0
+'''
+        assert t.repr() == expect.strip()
+
+    test_0()
+    test_1()
