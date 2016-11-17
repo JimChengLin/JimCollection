@@ -234,5 +234,63 @@ ac_direction: 5, ac_node: <root>, ac_offset: 0, cursor: 9, remainder: 0
 '''
         assert t.repr() == expect.strip()
 
+        def test_1():
+            global g_target
+            g_target = ''
+
+            t = SuffixTree()
+            for char in 'mississi$':
+                t.insert(char)
+            expect = '''
+    <root>
+    -- $ 8:9
+    -- i 1:2
+      -- $ 8:9
+      -- ssi 2:5
+        -- $ 8:9
+        -- ssi$ 5:9
+    -- mississi$ 0:9
+    -- s 2:3
+      -- i 4:5
+        -- $ 8:9
+        -- ssi$ 5:9
+      -- si 3:5
+        -- $ 8:9
+        -- ssi$ 5:9
+    ac_direction: 5, ac_node: <root>, ac_offset: 0, cursor: 9, remainder: 0
+    '''
+            assert t.repr() == expect.strip()
+
+
+    def test_2():
+        global g_target
+        g_target = ''
+
+        t = SuffixTree()
+        for char in 'abcabxabcd':
+            t.insert(char)
+        expect = '''
+<root>
+-- ab 0:2
+  -- c 2:3
+    -- abxabcd 3:10
+    -- d 9:10
+  -- xabcd 5:10
+-- b 1:2
+  -- c 2:3
+    -- abxabcd 3:10
+    -- d 9:10
+  -- xabcd 5:10
+-- c 2:3
+  -- abxabcd 3:10
+  -- d 9:10
+-- d 9:10
+-- xabcd 5:10
+ac_direction: 3, ac_node: <root>, ac_offset: 0, cursor: 10, remainder: 0
+'''
+        assert t.repr() == expect.strip()
+
+
     test_0()
     test_1()
+    test_2()
