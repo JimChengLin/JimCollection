@@ -14,11 +14,11 @@ class Node:
 
     @property
     def is_leaf(self):
-        return not self.is_root and self.link_to is None
+        return not self.is_root and not self.sub
 
     @property
     def is_inner(self):
-        return not self.is_root and self.link_to is not None
+        return not self.is_root and self.sub
 
     def __repr__(self):
         if self.is_root:
@@ -70,7 +70,7 @@ class SuffixTree:
         g_target += char
         self.remainder += 1
 
-        # offset 有可能超过边长
+        # offset 超过边长时的修正
         def overflow_fix():
             curr_collapse_node = self.ac_node.sub[g_target[self.ac_direction]]
             if not curr_collapse_node.is_leaf and self.ac_offset > curr_collapse_node.ed - curr_collapse_node.op:
@@ -137,7 +137,7 @@ class SuffixTree:
 
                 while self.remainder > 0:
                     # 2.2.1. 没有 suffix link
-                    if self.ac_node.link_to is None:
+                    if not self.ac_node.is_inner:
                         split_grow()
 
                         # 状态转移
@@ -233,33 +233,6 @@ ac_direction: 3, ac_node: <root>, ac_offset: 0, cursor: 10, remainder: 0
 ac_direction: 5, ac_node: <root>, ac_offset: 0, cursor: 9, remainder: 0
 '''
         assert t.repr() == expect.strip()
-
-        def test_1():
-            global g_target
-            g_target = ''
-
-            t = SuffixTree()
-            for char in 'mississi$':
-                t.insert(char)
-            expect = '''
-    <root>
-    -- $ 8:9
-    -- i 1:2
-      -- $ 8:9
-      -- ssi 2:5
-        -- $ 8:9
-        -- ssi$ 5:9
-    -- mississi$ 0:9
-    -- s 2:3
-      -- i 4:5
-        -- $ 8:9
-        -- ssi$ 5:9
-      -- si 3:5
-        -- $ 8:9
-        -- ssi$ 5:9
-    ac_direction: 5, ac_node: <root>, ac_offset: 0, cursor: 9, remainder: 0
-    '''
-            assert t.repr() == expect.strip()
 
 
     def test_2():
