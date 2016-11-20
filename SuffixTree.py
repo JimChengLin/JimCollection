@@ -1,10 +1,10 @@
 g_target = ''
+repeat_l = []
 
 
 class Node:
     def __init__(self):
         self.sub = {}
-
         self.op = self.ed = None
         self.link_to = None
 
@@ -63,6 +63,8 @@ class SuffixTree:
         print_tree(self.root)
         repr_str += ', '.join(sorted('{}: {}'.format(k, v) for k, v in self.__dict__.items() if k != 'root'))
         print(repr_str)
+        print(repeat_l)
+        print(g_target)
         return repr_str
 
     def insert(self, char: str):
@@ -91,6 +93,7 @@ class SuffixTree:
             # 1.2. 开始坍缩
             else:
                 collapse_node = self.ac_node.sub[char]
+                repeat_l.append((len(g_target) - 1, collapse_node.op))
                 self.ac_direction = collapse_node.op
                 self.ac_offset += 1
 
@@ -104,6 +107,7 @@ class SuffixTree:
 
             # 2.1. 能否扩大坍缩? 可以
             if char == g_target[collapse_node.op + self.ac_offset]:
+                repeat_l.append((len(g_target) - 1, collapse_node.op + self.ac_offset))
                 # 2.1.1. 如果是 inner_node, 坍缩是否达已经到极限? 是
                 if collapse_node.is_inner \
                         and collapse_node.op + self.ac_offset == collapse_node.ed:
@@ -205,6 +209,7 @@ if __name__ == '__main__':
 ac_direction: 3, ac_node: <root>, ac_offset: 0, cursor: 10, remainder: 0
 '''
         assert t.repr() == expect.strip()
+        repeat_l.clear()
 
 
     def test_1():
@@ -233,6 +238,7 @@ ac_direction: 3, ac_node: <root>, ac_offset: 0, cursor: 10, remainder: 0
 ac_direction: 5, ac_node: <root>, ac_offset: 0, cursor: 9, remainder: 0
 '''
         assert t.repr() == expect.strip()
+        repeat_l.clear()
 
 
     def test_2():
@@ -262,6 +268,7 @@ ac_direction: 5, ac_node: <root>, ac_offset: 0, cursor: 9, remainder: 0
 ac_direction: 3, ac_node: <root>, ac_offset: 0, cursor: 10, remainder: 0
 '''
         assert t.repr() == expect.strip()
+        repeat_l.clear()
 
 
     test_0()
