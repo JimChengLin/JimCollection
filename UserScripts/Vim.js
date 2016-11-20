@@ -390,7 +390,7 @@ var Page = {
     },
 
     scrollTop: (offset) => {
-        !shouldRelease && self !== top && top.document.body.focus();
+        !shouldRelease && self !== top && (document.location.href = "#");
         var targets = $('div:visible')
             .filter((i, elem) => elem.scrollHeight >= elem.clientHeight).toArray()
             .sort((a, b) => a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth).reverse();
