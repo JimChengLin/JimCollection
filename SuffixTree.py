@@ -186,25 +186,24 @@ class SuffixTreeDB(SuffixTree):
 
     def __getitem__(self, k):
         result = ''
-
         try:
             cursor = self.root.sub[k[0]]
-            offset = 0
+            cursor_offset = 0
             for require_char in k:
-                if cursor.op + offset == cursor.ed:
+                if cursor.op + cursor_offset == cursor.ed:
                     cursor = cursor.sub[require_char]
-                    offset = 0
+                    cursor_offset = 0
 
-                exist_char = g_target[cursor.op + offset]
+                exist_char = g_target[cursor.op + cursor_offset]
                 if exist_char != require_char:
                     return
                 else:
-                    offset += 1
+                    cursor_offset += 1
 
-            result += g_target[cursor.op + offset:cursor.ed if cursor.ed != ':ed' else None]
+            result += g_target[cursor.op + cursor_offset:cursor.ed if cursor.ed != ':ed' else None]
             while cursor.sub:
-                cursor = cursor.sub.popitem()
-                result += g_target[cursor.op:cursor.ed]
+                cursor = cursor.sub.popitem()[-1]
+                result += g_target[cursor.op:cursor.ed if cursor.ed != ':ed' else None]
             return result
         except KeyError:
             return
@@ -304,14 +303,11 @@ ac_direction: 3, ac_node: <root>, ac_offset: 0, cursor: 10, remainder: 0
         global g_target
         g_target = ''
 
-        db = SuffixTree()
+        db = SuffixTreeDB()
         for char in '[abc]abcabxabcd':
             db.insert(char)
-            db.repr()
-            print(char)
-            print()
-            # db['abc'] = 'abcabxabcd'
-            # print('val', db['[abc]'])
+        db.repr()
+        print('val', db['b'])
 
 
     # test_0()
