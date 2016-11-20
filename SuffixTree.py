@@ -63,8 +63,6 @@ class SuffixTree:
         print_tree(self.root)
         repr_str += ', '.join(sorted('{}: {}'.format(k, v) for k, v in self.__dict__.items() if k != 'root'))
         print(repr_str)
-        print(g_target)
-        print(repeat_l)
         return repr_str
 
     def insert(self, char: str):
@@ -122,15 +120,16 @@ class SuffixTree:
             # 2.2. 无法继续坍缩, 炸开累积的后缀
             else:
                 def split_grow():
-                    # 新节点继承 :ed, sub
-                    inherit_node = Node()
-                    inherit_node.op = collapse_node.op + self.ac_offset
-                    inherit_node.ed = collapse_node.ed
-                    inherit_node.sub = collapse_node.sub
+                    if collapse_node.is_leaf or collapse_node.ed - collapse_node.op > 1:
+                        # 新节点继承 :ed, sub
+                        inherit_node = Node()
+                        inherit_node.op = collapse_node.op + self.ac_offset
+                        inherit_node.ed = collapse_node.ed
+                        inherit_node.sub = collapse_node.sub
 
-                    # 原坍缩点成为 inner_node
-                    collapse_node.ed = inherit_node.op
-                    collapse_node.sub = {g_target[inherit_node.op]: inherit_node}
+                        # 原坍缩点成为 inner_node
+                        collapse_node.ed = inherit_node.op
+                        collapse_node.sub = {g_target[inherit_node.op]: inherit_node}
 
                     # 新节点记录 char
                     leaf_node = Node()
@@ -174,6 +173,44 @@ class SuffixTree:
                         collapse_node = next_collapse_node
                         # suffix link 消耗完之后. 自动进入 case 2.2.1.
         self.cursor += 1
+
+
+class SuffixTreeDB(SuffixTree):
+    def __setitem__(self, k, v):
+        self.insert('[')
+        for char in k:
+            self.insert(char)
+        self.insert(']')
+        for char in v:
+            self.insert(char)
+
+    def __getitem__(self, k):
+        result = ''
+
+        try:
+            cursor = self.root.sub[k[0]]
+            offset = 0
+            for require_char in k:
+                if cursor.op + offset == cursor.ed:
+                    cursor = cursor.sub[require_char]
+                    offset = 0
+
+                exist_char = g_target[cursor.op + offset]
+                if exist_char != require_char:
+                    return
+                else:
+                    offset += 1
+
+            result += g_target[cursor.op + offset:cursor.ed if cursor.ed != ':ed' else None]
+            while cursor.sub:
+                cursor = cursor.sub.popitem()
+                result += g_target[cursor.op:cursor.ed]
+            return result
+        except KeyError:
+            return
+
+    def __delitem__(self, k):
+        pass
 
 
 if __name__ == '__main__':
@@ -267,10 +304,14 @@ ac_direction: 3, ac_node: <root>, ac_offset: 0, cursor: 10, remainder: 0
         global g_target
         g_target = ''
 
-        t = SuffixTree()
-        for char in '$abca$bxabcd':
-            t.insert(char)
-        t.repr()
+        db = SuffixTree()
+        for char in '[abc]abcabxabcd':
+            db.insert(char)
+            db.repr()
+            print(char)
+            print()
+            # db['abc'] = 'abcabxabcd'
+            # print('val', db['[abc]'])
 
 
     # test_0()
