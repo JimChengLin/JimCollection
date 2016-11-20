@@ -63,8 +63,8 @@ class SuffixTree:
         print_tree(self.root)
         repr_str += ', '.join(sorted('{}: {}'.format(k, v) for k, v in self.__dict__.items() if k != 'root'))
         print(repr_str)
-        print(repeat_l)
         print(g_target)
+        print(repeat_l)
         return repr_str
 
     def insert(self, char: str):
