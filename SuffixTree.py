@@ -184,8 +184,7 @@ class SuffixTreeDB(SuffixTree):
         for char in v:
             self.insert(char)
 
-    def __getitem__(self, k):
-        result = ''
+    def find_cursor(self, k):
         try:
             cursor = self.root.sub[k[0]]
             cursor_offset = 0
@@ -199,17 +198,25 @@ class SuffixTreeDB(SuffixTree):
                     return
                 else:
                     cursor_offset += 1
-
-            result += g_target[cursor.op + cursor_offset:cursor.ed if cursor.ed != ':ed' else None]
-            while cursor.sub:
-                cursor = cursor.sub.popitem()[-1]
-                result += g_target[cursor.op:cursor.ed if cursor.ed != ':ed' else None]
-            return result
+            return cursor, cursor_offset
         except KeyError:
             return
 
+    def __getitem__(self, k):
+        result = ''
+        cursor, cursor_offset = self.find_cursor(k)
+        if cursor is not None:
+            result += g_target[cursor.op + cursor_offset:cursor.ed if cursor.ed != ':ed' else None]
+            while cursor.sub:
+                _, cursor = next(iter(cursor.sub.items()))
+                result += g_target[cursor.op:cursor.ed if cursor.ed != ':ed' else None]
+            return result
+
     def __delitem__(self, k):
-        pass
+        cursor, cursor_offset = self.find_cursor(k)
+        if cursor is not None:
+            cursor.ed = cursor.op + cursor_offset
+            cursor.sub.clear()
 
 
 if __name__ == '__main__':
@@ -308,6 +315,9 @@ ac_direction: 3, ac_node: <root>, ac_offset: 0, cursor: 10, remainder: 0
             db.insert(char)
         db.repr()
         print('val', db['b'])
+        del db['cab']
+        del db['b']
+        db.repr()
 
 
     # test_0()
