@@ -144,7 +144,7 @@ var Page = {
 
                 function isDisplayed(element) {
                     var style = getComputedStyle(element);
-                    if (style.opacity === '0'
+                    if ((style.opacity === '0' && !element.innerText)
                         || (element.classList.contains('_strict') && style.cursor.search(/pointer|text/) === -1)) {
                         return;
                     }
@@ -152,7 +152,6 @@ var Page = {
                     var rect = element.getClientRects()[0];
                     if (rect && rect.left >= 0 && rect.top >= 0 &&
                         rect.right <= innerWidth && rect.bottom <= innerHeight) {
-
                         element._left = rect.left;
                         element._top = rect.top;
                         var positions = [[element._left + rect.width / 2, element._top + rect.height / 2],
@@ -391,7 +390,7 @@ var Page = {
     },
 
     scrollTop: (offset) => {
-        !shouldRelease && self !== top && (document.location.href = "#");
+        !shouldRelease && self !== top && top.document.body.focus();
         var targets = $('div:visible')
             .filter((i, elem) => elem.scrollHeight >= elem.clientHeight).toArray()
             .sort((a, b) => a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth).reverse();

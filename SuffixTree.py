@@ -179,16 +179,8 @@ class SuffixTree:
 if __name__ == '__main__':
     def test_0():
         t = SuffixTree()
-        t.insert('x')
-        t.insert('y')
-        t.insert('z')
-        t.insert('x')
-        t.insert('y')
-        t.insert('a')
-        t.insert('x')
-        t.insert('y')
-        t.insert('z')
-        t.insert('$')
+        for char in 'xyzxyaxyz$':
+            t.insert(char)
         expect = '''
 <root>
 -- $ 9:10
@@ -271,6 +263,17 @@ ac_direction: 3, ac_node: <root>, ac_offset: 0, cursor: 10, remainder: 0
         repeat_l.clear()
 
 
-    test_0()
-    test_1()
-    test_2()
+    def test_3():
+        global g_target
+        g_target = ''
+
+        t = SuffixTree()
+        for char in '$abca$bxabcd':
+            t.insert(char)
+        t.repr()
+
+
+    # test_0()
+    # test_1()
+    # test_2()
+    test_3()
