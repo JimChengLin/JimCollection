@@ -154,7 +154,7 @@ var Page = {
                         rect.right <= innerWidth && rect.bottom <= innerHeight) {
                         element._left = rect.left;
                         element._top = rect.top;
-                        var positions = [[element._left + rect.width / 2, element._top + rect.height / 2],
+                        var positions = [[element._left + rect.width / 4, element._top + rect.height / 4],
                             [
                                 Math.min(element._left + rect.width - 1, element._left + length),
                                 Math.min(element._top + rect.height - 1, element._top + length)
