@@ -86,7 +86,6 @@ class SkipList:
                 new_top_node.arrow_right = up_new_node
 
     def delete(self, val):
-        # 偷个懒, 不处理降级的情况
         del_list = []
         cursor = self.top_node
         while cursor.arrow_bottom is not None:
