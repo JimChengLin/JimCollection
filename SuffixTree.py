@@ -72,10 +72,11 @@ class SuffixTree:
 
         # offset 超过边长时的修正
         def overflow_fix():
+            # self.repr()
             curr_collapse_node = self.ac_node.sub[g_target[self.ac_direction]]
             if not curr_collapse_node.is_leaf and self.ac_offset > curr_collapse_node.ed - curr_collapse_node.op:
                 self.ac_node = curr_collapse_node
-                self.ac_direction += 1
+                self.ac_direction += (curr_collapse_node.ed - curr_collapse_node.op)
                 self.ac_offset -= (curr_collapse_node.ed - curr_collapse_node.op)
                 return overflow_fix()
 
@@ -320,7 +321,7 @@ ac_direction: 3, ac_node: <root>, ac_offset: 0, cursor: 10, remainder: 0
         db.repr()
 
 
-    # test_0()
-    # test_1()
-    # test_2()
+    test_0()
+    test_1()
+    test_2()
     test_3()
