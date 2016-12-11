@@ -127,8 +127,10 @@ class SuffixTree:
                         inherit_node.op = collapse_node.op + self.ac_offset
                         inherit_node.ed = collapse_node.ed
                         inherit_node.sub = collapse_node.sub
+                        inherit_node.link_to = collapse_node.link_to
 
                         # 原坍缩点成为 inner_node
+                        collapse_node.link_to = None
                         collapse_node.ed = inherit_node.op
                         collapse_node.sub = {g_target[inherit_node.op]: inherit_node}
 
