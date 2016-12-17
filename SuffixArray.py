@@ -7,14 +7,15 @@ for _ in range(2):
 
 
 # 将 idx 和 val 绑定, 这很 OOP! ヾ(≧O≦)〃嗷~
+# 这或许是第一个用 OOP 思路写的 DC3?
 class Point:
     def __init__(self, idx, val):
-        self.idx = idx  # 在全局变量 src_list 中的 index
+        self.idx = idx  # 全局变量 src_list 中的 index
         self.val = val  # rank
-        self.rel_idx = idx  # 分治法中 sub_list 的 index
+        self.rel_idx = idx  # 分治法下 sub_list 的 index
 
     def __repr__(self):
-        return '{}:{}'.format(self.idx, self.val)
+        return 'idx:{}, val:{}'.format(self.idx, self.val)
 
 
 point_list = []
@@ -28,9 +29,10 @@ def dc3(in_list):
         if point.val != 0 and i % 3 in (1, 2):
             b1_b2_list.append(point)
             point.val = (point.val, in_list[i + 1].val, in_list[i + 2].val)
+    b1_b2_orig = b1_b2_list[:]  # 保留原来的
     b1_b2_list.sort(key=lambda point: point.val)  # 自行替换成 Radix Sort
 
-    # 我们根本不在乎每个 point 的 val(rank) 多大, 只要保持顺序即可, 在这里重写 val
+    # 我们根本不在乎每个 point 的 val(rank) 多大, 只要保持顺序即可. 在这里重写 val
     # 严重注意! 需要判断前后 val 是否相等. 是的话, 虽然顺序不同, 但 val 应该是一样的
     # 这步意义是将 3 个 char 的大小浓缩成一个 val, 提供给 b_0(高位组) 使用
     curr_rank = 0
@@ -47,7 +49,14 @@ def dc3(in_list):
             prev_val = point.val
         point.val = curr_rank
 
-    if curr_rank != len(b1_b2_list):  # 为真表明有重复 rank, 即排序未完成, 递归 dc3
+    if curr_rank != len(b1_b2_list):  # 表明有重复 rank, 即排序未完成, 递归 dc3
+        # 这里调整下 b1_b2 的顺序, 不再按照 in_list 排列
+        # 因为既然有重复的 rank, 说明 3 个 char 不足以决出胜负
+        # 那就再引入 3 个 char, 正好是一个循环
+        # So, [b1_0, b2_0, b1_1, b2_1, ...] => [b1_0, b1_1, ..., b2_0, b2_1, ...]
+        b1_b2_list[:] = [*(obj for i, obj in enumerate(b1_b2_orig) if i % 2 == 0),
+                         *(obj for i, obj in enumerate(b1_b2_orig) if i % 2 == 1)]
+
         for _ in range(2):
             # 这里 idx 可以设置为任意值, 其只是起到 padding 的作用
             b1_b2_list.append(Point(-1, 0))
@@ -127,4 +136,4 @@ def dc3(in_list):
 
 
 if __name__ == '__main__':
-    dc3(point_list)
+    print(dc3(point_list))
