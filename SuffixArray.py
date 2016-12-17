@@ -15,12 +15,14 @@ class Point:
         self.rel_idx = idx  # 分治法下 sub_list 的 index
 
     def __repr__(self):
-        return 'idx:{}, val:{}'.format(self.idx, self.val)
+        return 'idx:{}, val:{}, rel_idx:{}'.format(self.idx, self.val, self.rel_idx)
 
 
 point_list = []
 for i, val in enumerate(src_list):
     point_list.append(Point(i, val))
+# 后面会修改 point_list, 需要一个拷贝来查找相邻 b_1/b_2
+point_orig = point_list[:]
 
 
 def dc3(in_list):
@@ -72,21 +74,22 @@ def dc3(in_list):
             point.val = (point.val, in_list[i + 1].val)
     b_0_list.sort(key=lambda point: point.val)
 
-    # b_0 和 b1_b2 都排序好了, 开始合并
-    # 先写一遍相对 index
+    # <-- 写一遍相对 idx, 仅用于 Debug
     for i in range(len(in_list)):
         in_list[i].rel_idx = i
+    # -->
 
+    # b_0 和 b1_b2 都排序好了, 开始合并
     out_list = []
     while True:
         b_0_head = b_0_list[0]
         b_12_head = b1_b2_list[0]
 
-        def b_0_win():
+        def b_0_win():  # b_0 表示的后缀更大
             out_list.append(b_12_head)
             del b1_b2_list[0]
 
-        def b_12_win():
+        def b_12_win():  # b_12 表示的后缀更大
             out_list.append(b_0_head)
             del b_0_list[0]
 
@@ -98,7 +101,7 @@ def dc3(in_list):
             # 以上两种为能直接决出胜负的情况
 
             else:  # 如不能, 一定可以用 b_0 之后的 b_1 和 b_1 之后的 b_2 决出胜负
-                if in_list[b_0_head.rel_idx + 1].val > in_list[b_12_head.rel_idx + 1].val:
+                if point_orig[b_0_head.idx + 1].val > point_orig[b_12_head.idx + 1].val:
                     b_0_win()
                 else:
                     b_12_win()
@@ -116,7 +119,7 @@ def dc3(in_list):
                     b_12_win()
 
                 else:
-                    if in_list[b_0_head.rel_idx + 2].val > in_list[b_12_head.rel_idx + 2].val:
+                    if point_orig[b_0_head.idx + 2].val > point_orig[b_12_head.idx + 2].val:
                         b_0_win()
                     else:
                         b_12_win()
@@ -130,10 +133,13 @@ def dc3(in_list):
             break
 
     in_list[:] = out_list
+    # 同样, 排序之后, 重写 val
     for i in range(len(in_list)):
         in_list[i].val = i
     return in_list
 
 
 if __name__ == '__main__':
-    print(dc3(point_list))
+    result = dc3(point_list)
+    for i in result:
+        print(i.idx)
