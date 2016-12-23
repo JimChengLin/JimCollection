@@ -5,6 +5,7 @@ class State:
         self.len = None
         self.reboot = None
         self.trans = {}
+        self.is_end = False
         self.id = State.counter
         State.counter += 1
 
@@ -18,6 +19,7 @@ class State:
 
 
 class Automation:
+    # 均摊分析可证明线性复杂度
     def __init__(self):
         self.root = State()
         self.root.len = 0
@@ -75,6 +77,39 @@ class Automation:
                 curr_state.reboot = poss_reboot.reboot
         self.last_state = curr_state
 
+    def mark_end(self):
+        last_state = self.last_state
+        while True:
+            last_state.is_end = True
+            if last_state.reboot is not None and last_state.reboot.id != 0:
+                last_state = last_state.reboot
+            else:
+                break
+
+    def feed(self, src: str):
+        curr_state = self.root
+        for i, char in enumerate(src):
+            if curr_state is self.root:
+                print('begin at: {}'.format(i))
+
+            while True:
+                next_state = curr_state.trans.get(char)
+
+                if next_state is not None:  # 成功转移状态
+                    curr_state = next_state
+                    if curr_state.is_end:
+                        print('end at: {}, id: {}'.format(i, curr_state.id))
+                    break
+
+                elif curr_state is self.root:  # 无法 reboot
+                    break
+
+                else:  # 跳至 reboot 继续尝试
+                    curr_state = curr_state.reboot
+                    if curr_state.is_end:
+                        # 重启造成的击杀, i 要 -1
+                        print('end at: {}, id: {}'.format(i - 1, curr_state.id))
+
     def __repr__(self):
         return str(self.root)
 
@@ -83,4 +118,5 @@ if __name__ == '__main__':
     auto = Automation()
     for i in 'abcbc':
         auto.grow(i)
-    print(auto)
+    auto.mark_end()
+    auto.feed('sicneacbcbdobcacbcadoabcbc')
