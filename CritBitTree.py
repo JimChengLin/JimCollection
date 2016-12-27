@@ -1,3 +1,6 @@
+output_pool = []
+
+
 class CBInternal:
     def __init__(self):
         self.diff_at = None
@@ -6,7 +9,7 @@ class CBInternal:
         self.crit_1 = None
 
     def print(self, lv=0):
-        intent = '  '
+        intent = '    '
         print(intent * lv, 'diff_at: {}, mask: {}'.format(self.diff_at, bin(self.mask)))
 
         lv += 1
@@ -14,6 +17,7 @@ class CBInternal:
             if isinstance(sub, CBInternal):
                 sub.print(lv)
             else:
+                output_pool.append(sub)
                 print(intent * lv, sub)
 
 
@@ -123,3 +127,30 @@ class CBTree:
             self.root.print()
         else:
             print(self.root)
+
+
+if __name__ == '__main__':
+    from random import choice, randint
+
+    cbt = CBTree()
+
+    chars = (
+        b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k',
+        b'l', b'm', b'n', b'o', b'p', b'q', b'r', b's', b't', b'u', b'v'
+    )
+
+    samples = []
+    for i in range(10):
+        sample = b''
+        for i in range(randint(1, 10)):
+            sample += choice(chars)
+        if sample not in samples:
+            samples.append(sample)
+
+    for sample in samples:
+        cbt.insert(sample)
+    cbt.print()
+
+    print(output_pool)
+    print(sorted(samples))
+    assert output_pool == list(sorted(samples))
