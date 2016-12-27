@@ -102,6 +102,14 @@ class CBTree:
             else:
                 node.crit_1 = insert_point
 
+    def delete(self, target: bytes):
+        if self.root is None:
+            return 'NOT_FOUND'
+
+        grand, pa, des = self.find_best_match(target)
+        if des != target:
+            return 'NOT_FOUND'
+
     def find_best_match(self, src: bytes):
         q = [None] * 3
 
@@ -134,23 +142,20 @@ if __name__ == '__main__':
 
     cbt = CBTree()
 
-    chars = (
-        b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k',
-        b'l', b'm', b'n', b'o', b'p', b'q', b'r', b's', b't', b'u', b'v'
-    )
-
+    chars = (b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k')
     samples = []
-    for i in range(10):
+    for _ in range(1000):
         sample = b''
-        for i in range(randint(1, 10)):
+        for _ in range(randint(1, 4)):
             sample += choice(chars)
-        if sample not in samples:
-            samples.append(sample)
+        samples.append(sample)
+    samples = list(map(lambda x: x + b'$', samples))
 
     for sample in samples:
         cbt.insert(sample)
     cbt.print()
 
-    print(output_pool)
-    print(sorted(samples))
-    assert output_pool == list(sorted(samples))
+    samples = sorted(set(samples))
+    # print(output_pool)
+    # print(samples)
+    assert output_pool == samples
