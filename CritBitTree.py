@@ -175,3 +175,8 @@ if __name__ == '__main__':
         cbt.delete(del_val)
     cbt.print()
     assert output_pool == samples
+
+    for i in samples:
+        cbt.delete(i)
+    print('----BOOM')
+    cbt.print()
