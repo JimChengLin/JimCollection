@@ -110,6 +110,16 @@ class CBTree:
         if des != target:
             return 'NOT_FOUND'
 
+        if pa is None:
+            self.root = None
+        elif grand is None:
+            self.root = pa.crit_0 if des is pa.crit_1 else pa.crit_1
+        else:
+            if grand.crit_0 is pa:
+                grand.crit_0 = pa.crit_0 if des is pa.crit_1 else pa.crit_1
+            else:
+                grand.crit_1 = pa.crit_0 if des is pa.crit_1 else pa.crit_1
+
     def find_best_match(self, src: bytes):
         q = [None] * 3
 
@@ -153,9 +163,15 @@ if __name__ == '__main__':
 
     for sample in samples:
         cbt.insert(sample)
-    cbt.print()
+    # cbt.print()
 
     samples = sorted(set(samples))
     # print(output_pool)
     # print(samples)
+
+    for i in range(100):
+        del_i = randint(0, len(samples) - 1)
+        del_val = samples.pop(del_i)
+        cbt.delete(del_val)
+    cbt.print()
     assert output_pool == samples
