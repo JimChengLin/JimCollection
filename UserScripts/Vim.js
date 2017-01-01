@@ -392,14 +392,11 @@ var Page = {
     scrollTop: (offset) => {
         !shouldRelease && self !== top && (document.location.href = "#");
 
-        var targets = $('div').filter((i, elem) => elem.scrollHeight >= elem.clientHeight);
-        var cmp = (a, b) => a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth;
-        if (document.scrollingElement === document.activeElement) {
-            targets.not(document.scrollingElement).toArray().sort(cmp);
-            targets.push(document.scrollingElement);
-        } else {
-            targets.add(document.scrollingElement).add(document.activeElement).toArray().sort(cmp);
-        }
+        var targets = Array.from(document.querySelectorAll('div'))
+                           .filter((elem) => elem.scrollHeight >= elem.clientHeight)
+                           .sort((a, b) => a.scrollHeight > b.scrollHeight);
+        targets.push(typeof document.activeElement !== typeof document.scrollingElement ?
+            document.scrollingElement : document.activeElement);
 
         for (var i = targets.length - 1; i >= 0; i--) {
             var target = targets[i];
