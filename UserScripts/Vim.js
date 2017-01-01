@@ -391,12 +391,17 @@ var Page = {
 
     scrollTop: (offset) => {
         !shouldRelease && self !== top && (document.location.href = "#");
-        var targets = $('div:visible')
-            .filter((i, elem) => elem.scrollHeight >= elem.clientHeight).toArray()
-            .sort((a, b) => a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth).reverse();
-        targets.unshift(document.scrollingElement);
 
-        for (var i = 0; i < targets.length; i++) {
+        var targets = $('div').filter((i, elem) => elem.scrollHeight >= elem.clientHeight);
+        var cmp = (a, b) => a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth;
+        if (document.scrollingElement === document.activeElement) {
+            targets.not(document.scrollingElement).toArray().sort(cmp);
+            targets.push(document.scrollingElement);
+        } else {
+            targets.add(document.scrollingElement).add(document.activeElement).toArray().sort(cmp);
+        }
+
+        for (var i = targets.length - 1; i >= 0; i--) {
             var target = targets[i];
             if ((target.scrollTop += 1) !== 1 || (target.scrollTop += -1) !== -1) {
                 return target.scrollTop += offset;
