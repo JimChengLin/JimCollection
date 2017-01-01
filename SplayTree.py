@@ -113,7 +113,7 @@ class SplayTree:  # 懒得写完所有操作
         def small_up(s):
             p = s.parent
 
-            if p.parent:
+            if p and p.parent:
                 if p.parent.small is p:
                     p.parent.small = s
                 elif p.parent.big is p:
@@ -125,8 +125,11 @@ class SplayTree:  # 懒得写完所有操作
             p.small = s.big
             s.big.parent = p
 
-            s.big = parent
+            s.big = p
             p.parent = s
+
+            self.print()
+            print()
 
         def big_up(b):
             p = b.parent
@@ -141,8 +144,8 @@ class SplayTree:  # 懒得写完所有操作
         def zig():
             # node 处于 root.small 的情况
             self.root = node
-            self.root.parent = None
             small_up(node)
+            self.root.parent = None
 
         def zig_():
             toggle(node, parent)
