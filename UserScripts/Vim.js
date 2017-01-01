@@ -392,9 +392,10 @@ var Page = {
     scrollTop: (offset) => {
         !shouldRelease && self !== top && (document.location.href = "#");
 
-        var targets = Array.from(document.querySelectorAll('div'))
-                           .filter((elem) => elem.scrollHeight >= elem.clientHeight)
-                           .sort((a, b) => a.scrollHeight > b.scrollHeight);
+        var targets = Array
+            .from(document.querySelectorAll('div'))
+            .filter((elem) => elem.scrollHeight >= elem.clientHeight && getComputedStyle(elem).overflowY !== 'hidden')
+            .sort((a, b) => a.scrollHeight > b.scrollHeight);
         targets.push(typeof document.activeElement !== typeof document.scrollingElement ?
             document.scrollingElement : document.activeElement);
 
@@ -404,6 +405,7 @@ var Page = {
                 return target.scrollTop += offset;
             }
         }
+        scrollBy(0, offset)
     },
 
     plus: ()=> {
