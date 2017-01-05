@@ -4,7 +4,7 @@
 Element.prototype._addEventListener = Element.prototype.addEventListener;
 Element.prototype.addEventListener = function (type, listener, userCapture) {
     this._addEventListener(type, listener, userCapture);
-    if (this.tagName.match(/^(DIV|I)$/) && type.match(/(mouse|click)/)) {
+    if (this.tagName.match(/^(DIV|I|LI)$/) && type.match(/(mouse|click)/)) {
         Page.clickElements.push(this);
     }
 };
@@ -396,8 +396,12 @@ var Page = {
             .from(document.querySelectorAll('div'))
             .filter((elem) => elem.scrollHeight >= elem.clientHeight && getComputedStyle(elem).overflowY !== 'hidden')
             .sort((a, b) => a.scrollHeight > b.scrollHeight);
-        targets.push(typeof document.activeElement !== typeof document.scrollingElement ?
-            document.scrollingElement : document.activeElement);
+
+        if (typeof document.activeElement !== typeof document.scrollingElement) {
+            if (document.scrollingElement.tagName.match(/^(DIV|BODY)$/)) targets.push(document.scrollingElement);
+        } else {
+            if (document.activeElement.tagName.match(/^(DIV|BODY)$/)) targets.push(document.activeElement);
+        }
 
         for (var i = targets.length - 1; i >= 0; i--) {
             var target = targets[i];
