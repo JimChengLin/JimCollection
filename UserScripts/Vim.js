@@ -67,6 +67,7 @@ function register() {
 
     addEventListener('keyup', (event) => {
         if (Page.isCommand(event)) {
+            event.preventDefault();
             event.stopImmediatePropagation();
         }
     }, true);

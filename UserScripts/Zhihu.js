@@ -11,9 +11,7 @@ switch (location.host) {
 
 function zhihuDaily() {
     $(() => {
-        if (location.pathname === '/') {
-            $('.wrap:contains("读读日报")').remove();
-        } else if (location.pathname.startsWith('/story')) {
+        if (location.pathname.startsWith('/story')) {
             let target = $('.question:last-child').not(':contains("查看知乎原文")');
             if (target) {
                 target.remove();
