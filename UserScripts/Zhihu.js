@@ -30,18 +30,30 @@ function zhihu() {
     $(() => {
         let change = true;
         let observer = new MutationObserver(() => change = true);
-        observer.observe(document.querySelector('body'), {childList: true, subtree: true});
+        observer.observe(document.querySelector('body'), {childList: true, subtree: true, attributes: true});
         setInterval(() => {
             if (change) {
-                $('a.external').map((i, elem) => {
+                $('a.external:not(._pass)').map((i, elem) => {
+                    elem.classList.add('_pass');
                     let sign = 'link.zhihu.com/?target=';
                     if (elem.href && elem.href.includes(sign)) {
                         elem.href = decodeURIComponent(elem.href.substr(elem.href.indexOf(sign) + sign.length));
                     }
                 });
+
+                let elem = document.activeElement;
+                if (elem && elem.classList.contains('public-DraftEditor-content')
+                    && !elem.classList.contains('_blur')) {
+                    document.querySelector('.Modal--fullPage').focus();
+                    elem.classList.add('_blur');
+                }
+                else if (document.querySelector('._blur') && !document.querySelector('.CommentEditor--active')) {
+                    document.querySelector('.Modal--fullPage').focus();
+                    document.querySelector('.CommentEditor--normal').classList.add('CommentEditor--active');
+                }
                 change = false;
             }
-        }, 1000);
+        }, 100);
     });
 
     if (location.pathname.endsWith('/topic')) {

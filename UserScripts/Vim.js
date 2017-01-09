@@ -55,7 +55,6 @@ function register() {
             isCommand ? Page.escape() : activeElement && activeElement.blur();
             document.body.click();
         } else if (isCommand) {
-            event.preventDefault();
             event.stopImmediatePropagation();
         }
 
