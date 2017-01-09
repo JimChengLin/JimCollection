@@ -30,7 +30,7 @@ function zhihu() {
     $(() => {
         let change = true;
         let observer = new MutationObserver(() => change = true);
-        observer.observe(document.querySelector('a'), {childList: true, subtree: true});
+        observer.observe(document.querySelector('body'), {childList: true, subtree: true});
         setInterval(() => {
             if (change) {
                 $('a.external').map((i, elem) => {
@@ -39,6 +39,7 @@ function zhihu() {
                         elem.href = decodeURIComponent(elem.href.substr(elem.href.indexOf(sign) + sign.length));
                     }
                 });
+                change = false;
             }
         }, 1000);
     });
