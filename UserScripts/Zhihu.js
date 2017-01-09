@@ -41,15 +41,19 @@ function zhihu() {
                     }
                 });
 
+                let blurF = () => document.querySelector('.Modal--fullPage').focus();
                 let elem = document.activeElement;
                 if (elem && elem.classList.contains('public-DraftEditor-content')
                     && !elem.classList.contains('_blur')) {
-                    document.querySelector('.Modal--fullPage').focus();
+                    blurF();
                     elem.classList.add('_blur');
                 }
                 else if (document.querySelector('._blur') && !document.querySelector('.CommentEditor--active')) {
-                    document.querySelector('.Modal--fullPage').focus();
+                    blurF();
                     document.querySelector('.CommentEditor--normal').classList.add('CommentEditor--active');
+                }
+                else if (document.querySelector('.Comments-notification')) {
+                    blurF();
                 }
                 change = false;
             }
