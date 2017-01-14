@@ -57,7 +57,7 @@ function zhihu() {
                 }
                 change = false;
             }
-        }, 100);
+        }, 50);
     });
 
     if (location.pathname.endsWith('/topic')) {

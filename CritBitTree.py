@@ -138,6 +138,22 @@ class CBTree:
             q.append(cursor)
         return q  # grand, pa, des
 
+    def iter(self, prefix: bytes):
+        grand, pa, des = self.find_best_match(prefix)
+        if not des.startswith(prefix):
+            return
+        else:
+            yield des
+
+        if pa.crit_1 != des:
+            q = [pa.crit_1]
+            while q:
+                cursor = q.pop(0)
+                if isinstance(cursor, bytes):
+                    yield cursor
+                else:
+                    q[0:0] = (cursor.crit_0, cursor.crit_1)
+
     def print(self):
         if self.root is None:
             print('empty')
@@ -154,7 +170,7 @@ if __name__ == '__main__':
 
     chars = (b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k')
     samples = []
-    for _ in range(1000):
+    for _ in range(1000000):
         sample = b''
         for _ in range(randint(1, 4)):
             sample += choice(chars)
@@ -175,6 +191,9 @@ if __name__ == '__main__':
         cbt.delete(del_val)
     cbt.print()
     assert output_pool == samples
+
+    samples_startswith_a = [i for i in samples if i.startswith(b'a')]
+    assert samples_startswith_a == list(cbt.iter(b'a'))
 
     for i in samples:
         cbt.delete(i)
