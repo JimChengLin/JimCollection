@@ -4,7 +4,7 @@
 Element.prototype._addEventListener = Element.prototype.addEventListener;
 Element.prototype.addEventListener = function (type, listener, userCapture) {
     this._addEventListener(type, listener, userCapture);
-    if (this.tagName.match(/^(DIV|I)$/) && type.match(/(mouse|click)/)) {
+    if (this.tagName.match(/^(DIV|I|LI)$/) && type.match(/(mouse|click)/)) {
         Page.clickElements.push(this);
     }
 };
@@ -67,6 +67,7 @@ function register() {
 
     addEventListener('keyup', (event) => {
         if (Page.isCommand(event)) {
+            event.preventDefault();
             event.stopImmediatePropagation();
         }
     }, true);
@@ -392,13 +393,15 @@ var Page = {
     scrollTop: (offset) => {
         !shouldRelease && self !== top && (document.location.href = "#");
 
-        var targets = $('div').filter((i, elem) => elem.scrollHeight >= elem.clientHeight);
-        var cmp = (a, b) => a.scrollHeight * a.scrollWidth > b.scrollHeight * b.scrollWidth;
-        if (document.scrollingElement === document.activeElement) {
-            targets.not(document.scrollingElement).toArray().sort(cmp);
-            targets.push(document.scrollingElement);
+        var targets = Array
+            .from(document.querySelectorAll('div'))
+            .filter((elem) => elem.scrollHeight >= elem.clientHeight && getComputedStyle(elem).overflowY !== 'hidden')
+            .sort((a, b) => a.scrollHeight > b.scrollHeight);
+
+        if (typeof document.activeElement !== typeof document.scrollingElement) {
+            if (document.scrollingElement.tagName.match(/^(DIV|BODY)$/)) targets.push(document.scrollingElement);
         } else {
-            targets.add(document.scrollingElement).add(document.activeElement).toArray().sort(cmp);
+            if (document.activeElement.tagName.match(/^(DIV|BODY)$/)) targets.push(document.activeElement);
         }
 
         for (var i = targets.length - 1; i >= 0; i--) {
@@ -407,6 +410,7 @@ var Page = {
                 return target.scrollTop += offset;
             }
         }
+        scrollBy(0, offset)
     },
 
     plus: ()=> {

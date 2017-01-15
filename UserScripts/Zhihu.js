@@ -11,9 +11,7 @@ switch (location.host) {
 
 function zhihuDaily() {
     $(() => {
-        if (location.pathname === '/') {
-            $('.wrap:contains("读读日报")').remove();
-        } else if (location.pathname.startsWith('/story')) {
+        if (location.pathname.startsWith('/story')) {
             let target = $('.question:last-child').not(':contains("查看知乎原文")');
             if (target) {
                 target.remove();
@@ -23,25 +21,43 @@ function zhihuDaily() {
 }
 
 function zhihu() {
-    $('<style>@media screen and (max-width:1120px){.zu-top{display:none;}}</style>').appendTo('html');
-    $(window).on('copy', () => {
-        GM_setClipboard(getSelection().toString(), 'text');
-    });
+    $('<style>' +
+        '@media screen and (max-width:1120px){.zu-top{display:none;}}' +
+        '*{font-family:open sans} code{font-family:consolas}' +
+        '</style>').appendTo('html');
+    $(window).on('copy', () => GM_setClipboard(getSelection().toString(), 'text'));
 
-    $(()=> {
+    $(() => {
         let change = true;
         let observer = new MutationObserver(() => change = true);
-        observer.observe(document.querySelector('a'), {childList: true, subtree: true});
+        observer.observe(document.querySelector('body'), {childList: true, subtree: true, attributes: true});
         setInterval(() => {
             if (change) {
-                $('a.external').map((i, elem) => {
+                $('a.external:not(._pass)').map((i, elem) => {
+                    elem.classList.add('_pass');
                     let sign = 'link.zhihu.com/?target=';
                     if (elem.href && elem.href.includes(sign)) {
                         elem.href = decodeURIComponent(elem.href.substr(elem.href.indexOf(sign) + sign.length));
                     }
                 });
+
+                let blurF = () => document.querySelector('.Modal--fullPage').focus();
+                let elem = document.activeElement;
+                if (elem && elem.classList.contains('public-DraftEditor-content')
+                    && !elem.classList.contains('_blur')) {
+                    blurF();
+                    elem.classList.add('_blur');
+                }
+                else if (document.querySelector('._blur') && !document.querySelector('.CommentEditor--active')) {
+                    blurF();
+                    document.querySelector('.CommentEditor--normal').classList.add('CommentEditor--active');
+                }
+                else if (document.querySelector('.Comments-notification')) {
+                    blurF();
+                }
+                change = false;
             }
-        }, 1000);
+        }, 50);
     });
 
     if (location.pathname.endsWith('/topic')) {
