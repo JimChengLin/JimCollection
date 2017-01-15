@@ -10,7 +10,7 @@ class CBInternal:
 
     def print(self, lv=0):
         intent = '    '
-        print(intent * lv, 'diff_at: {}, mask: {}'.format(self.diff_at, bin(self.mask)))
+        print(intent * lv, 'diff_at: {}, mask: {}'.format(self.diff_at, self.mask))
 
         lv += 1
         for sub in (self.crit_0, self.crit_1):
@@ -73,7 +73,7 @@ class CBTree:
 
                 if isinstance(insert_point, bytes):
                     break
-                elif isinstance(insert_point, CBInternal):
+                else:
                     if insert_point.diff_at > diff_at:
                         break
                     elif insert_point.diff_at == diff_at and insert_point.mask > node.mask:

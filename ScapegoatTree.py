@@ -42,18 +42,17 @@ class ScapegoatTree(Generic[T]):
         if self.root is None:
             self.root = Node(val)
 
-        height = -1
+        height = 0
         path: List[Node] = []  # record parents
 
         # insert like BST
         cursor: Node = self.root
         while True:
-            height += 1
-
             if cursor.val == val:
                 # already exist
                 return
 
+            height += 1
             # go down
             path.append(cursor)
             if val < cursor.val:
@@ -72,7 +71,7 @@ class ScapegoatTree(Generic[T]):
                     break
 
         # check if need rebuild
-        if height > log2(self.size):
+        if height > log(self.size, 1 / 0.75):
             self.print()
             self.rebuild(*self.find_scapegoat(path, cursor))
 
@@ -129,11 +128,10 @@ class ScapegoatTree(Generic[T]):
             height += 1
             size += ScapegoatTree.get_size(sibling) + 1
             # if parent is balanced
-            if height > log2(size):  # unbalanced
-                cursor = parent
-            else:  # balanced
+            if height > log(size, 1 / 0.75):  # unbalanced
                 scapegoat_parent = parent
                 break
+            cursor = parent
         return cursor, scapegoat_parent
 
     @staticmethod
@@ -192,5 +190,7 @@ if __name__ == '__main__':
     tree.print()
 
     tree.insert(12)
+    for i in range(100):
+        tree.insert(i)
     print('---\n')
     tree.print()
