@@ -2,6 +2,7 @@ g_target = ''
 repeat_l = []
 
 
+# 实现有纰漏，请查看我的PiXiu项目的实现
 class Node:
     def __init__(self):
         self.sub = {}
