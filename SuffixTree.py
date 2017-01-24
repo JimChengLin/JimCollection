@@ -1,330 +1,255 @@
-g_target = ''
-repeat_l = []
+from typing import Dict
+
+curr_str = ''
 
 
-# 实现有纰漏，请查看我的PiXiu项目的实现
-class Node:
+class STNode:
+    id_counter = 0
+    default_suffix_link: 'STNode' = None
+
     def __init__(self):
-        self.sub = {}
-        self.op = self.ed = None
-        self.link_to = None
+        self.content_: Dict[str, STNode] = {}
+
+        self.op: int = None
+        self._ed: int = None
+        self.suffix_link: STNode = STNode.default_suffix_link
+        self.parent: STNode = None
+
+        self.idt = STNode.id_counter
+        STNode.id_counter += 1
+
+    def __getitem__(self, key: str):
+        return self.content_[key]
+
+    def __setitem__(self, key: str, value: 'STNode'):
+        self.content_[key] = value
+
+    def __contains__(self, key: str):
+        return key in self.content_
+
+    def __lt__(self, other: 'STNode'):
+        return str(self) < str(other)
+
+    def __repr__(self):
+        if self.is_root:
+            return f'# id:{self.idt}'
+        else:
+            op, ed = self.op, self.ed
+            return f'{curr_str[op:ed]} {op}:{ed} id:{self.idt} lk:{self.suffix_link.idt}'
+
+    def __iter__(self):
+        yield from curr_str[self.op:self.ed]
+
+    @property
+    def ed(self):
+        return self._ed if self._ed != ':ed' else len(curr_str)
+
+    @ed.setter
+    def ed(self, val):
+        self._ed = val
 
     @property
     def is_root(self):
         return self.op is None and self.ed is None
 
     @property
-    def is_leaf(self):
-        return not self.is_root and not self.sub
+    def is_inner(self):
+        return not self.is_root and self.content_
 
     @property
-    def is_inner(self):
-        return not self.is_root and self.sub
-
-    def __repr__(self):
-        if self.is_root:
-            return '<root>'
-        else:
-            op, ed = self.op, self.ed
-            if ed == ':ed':
-                ed = len(g_target)
-            return g_target[op:ed] + ' {}:{}'.format(op, ed)
-
-    def __lt__(self, other: 'Node'):
-        return str(self) < str(other)
+    def is_leaf(self):
+        return not self.is_root and not self.content_
 
 
 class SuffixTree:
     def __init__(self):
-        self.root = Node()
+        self.root = STNode()
+        STNode.default_suffix_link = self.root
 
         self.remainder = 0
         self.cursor = 0
 
-        self.ac_node = self.root
-        self.ac_direction = 0
-        self.ac_offset = 0
+        self.act_node = self.root
+        self.act_direct = 0
+        self.act_offset = 0
 
-    def repr(self):
-        repr_str = ''
+    def __repr__(self):
+        ret = ''
 
-        def print_tree(node: 'Node', level=0):
-            nonlocal repr_str
-            if level == 0:
+        def print_node(node: STNode, lv=0):
+            nonlocal ret
+            if lv == 0:
                 prefix = ''
-            elif level == 1:
-                prefix = '-- '
             else:
-                prefix = '  ' * (level - 1) + '-- '
-            repr_str += prefix + str(node) + '\n'
+                prefix = '  ' * (lv - 1) + '--'
 
-            for child in sorted(node.sub.values()):
-                print_tree(child, level + 1)
+            if node is self.act_node:
+                prefix += '*'
 
-        print_tree(self.root)
-        repr_str += ', '.join(sorted('{}: {}'.format(k, v) for k, v in self.__dict__.items() if k != 'root'))
-        print(repr_str)
-        return repr_str
+            ret += f'{prefix}{node}\n'
 
-    def insert(self, char: str):
-        global g_target
-        g_target += char
+            for child in sorted(node.content_.values()):
+                print_node(child, lv + 1)
+
+        print_node(self.root)
+
+        ret += ', '.join('{}: {}'.format(k, v) for k, v in self.__dict__.items())
+        return ret
+
+    def insert_char(self, char: str):
+        global curr_str
+        curr_str += char
         self.remainder += 1
 
-        # offset 超过边长时的修正
-        def overflow_fix():
-            # self.repr()
-            curr_collapse_node = self.ac_node.sub[g_target[self.ac_direction]]
-            if not curr_collapse_node.is_leaf and self.ac_offset > curr_collapse_node.ed - curr_collapse_node.op:
-                self.ac_node = curr_collapse_node
-                self.ac_direction += (curr_collapse_node.ed - curr_collapse_node.op)
-                self.ac_offset -= (curr_collapse_node.ed - curr_collapse_node.op)
-                return overflow_fix()
-
-        def case_1():
-            # 1.1. 无法坍缩, 建立新的叶节点
-            if char not in self.ac_node.sub:
-                leaf_node = Node()
+        def case_root():
+            if char not in self.root:
+                leaf_node = STNode()
+                leaf_node.parent = self.root
                 leaf_node.op = self.cursor
                 leaf_node.ed = ':ed'
-                self.ac_node.sub[char] = leaf_node
+                self.root[char] = leaf_node
                 self.remainder -= 1
-
-            # 1.2. 开始坍缩
             else:
-                collapse_node = self.ac_node.sub[char]
-                repeat_l.append((len(g_target) - 1, collapse_node.op))
-                self.ac_direction = collapse_node.op
-                self.ac_offset += 1
+                edge_node = self.root[char]
+                self.act_direct = edge_node.op
+                self.act_offset += 1
+                assert self.act_offset == 1
 
-        # 1. ac_node 是 root 的初始状态
-        if self.ac_node.is_root and self.ac_offset == 0:
-            case_1()
-
-        # 2. 已经坍缩
+        if self.act_node.is_root and self.act_offset == 0:
+            case_root()
         else:
-            collapse_node = self.ac_node.sub[g_target[self.ac_direction]]
+            edge_node = self.act_node[curr_str[self.act_direct]]
 
-            # 2.1. 能否扩大坍缩? 可以
-            if char == g_target[collapse_node.op + self.ac_offset]:
-                repeat_l.append((len(g_target) - 1, collapse_node.op + self.ac_offset))
-                # 2.1.1. 如果是 inner_node, 坍缩是否达已经到极限? 是
-                if collapse_node.is_inner \
-                        and collapse_node.op + self.ac_offset == collapse_node.ed:
-                    # 推移 ac_node
-                    self.ac_node = collapse_node
-                    self.ac_direction = collapse_node.op + self.ac_offset
-                    self.ac_offset = 1
-                # 2.1.2. 一般情况
-                else:
-                    self.ac_offset += 1
+            if edge_node.op + self.act_offset == edge_node.ed \
+                    and char in edge_node:
+                self.act_node = edge_node
+                self.act_direct = edge_node[char].op
+                self.act_offset = 1
+            elif char == curr_str[edge_node.op + self.act_offset]:
+                self.act_offset += 1
 
-            # 2.2. 无法继续坍缩, 炸开累积的后缀
             else:
+                prev_inner_node: STNode = None
+
                 def split_grow():
-                    if collapse_node.is_leaf or collapse_node.ed - collapse_node.op > 1:
-                        # 新节点继承 :ed, sub
-                        inherit_node = Node()
-                        inherit_node.op = collapse_node.op + self.ac_offset
-                        inherit_node.ed = collapse_node.ed
-                        inherit_node.sub = collapse_node.sub
-                        inherit_node.link_to = collapse_node.link_to
+                    nonlocal prev_inner_node
 
-                        # 原坍缩点成为 inner_node
-                        collapse_node.link_to = None
-                        collapse_node.ed = inherit_node.op
-                        collapse_node.sub = {g_target[inherit_node.op]: inherit_node}
-
-                    # 新节点记录 char
-                    leaf_node = Node()
+                    leaf_node = STNode()
                     leaf_node.op = self.cursor
                     leaf_node.ed = ':ed'
-                    collapse_node.sub[g_target[leaf_node.op]] = leaf_node
                     self.remainder -= 1
 
+                    if (edge_node.is_leaf or edge_node.ed - edge_node.op > 1) \
+                            and edge_node.op + self.act_offset != edge_node.ed:
+                        inner_node = STNode()
+                        if prev_inner_node:
+                            prev_inner_node.suffix_link = inner_node
+                        prev_inner_node = inner_node
+
+                        inner_node.op = edge_node.op
+                        inner_node.ed = inner_node.op + self.act_offset
+                        inner_node.parent = edge_node.parent
+                        inner_node.parent[curr_str[inner_node.op]] = inner_node
+
+                        edge_node.op = inner_node.ed
+                        edge_node.parent = inner_node
+
+                        inner_node[curr_str[edge_node.op]] = edge_node
+                        inner_node[curr_str[leaf_node.op]] = leaf_node
+                        leaf_node.parent = inner_node
+                    else:
+                        if prev_inner_node:
+                            prev_inner_node.suffix_link = edge_node
+                        prev_inner_node = edge_node
+
+                        edge_node[curr_str[leaf_node.op]] = leaf_node
+                        leaf_node.parent = edge_node
+
+                def overflow_fix():
+                    nonlocal edge_node
+                    edge_node = self.act_node[curr_str[self.act_direct]]
+                    supply = edge_node.ed - edge_node.op
+                    if self.act_offset > supply:
+                        self.act_node = edge_node
+                        self.act_direct += supply
+                        self.act_offset -= supply
+                        return overflow_fix()
+
                 while self.remainder > 0:
-                    # 2.2.1. 没有 suffix link
-                    if not self.ac_node.is_inner:
-                        split_grow()
+                    split_grow()
 
-                        # 状态转移
-                        self.ac_offset -= 1
-                        self.ac_direction += 1
+                    if not self.act_node.is_inner:
+                        self.act_offset -= 1
+                        self.act_direct += 1
 
-                        if self.ac_offset > 0:
+                        if self.act_offset > 0:
                             overflow_fix()
-
-                            next_collapse_node = self.ac_node.sub[g_target[self.ac_direction]]
-                            collapse_node.link_to = next_collapse_node
-                            collapse_node = next_collapse_node
-
-                        # 累积后缀已炸完
                         else:
-                            # 进入 case 1.
-                            collapse_node.link_to = self.root
-                            case_1()
+                            case_root()
                             break
 
-                    # 2.2.2. 需要运用 suffix link
                     else:
-                        split_grow()
-                        # 状态转移
-                        self.ac_node = self.ac_node.link_to
+                        self.act_node = self.act_node.suffix_link
                         overflow_fix()
 
-                        next_collapse_node = self.ac_node.sub[g_target[self.ac_direction]]
-                        collapse_node.link_to = next_collapse_node
-                        collapse_node = next_collapse_node
-                        # suffix link 消耗完之后. 自动进入 case 2.2.1.
+                    if edge_node.op + self.act_offset == edge_node.ed \
+                            and char in edge_node:
+                        self.act_node = edge_node
+                        self.act_direct = edge_node[char].op
+                        self.act_offset = 1
+
+                        if prev_inner_node:
+                            prev_inner_node.suffix_link = self.act_node
+                        break
+                    elif char == curr_str[edge_node.op + self.act_offset]:
+                        break
         self.cursor += 1
 
+    def __contains__(self, item: str):
+        edge_node = self.root.content_.get(item[0])
+        if edge_node is None:
+            return False
 
-class SuffixTreeDB(SuffixTree):
-    def __setitem__(self, k, v):
-        self.insert('[')
-        for char in k:
-            self.insert(char)
-        self.insert(']')
-        for char in v:
-            self.insert(char)
-
-    def find_cursor(self, k):
-        try:
-            cursor = self.root.sub[k[0]]
-            cursor_offset = 0
-            for require_char in k:
-                if cursor.op + cursor_offset == cursor.ed:
-                    cursor = cursor.sub[require_char]
-                    cursor_offset = 0
-
-                exist_char = g_target[cursor.op + cursor_offset]
-                if exist_char != require_char:
-                    return
+        i = 0
+        while True:
+            for exist_char in edge_node:
+                if exist_char != item[i]:
+                    return False
                 else:
-                    cursor_offset += 1
-            return cursor, cursor_offset
-        except KeyError:
-            return
-
-    def __getitem__(self, k):
-        result = ''
-        cursor, cursor_offset = self.find_cursor(k)
-        if cursor is not None:
-            result += g_target[cursor.op + cursor_offset:cursor.ed if cursor.ed != ':ed' else None]
-            while cursor.sub:
-                _, cursor = next(iter(cursor.sub.items()))
-                result += g_target[cursor.op:cursor.ed if cursor.ed != ':ed' else None]
-            return result
-
-    def __delitem__(self, k):
-        cursor, cursor_offset = self.find_cursor(k)
-        if cursor is not None:
-            cursor.ed = cursor.op + cursor_offset
-            cursor.sub.clear()
+                    i += 1
+                    if i == len(item):
+                        return True
+            edge_node = edge_node.content_[item[i]]
 
 
 if __name__ == '__main__':
-    def test_0():
-        t = SuffixTree()
-        for char in 'xyzxyaxyz$':
-            t.insert(char)
-        expect = '''
-<root>
--- $ 9:10
--- axyz$ 5:10
--- xy 0:2
-  -- axyz$ 5:10
-  -- z 2:3
-    -- $ 9:10
-    -- xyaxyz$ 3:10
--- y 1:2
-  -- axyz$ 5:10
-  -- z 2:3
-    -- $ 9:10
-    -- xyaxyz$ 3:10
--- z 2:3
-  -- $ 9:10
-  -- xyaxyz$ 3:10
-ac_direction: 3, ac_node: <root>, ac_offset: 0, cursor: 10, remainder: 0
-'''
-        assert t.repr() == expect.strip()
-        repeat_l.clear()
+    from random import choice
+
+    st = SuffixTree()
 
 
-    def test_1():
-        global g_target
-        g_target = ''
+    def bundle_test(test_data):
+        global curr_str
+        curr_str = ''
+        for i, char in enumerate(test_data):
+            # print()
+            # print('insert', char)
+            st.insert_char(char)
 
-        t = SuffixTree()
-        for char in 'mississi$':
-            t.insert(char)
-        expect = '''
-<root>
--- $ 8:9
--- i 1:2
-  -- $ 8:9
-  -- ssi 2:5
-    -- $ 8:9
-    -- ssi$ 5:9
--- mississi$ 0:9
--- s 2:3
-  -- i 4:5
-    -- $ 8:9
-    -- ssi$ 5:9
-  -- si 3:5
-    -- $ 8:9
-    -- ssi$ 5:9
-ac_direction: 5, ac_node: <root>, ac_offset: 0, cursor: 9, remainder: 0
-'''
-        assert t.repr() == expect.strip()
-        repeat_l.clear()
+            # print(i, 'th')
+            # print(st)
+
+            for start in range(i + 1):
+                # print('testing', test_data[start:i + 1])
+                assert test_data[start:i + 1] in st
+        st.__init__()
 
 
-    def test_2():
-        global g_target
-        g_target = ''
+    alphabet = ('A', 'B', 'C', 'D', 'E')
 
-        t = SuffixTree()
-        for char in 'abcabxabcd':
-            t.insert(char)
-        expect = '''
-<root>
--- ab 0:2
-  -- c 2:3
-    -- abxabcd 3:10
-    -- d 9:10
-  -- xabcd 5:10
--- b 1:2
-  -- c 2:3
-    -- abxabcd 3:10
-    -- d 9:10
-  -- xabcd 5:10
--- c 2:3
-  -- abxabcd 3:10
-  -- d 9:10
--- d 9:10
--- xabcd 5:10
-ac_direction: 3, ac_node: <root>, ac_offset: 0, cursor: 10, remainder: 0
-'''
-        assert t.repr() == expect.strip()
-        repeat_l.clear()
-
-
-    def test_3():
-        global g_target
-        g_target = ''
-
-        db = SuffixTreeDB()
-        for char in '[abc]abcabxabcd':
-            db.insert(char)
-        db.repr()
-        print('val', db['b'])
-        del db['cab']
-        del db['b']
-        db.repr()
-
-
-    test_0()
-    test_1()
-    test_2()
-    test_3()
+    for _ in range(10000):
+        test_d = ''
+        for _ in range(20):
+            test_d += choice(alphabet)
+        print(test_d)
+        bundle_test(test_d)
