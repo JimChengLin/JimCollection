@@ -180,6 +180,38 @@ class CBTree:
             if yield_mode:
                 yield i
 
+    def prefix_iter_plus(self, prefix: bytes):
+        can_start = False
+
+        def yield_search(cursor, on: bool):
+            nonlocal can_start
+
+            if isinstance(cursor, bytes):
+                if can_start:
+                    yield cursor
+                else:
+                    if cursor.startswith(prefix):
+                        can_start = True
+                        yield cursor
+                return
+
+            check_byte = prefix[cursor.diff_at] if len(prefix) > cursor.diff_at else 0
+            direct = (1 + (cursor.mask | check_byte)) >> 8
+
+            if not on and cursor.diff_at >= len(prefix):
+                on = True
+
+            if not on:
+                if direct == 0:
+                    yield from yield_search(cursor.crit_0, False)
+                else:
+                    yield from yield_search(cursor.crit_1, False)
+            else:
+                yield from yield_search(cursor.crit_0, True)
+                yield from yield_search(cursor.crit_1, True)
+
+        yield from yield_search(self.root, False)
+
     def print(self):
         if self.root is None:
             print('empty')
@@ -190,34 +222,32 @@ class CBTree:
 
 
 if __name__ == '__main__':
-    from random import choice, seed
+    from random import seed, choice
 
     seed(19950207)
 
     cbt = CBTree()
 
-    alphabet = (b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k')
+    alphabet = (b'a', b'b', b'c', b'd', b'e', b'f', b'g')
     samples = []
-
-    for _ in range(1000):
+    for _ in range(1):
         sample = b''
-        for _ in range(10):
+        for _ in range(_ % 10 + 1):
             sample += choice(alphabet)
         sample += b'$'
 
         samples.append(sample)
         cbt.insert(sample)
 
-        # print(list(cbt.iter()))
-        assert list(sorted(set(samples))) == list(cbt.iter())
-    cbt.find_best_match(b'b')
-    # cbt.print()
-    print()
-    print()
-    cbt.break_point.print() if cbt.break_point is not None else None
+        a = list(sorted(filter(lambda x: x.startswith(b'd'), set(samples))))
+        b = list(cbt.prefix_iter(b'd'))
+        c = list(cbt.prefix_iter_plus(b'd'))
+        assert a == c
+        assert b == c
 
-    a = list(sorted(filter(lambda x: x.startswith(b'c'), set(samples))))
-    b = list(cbt.prefix_iter(b'c'))
-    # assert list(sorted(filter(lambda x: x.startswith(b'c'), set(samples)))) == list(cbt.prefix_iter(b'c'))
-    print(a)
-    print(b)
+        # samples = [b'a$', b'b$', b'c$']
+        # for sample in samples:
+        #     cbt.insert(sample)
+        #
+        # cbt.print()
+        # print(list(cbt.prefix_iter_plus(b'b')))
