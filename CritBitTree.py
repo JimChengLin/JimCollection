@@ -138,21 +138,21 @@ class CBTree:
             q.append(cursor)
         return q  # grand, pa, des
 
-    def iter(self, prefix: bytes):
-        grand, pa, des = self.find_best_match(prefix)
-        if not des.startswith(prefix):
+    def iter(self):
+        if self.root is None:
             return
-        else:
-            yield des
+        if isinstance(self.root, bytes):
+            yield self.root
+            return
 
-        if pa.crit_1 != des:
-            q = [pa.crit_1]
-            while q:
-                cursor = q.pop(0)
-                if isinstance(cursor, bytes):
-                    yield cursor
+        def iter_node(node: CBInternal):
+            for sub_node in (node.crit_0, node.crit_1):
+                if isinstance(sub_node, bytes):
+                    yield sub_node
                 else:
-                    q[0:0] = (cursor.crit_0, cursor.crit_1)
+                    yield from iter_node(sub_node)
+
+        yield from iter_node(self.root)
 
     def print(self):
         if self.root is None:
@@ -164,38 +164,22 @@ class CBTree:
 
 
 if __name__ == '__main__':
-    from random import choice, randint
+    from random import choice
 
     cbt = CBTree()
 
-    chars = (b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k')
+    alphabet = (b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k')
     samples = []
-    for _ in range(1000000):
+
+    for _ in range(10000):
         sample = b''
-        for _ in range(randint(1, 4)):
-            sample += choice(chars)
+        for _ in range(10):
+            sample += choice(alphabet)
+        sample += b'$'
+
         samples.append(sample)
-    samples = list(map(lambda x: x + b'$', samples))
-
-    for sample in samples:
         cbt.insert(sample)
-    # cbt.print()
 
-    samples = sorted(set(samples))
-    # print(output_pool)
-    # print(samples)
-
-    for i in range(100):
-        del_i = randint(0, len(samples) - 1)
-        del_val = samples.pop(del_i)
-        cbt.delete(del_val)
-    cbt.print()
-    assert output_pool == samples
-
-    samples_startswith_a = [i for i in samples if i.startswith(b'a')]
-    assert samples_startswith_a == list(cbt.iter(b'a'))
-
-    for i in samples:
-        cbt.delete(i)
-    print('----BOOM')
-    cbt.print()
+        # print(list(cbt.iter()))
+        assert list(sorted(set(samples))) == list(cbt.iter())
+        print('----')
