@@ -24,6 +24,8 @@ class CBInternal:
 class CBTree:
     def __init__(self):
         self.root = None
+        self.break_point = None
+        self.find_q = []
 
     def insert(self, new_bytes: bytes):
         if self.root is None:
@@ -127,6 +129,9 @@ class CBTree:
         while isinstance(cursor, CBInternal):
             # 计算方向
             check_byte = src[cursor.diff_at] if len(src) > cursor.diff_at else 0
+            if cursor.diff_at < len(src):
+                self.break_point = cursor
+
             direct = (1 + (cursor.mask | check_byte)) >> 8
 
             if direct == 0:
@@ -138,7 +143,7 @@ class CBTree:
             q.append(cursor)
         return q  # grand, pa, des
 
-    def iter(self):
+    def iter(self, from_node=None):
         if self.root is None:
             return
         if isinstance(self.root, bytes):
@@ -152,7 +157,28 @@ class CBTree:
                 else:
                     yield from iter_node(sub_node)
 
-        yield from iter_node(self.root)
+        if from_node is None:
+            from_node = self.root
+        yield from iter_node(from_node)
+
+    def prefix_iter(self, prefix: bytes):
+        _, _, des = self.find_best_match(prefix)
+        start_node = self.break_point
+        des: bytes
+        if not des.startswith(prefix):
+            return
+
+        prefix = prefix[:-1] + bytes(chr(prefix[-1] + 1), encoding='ascii')
+        _, _, end_bytes = self.find_best_match(prefix)
+
+        yield_mode = False
+        for i in self.iter(start_node):
+            if i is des:
+                yield_mode = True
+            if i is end_bytes:
+                break
+            if yield_mode:
+                yield i
 
     def print(self):
         if self.root is None:
@@ -164,14 +190,16 @@ class CBTree:
 
 
 if __name__ == '__main__':
-    from random import choice
+    from random import choice, seed
+
+    seed(19950207)
 
     cbt = CBTree()
 
     alphabet = (b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k')
     samples = []
 
-    for _ in range(10000):
+    for _ in range(1000):
         sample = b''
         for _ in range(10):
             sample += choice(alphabet)
@@ -182,4 +210,14 @@ if __name__ == '__main__':
 
         # print(list(cbt.iter()))
         assert list(sorted(set(samples))) == list(cbt.iter())
-        print('----')
+    cbt.find_best_match(b'b')
+    # cbt.print()
+    print()
+    print()
+    cbt.break_point.print() if cbt.break_point is not None else None
+
+    a = list(sorted(filter(lambda x: x.startswith(b'c'), set(samples))))
+    b = list(cbt.prefix_iter(b'c'))
+    # assert list(sorted(filter(lambda x: x.startswith(b'c'), set(samples)))) == list(cbt.prefix_iter(b'c'))
+    print(a)
+    print(b)
