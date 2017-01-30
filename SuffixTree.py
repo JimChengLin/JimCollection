@@ -168,12 +168,21 @@ class SuffixTree:
                 def overflow_fix():
                     nonlocal edge_node
                     edge_node = self.act_node[curr_str[self.act_direct]]
-                    supply = edge_node.ed - edge_node.op
-                    if self.act_offset > supply:
-                        self.act_node = edge_node
-                        self.act_direct += supply
-                        self.act_offset -= supply
-                        return overflow_fix()
+                    for char in curr_str[len(curr_str) - self.act_offset:len(curr_str)]:
+                        print(char)
+
+                    require_chars = list(curr_str[len(curr_str) - self.act_offset:len(curr_str)])
+                    while require_chars:
+                        for char in curr_str[edge_node.op:edge_node.ed]:
+                            assert char == require_chars.pop(0)
+                            if not require_chars:
+                                return
+                        if require_chars:
+                            self.act_node = edge_node
+                            diff = edge_node.ed - edge_node.op
+                            edge_node = edge_node[require_chars[0]]
+                            self.act_direct += diff
+                            self.act_offset -= diff
 
                 while self.remainder > 0:
                     split_grow()

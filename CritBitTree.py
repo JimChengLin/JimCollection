@@ -193,6 +193,8 @@ class CBTree:
                     if cursor.startswith(prefix):
                         can_start = True
                         yield cursor
+                    else:
+                        yield 'FAILED'
                 return
 
             check_byte = prefix[cursor.diff_at] if len(prefix) > cursor.diff_at else 0
@@ -210,7 +212,11 @@ class CBTree:
                 yield from yield_search(cursor.crit_0, True)
                 yield from yield_search(cursor.crit_1, True)
 
-        yield from yield_search(self.root, False)
+        for i in yield_search(self.root, False):
+            if i == 'FAILED':
+                return
+            else:
+                yield i
 
     def print(self):
         if self.root is None:
@@ -230,7 +236,7 @@ if __name__ == '__main__':
 
     alphabet = (b'a', b'b', b'c', b'd', b'e', b'f', b'g')
     samples = []
-    for _ in range(1):
+    for _ in range(1000):
         sample = b''
         for _ in range(_ % 10 + 1):
             sample += choice(alphabet)
