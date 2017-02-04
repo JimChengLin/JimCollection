@@ -94,14 +94,12 @@ function zhihu() {
             observer.observe(document.querySelector('div.zu-main-content'), {childList: true, subtree: true});
             setInterval(() => {
                 if (change) {
-                    $('.feed-item > link:not(._checked)').map((i, elem) => {
+                    $('.feed-item > link').map((i, elem) => {
                         elem = $(elem);
-                        elem.addClass('_checked');
                         if (DayDiff.search(elem.attr('href')) > 0.5) {
-                            elem.closest('.feed-item').find('.expandable, .zm-item-meta').fadeOut();
+                            elem.closest('.feed-item').find('.expandable, .zm-item-meta').hide();
                         }
                     });
-                    $('.goog-scrollfloater-floating').remove();
                     change = false;
                 }
             }, 1000);
