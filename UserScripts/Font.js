@@ -2,7 +2,9 @@
 
 $(() => {
     probeLang();
-    travel(document.body);
+    if (isTraditional) {
+        travel(document.body);
+    }
 });
 
 var isTraditional;
@@ -18,9 +20,7 @@ function probeLang() {
 }
 
 function travel(element) {
-    if (isTraditional) {
-        simplify(element);
-    }
+    simplify(element);
     var children = element.children;
     for (var i = 0; i < children.length; i++) {
         var child = children[i];
