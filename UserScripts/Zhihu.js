@@ -100,6 +100,7 @@ function zhihu() {
                             elem.closest('.feed-item').find('.expandable, .zm-item-meta').hide();
                         }
                     });
+                    $('.goog-scrollfloater-floating').remove();
                     change = false;
                 }
             }, 1000);
