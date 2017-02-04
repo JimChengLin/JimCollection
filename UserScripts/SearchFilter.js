@@ -27,7 +27,7 @@ function main() {
 
                 var emList = abstract.find('em');
                 mapBackup[link] = emList.length ?
-                '-' + emList.first().text() + '...' + emList.last().text() : extract(mapMain[link]);
+                    '-' + emList.first().text() + '...' + emList.last().text() : extract(mapMain[link]);
             }
         };
     }
@@ -48,11 +48,11 @@ function main() {
 
                     mapMain[link] = '-' +
                         abstract.contents()
-                                .filter((i, elem) => elem.nodeType === Node.TEXT_NODE || elem.tagName === 'EM').text();
+                            .filter((i, elem) => elem.nodeType === Node.TEXT_NODE || elem.tagName === 'EM').text();
 
                     var emList = abstract.find('em');
                     mapBackup[link] = emList.length ?
-                    '-' + emList.first().text() + '...' + emList.last().text() : extract(mapMain[link]);
+                        '-' + emList.first().text() + '...' + emList.last().text() : extract(mapMain[link]);
                 }
             });
         };

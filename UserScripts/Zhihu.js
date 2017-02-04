@@ -21,12 +21,7 @@ function zhihuDaily() {
 }
 
 function zhihu() {
-    $('<style>' +
-        '@media screen and (max-width:1120px){.zu-top{display:none;}}' +
-        '*{font-family:open sans} code{font-family:consolas}' +
-        '</style>').appendTo('html');
     $(window).on('copy', () => GM_setClipboard(getSelection().toString(), 'text'));
-
     $(() => {
         let change = true;
         let observer = new MutationObserver(() => change = true);
