@@ -32,32 +32,6 @@ function main() {
         };
     }
 
-    else if (isEngine = (href.includes('baidu.com/s?'))) {
-        $('<style>#content_right{visibility:hidden}</style>').appendTo('html');
-        update = function () {
-            $('span:contains("商业推广"), span:contains("广告")').closest('div').remove();
-            var result = $('.c-container');
-            result.map((i, element) => {
-                element = $(element);
-
-                var link = element.find('.t > a:first');
-                var abstract = element.find('.c-abstract');
-                if (link.length && abstract.length) {
-                    link.trigger('mousedown');
-                    link = link.attr('href');
-
-                    mapMain[link] = '-' +
-                        abstract.contents()
-                            .filter((i, elem) => elem.nodeType === Node.TEXT_NODE || elem.tagName === 'EM').text();
-
-                    var emList = abstract.find('em');
-                    mapBackup[link] = emList.length ?
-                        '-' + emList.first().text() + '...' + emList.last().text() : extract(mapMain[link]);
-                }
-            });
-        };
-    }
-
     function commit() {
         update();
         GM_setValue('mapMain', JSON.stringify(mapMain));
@@ -68,23 +42,13 @@ function main() {
         commit();
         var change;
         var observer = new MutationObserver(() => change = true);
-        observer.observe(document.body, setting || {childList: true, subtree: true, attributes: true});
+        observer.observe(document.body, setting);
         setInterval(() => {
             if (change) {
                 commit();
                 change = false;
             }
         }, 1000);
-    }
-
-    else if (href.includes('www.baidu.com/link?')) {
-        var url = $('head > noscript').text().match(/URL='(.+)'/).pop();
-        mapMain = JSON.parse(GM_getValue('mapMain'));
-        mapBackup = JSON.parse(GM_getValue('mapBackup'));
-        mapMain[url] = mapMain[href];
-        mapBackup[url] = mapBackup[href];
-        GM_setValue('mapMain', JSON.stringify(mapMain));
-        GM_setValue('mapBackup', JSON.stringify(mapBackup));
     }
 
     else if (top === self) {
