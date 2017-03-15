@@ -115,7 +115,7 @@ $(`<style>
     border-radius: 3px;
     box-shadow: 0 0 2px;
     color: black;
-    font-family: consolas;
+    font-family: monospace;
     font-size: 13px;
     position: fixed;
     z-index: 2147483648;

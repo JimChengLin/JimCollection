@@ -1,24 +1,10 @@
 'use strict';
 
-var record = GM_getValue('fontQueue');
-var fontQueue = record ? record.split(',') : [];
-$(`<style>${fontQueue.map((i) => inject(i, 'defer')).join()}</style>`).prependTo('html');
-
-function inject(font, defer) {
-    var code = `@font-face{font-family:${font};src:local('');}` +
-        `@font-face{font-family:${font};unicode-range:u+4e00-9fff;src:local(noto sans cjk sc);}` +
-        `@font-face{font-family:${font};unicode-range:u+0-4dff,u+a000-10ffff;src:local(${font});}`;
-    if (!defer) {
-        $(`<style>${code}</style>`).appendTo('html');
-    } else {
-        return code;
-    }
-}
-
 $(() => {
     probeLang();
-    travel(document.body);
-    GM_setValue('fontQueue', fontQueue.slice(0, 100).join(','));
+    if (isTraditional) {
+        travel(document.body);
+    }
 });
 
 var isTraditional;
@@ -33,60 +19,18 @@ function probeLang() {
     }
 }
 
-var cache;
-function travel(element, probe) {
-    var $element = $(element);
-    var fontFamily = $element.css('font-family').replace(/'|"/g, '').toLowerCase();
-    var fonts = redirect(fontFamily.split(',').map((f)=>f.trim()).filter((f)=>/^[\sa-zA-Z\u4e00-\u9fff\-]+$/.test(f)));
-
-    function redirect(fonts) {
-        var isModified;
-        for (var i = 0; i < fonts.length; i++) {
-            var font = fonts[i];
-            if (font.match(/sans-serif|serif/)) {
-                isModified = (fonts[i] = 'open sans');
-            } else if (font.match('monospace')) {
-                isModified = (fonts[i] = 'consolas');
-            }
-        }
-        if (isModified) {
-            $element.css('font-family', fonts.join());
-        }
-        return fonts;
-    }
-
-    if (element.tagName === 'INPUT' || ((probe || probe === undefined) &&
-        (probe = (element.innerText && element.innerText.match(/[\u4E00-\u9FFF]/))) && fontFamily !== cache)) {
-        cache = fontFamily;
-        fonts.map(
-            (font) => {
-                var curr = fontQueue.indexOf(font);
-                if (curr === -1) {
-                    inject(font);
-                    fontQueue.push(font);
-                } else if (curr !== 0) {
-                    var prev = curr - 1;
-                    var temp = fontQueue[curr];
-                    fontQueue[curr] = fontQueue[prev];
-                    fontQueue[prev] = temp;
-                }
-            }
-        );
-    }
-
-    if (probe && isTraditional) {
-        simplify(element);
-    }
+function travel(element) {
+    simplify(element);
     var children = element.children;
     for (var i = 0; i < children.length; i++) {
         var child = children[i];
-        travel(child, probe);
+        travel(child);
     }
 }
 
 function simplify(element) {
     var childNodes = element.childNodes;
-    for (i = 0; i < childNodes.length; i++) {
+    for (var i = 0; i < childNodes.length; i++) {
         var childNode = childNodes[i];
         if (childNode.nodeType === Node.TEXT_NODE) {
             childNode.data = transform(childNode.data);

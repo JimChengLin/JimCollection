@@ -21,12 +21,7 @@ function zhihuDaily() {
 }
 
 function zhihu() {
-    $('<style>' +
-        '@media screen and (max-width:1120px){.zu-top{display:none;}}' +
-        '*{font-family:open sans} code{font-family:consolas}' +
-        '</style>').appendTo('html');
     $(window).on('copy', () => GM_setClipboard(getSelection().toString(), 'text'));
-
     $(() => {
         let change = true;
         let observer = new MutationObserver(() => change = true);
@@ -99,11 +94,10 @@ function zhihu() {
             observer.observe(document.querySelector('div.zu-main-content'), {childList: true, subtree: true});
             setInterval(() => {
                 if (change) {
-                    $('.feed-item > link:not(._checked)').map((i, elem) => {
+                    $('.feed-item > link').map((i, elem) => {
                         elem = $(elem);
-                        elem.addClass('_checked');
                         if (DayDiff.search(elem.attr('href')) > 0.5) {
-                            elem.closest('.feed-item').find('.expandable, .zm-item-meta').fadeOut();
+                            elem.closest('.feed-item').find('.expandable, .zm-item-meta').hide();
                         }
                     });
                     $('.goog-scrollfloater-floating').remove();
