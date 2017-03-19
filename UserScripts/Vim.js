@@ -411,11 +411,10 @@ z-index: 2147483648;}
                 .filter((elem) => elem.scrollHeight >= elem.clientHeight && getComputedStyle(elem).overflowY !== 'hidden')
                 .sort((a, b) => a.scrollHeight > b.scrollHeight);
 
-            for (var elem of [document.scrollingElement, document.activeElement]) {
-                if (elem && elem.tagName.match(/^(DIV|BODY)$/)) {
-                    targets.push(elem);
-                    break;
-                }
+            if (typeof document.activeElement !== typeof document.scrollingElement) {
+                if (document.scrollingElement.tagName.match(/^(DIV|BODY)$/)) targets.push(document.scrollingElement);
+            } else {
+                if (document.activeElement.tagName.match(/^(DIV|BODY)$/)) targets.push(document.activeElement);
             }
 
             for (var i = targets.length - 1; i >= 0; i--) {
@@ -424,7 +423,7 @@ z-index: 2147483648;}
                     return target.scrollTop += offset;
                 }
             }
-            scrollBy(0, offset)
+            scrollBy(0, offset);
         },
 
         plus: () => {
@@ -474,12 +473,12 @@ z-index: 2147483648;}
             return {
                 from: Math.floor(from),
                 to: Math.floor(to)
-            }
+            };
         },
 
         getLeft: (node) => {
             if (node.left) {
-                return node.left
+                return node.left;
             } else {
                 return node.left = Tree.create(node.from, Math.floor((node.from + node.to) / 2));
             }
@@ -487,7 +486,7 @@ z-index: 2147483648;}
 
         getRight: (node) => {
             if (node.right) {
-                return node.right
+                return node.right;
             } else {
                 return node.right = Tree.create(Math.floor((node.from + node.to) / 2) + 1, node.to);
             }
@@ -538,10 +537,10 @@ z-index: 2147483648;}
                     outPipe(node.values);
                 }
                 if (node.left) {
-                    include(node.left, outPipe)
+                    include(node.left, outPipe);
                 }
                 if (node.right) {
-                    include(node.right, outPipe)
+                    include(node.right, outPipe);
                 }
             }
         }
