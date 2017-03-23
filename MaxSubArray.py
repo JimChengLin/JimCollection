@@ -40,3 +40,22 @@ def mid_max_list(root: List[Number]) -> (Number, List[Number]):
 
 
 print(max_list(sample))
+
+
+class Solution(object):
+    def maxSubArray(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        curr_max = max_ = float('-inf')
+        for num in nums:
+            if curr_max < 0:
+                curr_max = max(curr_max, num)
+            else:
+                curr_max += num
+            max_ = max(max_, curr_max)
+        return max_
+
+
+print(Solution().maxSubArray(sample))
