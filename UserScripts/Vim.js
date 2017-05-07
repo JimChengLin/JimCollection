@@ -127,8 +127,7 @@ z-index: 2147483648;
 
                     function isDisplayed(element) {
                         var style = getComputedStyle(element);
-                        if ((style.opacity === '0' && !element.innerText)
-                            || (element.classList.contains('_strict') && style.cursor.search(/pointer|text/) === -1)) {
+                        if (style.opacity === '0' || (element.classList.contains('_strict') && style.cursor.search(/pointer|text/) === -1)) {
                             return;
                         }
 
