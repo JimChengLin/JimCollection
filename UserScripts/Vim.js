@@ -20,49 +20,16 @@
             Page.clickElements.push(this);
         }
     };
-
     // Event
     $(window).on('click resize scroll', () => Page.escape());
 
-    var counter = 0;
-    var shouldBlur = true;
-    var shouldRelease = false;
-
-    var interval = setInterval(() => {
-        if (counter < 3000 && shouldBlur && !shouldRelease) {
-            counter += 10;
-            var activeElement = document.activeElement;
-            if (activeElement && activeElement.tagName.match(/(INPUT|TEXTAREA)/)) {
-                activeElement.blur && activeElement.blur();
-                if (activeElement._focus) {
-                    shouldBlur = false;
-                }
-            }
-        } else {
-            clearInterval(interval);
-        }
-    }, 10);
-
-    $(() => {
-        $('input, textarea').map((i, elem) => {
-            elem._focus = elem.focus;
-            elem.focus = function () {
-                if (shouldRelease) {
-                    elem._focus.apply(this, arguments);
-                }
-            };
-        });
-    });
-
     window ? register() : setTimeout(register);
     function register() {
-        addEventListener('mousedown', () => shouldRelease = true, true);
         addEventListener('keydown', (event) => {
-            var isTab = (event.code === 'Tab');
             var isCommand = Page.isCommand(event);
             var activeElement = document.activeElement;
 
-            if (isTab && !tab()) {
+            if (event.code === 'Tab' && !tab()) {
                 event.preventDefault();
                 event.stopImmediatePropagation();
                 isCommand ? Page.escape() : activeElement && activeElement.blur();
@@ -122,7 +89,8 @@
 box-shadow: 0 0 1px 1px gray;
 pointer-events: none;
 position: absolute;
-z-index: 2147483648;}
+z-index: 2147483648;
+}
 ._hint{
 background-color: rgba(173, 216, 230, 0.7);
 border-radius: 3px;
@@ -131,7 +99,8 @@ color: black;
 font-family: monospace;
 font-size: 13px;
 position: fixed;
-z-index: 2147483648;}
+z-index: 2147483648;
+}
 </style>`).appendTo('html');
 
     var Page = {
@@ -153,7 +122,7 @@ z-index: 2147483648;}
                 return purify(elements, clickElements.add(clickElements.find('div')).addClass('_strict'));
 
                 function purify(elements, clickElements) {
-                    const length = 16;
+                    var length = 16;
                     var substitutes = [];
 
                     function isDisplayed(element) {
@@ -292,8 +261,8 @@ z-index: 2147483648;}
                     element = elements[i];
 
                     if ((element.tagName === 'INPUT' &&
-                        element.type.search(/(button|checkbox|file|hidden|image|radio|reset|submit)/i) === -1) ||
-                        element.hasAttribute('contenteditable') || element.tagName === 'TEXTAREA') {
+                        element.type.search(/(button|checkbox|file|hidden|image|radio|reset|submit)/i) === -1)
+                        || element.hasAttribute('contenteditable') || element.tagName === 'TEXTAREA') {
                         var hint = hints[i];
                         hints[i] = availableChar;
                         availableChar = hint;
@@ -404,8 +373,6 @@ z-index: 2147483648;}
         },
 
         scrollTop: (offset) => {
-            !shouldRelease && self !== top && (document.location.href = "#");
-
             var targets = Array
                 .from(document.querySelectorAll('div'))
                 .filter((elem) => elem.scrollHeight >= elem.clientHeight && getComputedStyle(elem).overflowY !== 'hidden')
@@ -432,12 +399,9 @@ z-index: 2147483648;}
         },
 
         click: (element) => {
-            shouldRelease = true;
-
-            if ((element.tagName === 'INPUT' &&
-                element.type.search(/(button|checkbox|file|hidden|image|radio|reset|submit)/i) === -1) ||
-                element.hasAttribute('contenteditable') || element.tagName === 'TEXTAREA') {
-                element._focus ? element._focus() : element.focus();
+            if ((element.tagName === 'INPUT' && element.type.search(/(button|checkbox|file|hidden|image|radio|reset|submit)/i) === -1)
+                || element.hasAttribute('contenteditable') || element.tagName === 'TEXTAREA') {
+                element.focus();
                 if (element.setSelectionRange) {
                     try {
                         var len = element.value.length * 2;
