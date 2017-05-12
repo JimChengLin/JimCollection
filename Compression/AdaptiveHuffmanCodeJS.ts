@@ -90,10 +90,31 @@ class Tree {
     }
 
     private addChar(char: string) {
+        let NYTParent = new TreeNode();
+        let newCharNode = new TreeNode();
 
+        NYTParent.left = this.NYT;
+        NYTParent.right = newCharNode;
+        NYTParent.parent = this.NYT.parent;
+
+        if (this.NYT.parent) {
+            this.NYT.parent.left = NYTParent;
+        }
+        this.NYT.parent = NYTParent;
+
+        newCharNode.parent = NYTParent;
+        newCharNode.char = char;
+        this.increaseWeight(newCharNode);
     }
 
     private increaseWeight(node: TreeNode) {
+        ++node.weight;
+        if (node.parent) {
+            this.tryMoveUp(node);
+        }
+    }
+
+    private tryMoveUp(node: TreeNode) {
 
     }
 
