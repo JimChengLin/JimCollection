@@ -53,7 +53,7 @@ class Tree {
     toString(): string {
         let res = '';
 
-        function addNode(node: TreeNode, lv = 0) {
+        function add(node: TreeNode, lv = 0) {
             if (!node) {
                 return;
             }
@@ -66,21 +66,44 @@ class Tree {
             }
 
             res += prefix + node.toString() + '\n';
-            addNode(node.left, lv + 1);
-            addNode(node.right, lv + 1);
+            add(node.left, lv + 1);
+            add(node.right, lv + 1);
         }
 
-        addNode(this.root);
+        add(this.root);
         return res;
+    }
+
+    encode(char: string): BitPack {
+
+    }
+
+    private addChar() {
+
+    }
+
+    private increaseWeight() {
+
+    }
+
+    private swapNode() {
+
     }
 }
 
 class TreeNode {
-    public parent: TreeNode;
-    public left: TreeNode;
-    public right: TreeNode;
+    parent: TreeNode;
+    left: TreeNode;
+    right: TreeNode;
+
+    char: string;
+    weight: number = 0;
 
     toString(): string {
-
+        if (this.char) {
+            return this.char + ' ' + this.weight.toString();
+        } else {
+            return '+ ' + this.weight.toString();
+        }
     }
 }
