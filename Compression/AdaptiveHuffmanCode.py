@@ -250,7 +250,7 @@ class Tree:
             if lv == 0:
                 prefix = ''
             else:
-                prefix = '  ' * (lv - 1) + '  '
+                prefix = '  ' * (lv - 1) + '--'
 
             res += prefix + str(node) + '\n'
             print_node(node.left, lv + 1)

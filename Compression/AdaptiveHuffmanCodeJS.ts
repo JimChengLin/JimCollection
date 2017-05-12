@@ -28,12 +28,11 @@ class BitPack {
     const r = ALPHABET.length - Math.pow(2, e);
     const k = 2 * r;
 
-    let i = 0;
-    for (let len = ALPHABET.length - k, cnt = r; i < len; ++i, ++cnt) {
+    for (let i = 0, len = ALPHABET.length - k, cnt = r; i < len; ++i, ++cnt) {
         TABLE[ALPHABET[i]] = new BitPack(e, cnt);
         // console.log(ALPHABET[i], TABLE[ALPHABET[i]].toString());
     }
-    for (let j = i, len = j + k, cnt = 0; j < len; ++j, ++cnt) {
+    for (let j = ALPHABET.length - k, len = ALPHABET.length, cnt = 0; j < len; ++j, ++cnt) {
         TABLE[ALPHABET[j]] = new BitPack(e + 1, cnt);
         // console.log(ALPHABET[j], TABLE[ALPHABET[j]].toString());
     }
@@ -46,9 +45,42 @@ class Tree {
     private root: TreeNode;
 
     constructor() {
+        this.root = new TreeNode();
+        this.NYT = this.root;
+        this.UPDATE_TABLE['NTY'] = this.NYT;
+    }
+
+    toString(): string {
+        let res = '';
+
+        function addNode(node: TreeNode, lv = 0) {
+            if (!node) {
+                return;
+            }
+
+            let prefix = '';
+            if (lv > 0) {
+                for (let i = 0; i < lv; ++i) {
+                    prefix += '    ';
+                }
+            }
+
+            res += prefix + node.toString() + '\n';
+            addNode(node.left, lv + 1);
+            addNode(node.right, lv + 1);
+        }
+
+        addNode(this.root);
+        return res;
     }
 }
 
 class TreeNode {
+    public parent: TreeNode;
+    public left: TreeNode;
+    public right: TreeNode;
 
+    toString(): string {
+
+    }
 }
