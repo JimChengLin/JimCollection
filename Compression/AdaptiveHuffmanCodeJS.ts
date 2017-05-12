@@ -15,7 +15,7 @@ class BitPack {
         return res;
     }
 
-    merge(other: BitPack): BitPack {
+    extend(other: BitPack): BitPack {
         this.len += other.len;
         this.val <<= other.len;
         this.val |= other.val;
@@ -75,14 +75,25 @@ class Tree {
     }
 
     encode(char: string): BitPack {
+        let res: BitPack;
+
+        if (!this.UPDATE_TABLE.hasOwnProperty(char)) {
+            res = this.NYT.toBitPack().extend(TABLE[char]);
+            this.addChar(char);
+        } else {
+            let charNode = this.UPDATE_TABLE[char];
+            res = charNode.toBitPack();
+            this.increaseWeight(charNode);
+        }
+
+        return res;
+    }
+
+    private addChar(char: string) {
 
     }
 
-    private addChar() {
-
-    }
-
-    private increaseWeight() {
+    private increaseWeight(node: TreeNode) {
 
     }
 
@@ -97,13 +108,27 @@ class TreeNode {
     right: TreeNode;
 
     char: string;
-    weight: number = 0;
+    weight = 0;
 
     toString(): string {
         if (this.char) {
             return this.char + ' ' + this.weight.toString();
         } else {
             return '+ ' + this.weight.toString();
+        }
+    }
+
+    toBitPack(): BitPack {
+
+    }
+
+    replaceChild(child: TreeNode, newChild: TreeNode) {
+        if (this.left == child) {
+            this.left = newChild;
+        } else if (this.right == child) {
+            this.right = newChild;
+        } else {
+            throw new Error();
         }
     }
 }
