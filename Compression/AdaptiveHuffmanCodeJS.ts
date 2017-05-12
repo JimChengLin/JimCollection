@@ -110,15 +110,15 @@ class Tree {
     private increaseWeight(node: TreeNode) {
         ++node.weight;
         if (node.parent) {
-            this.tryMoveUp(node);
+            this.tryMoveUp(node, node.parent);
         }
     }
 
-    private tryMoveUp(node: TreeNode) {
+    private tryMoveUp(node: TreeNode, target: TreeNode) {
 
     }
 
-    private swapNode() {
+    private swapNode(a: TreeNode, b: TreeNode) {
 
     }
 }
@@ -155,13 +155,13 @@ class TreeNode {
         return new BitPack(cnt, code);
     }
 
-    replaceChild(child: TreeNode, newChild: TreeNode) {
-        if (this.left == child) {
-            this.left = newChild;
-        } else if (this.right == child) {
-            this.right = newChild;
-        } else {
-            throw new Error();
+    updateWeight() {
+        this.weight = 0;
+        if (this.left) {
+            this.weight += this.left.weight;
+        }
+        if (this.right) {
+            this.weight += this.right.weight;
         }
     }
 }
