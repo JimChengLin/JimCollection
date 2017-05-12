@@ -119,7 +119,19 @@ class TreeNode {
     }
 
     toBitPack(): BitPack {
+        let cnt = 0;
+        let code = 0;
+        let cursor: TreeNode = this;
+        while (cursor.parent) {
+            ++cnt;
+            code <<= 1;
 
+            if (cursor == cursor.parent.right) {
+                code |= 1;
+            }
+            cursor = cursor.parent;
+        }
+        return new BitPack(cnt, code);
     }
 
     replaceChild(child: TreeNode, newChild: TreeNode) {
