@@ -121,6 +121,25 @@ class Tree {
     }
 
     private addChar(char: string) {
+        let NYTParent = new TreeNode();
+        let charNode = new TreeNode();
+
+        if (this.NYT.parent) {
+            this.NYT.parent.bindLeft(NYTParent);
+        } else {
+            this.root = NYTParent;
+        }
+
+        NYTParent.bindLeft(this.NYT);
+        NYTParent.bindRight(charNode);
+        ++NYTParent.weight;
+
+        charNode.char = char;
+        this.UPDATE_TABLE[char] = charNode;
+        this.tryMoveUp(charNode);
+    }
+
+    private tryMoveUp(node: TreeNode) {
 
     }
 
