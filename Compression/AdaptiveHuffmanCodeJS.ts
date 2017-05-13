@@ -30,11 +30,11 @@ class BitPack {
 
     for (let i = 0, len = ALPHABET.length - k, cnt = r; i < len; ++i, ++cnt) {
         TABLE[ALPHABET[i]] = new BitPack(e, cnt);
-        // console.log(ALPHABET[i], TABLE[ALPHABET[i]].toString());
+        console.log(ALPHABET[i], TABLE[ALPHABET[i]].toString());
     }
     for (let j = ALPHABET.length - k, len = ALPHABET.length, cnt = 0; j < len; ++j, ++cnt) {
         TABLE[ALPHABET[j]] = new BitPack(e + 1, cnt);
-        // console.log(ALPHABET[j], TABLE[ALPHABET[j]].toString());
+        console.log(ALPHABET[j], TABLE[ALPHABET[j]].toString());
     }
 })();
 
@@ -45,8 +45,10 @@ class Tree {
     private root: TreeNode;
 
     constructor() {
+        this.UPDATE_TABLE = {};
         this.root = new TreeNode();
         this.NYT = this.root;
+        this.NYT.char = 'NYT';
         this.UPDATE_TABLE['NTY'] = this.NYT;
     }
 
@@ -93,33 +95,70 @@ class Tree {
         let NYTParent = new TreeNode();
         let newCharNode = new TreeNode();
 
-        NYTParent.left = this.NYT;
-        NYTParent.right = newCharNode;
-        NYTParent.parent = this.NYT.parent;
-
         if (this.NYT.parent) {
-            this.NYT.parent.left = NYTParent;
+            this.NYT.parent.bindLeft(NYTParent);
+        } else {
+            this.root = NYTParent;
         }
-        this.NYT.parent = NYTParent;
 
-        newCharNode.parent = NYTParent;
+        NYTParent.bindLeft(this.NYT);
+        NYTParent.bindRight(newCharNode);
+        ++NYTParent.weight;
+
         newCharNode.char = char;
         this.increaseWeight(newCharNode);
+        this.UPDATE_TABLE[char] = newCharNode;
     }
 
     private increaseWeight(node: TreeNode) {
         ++node.weight;
-        if (node.parent) {
-            this.tryMoveUp(node, node.parent);
-        }
+        this.tryMoveUp(node, node.parent);
     }
 
     private tryMoveUp(node: TreeNode, target: TreeNode) {
+        if (target == this.root && target.right.weight >= node.weight) {
+            target.updateWeight();
+            return;
+        }
 
+        // 优先向上
+        if (target.weight < node.weight) {
+            // 递归
+            if (target.parent && target.parent.weight < node.weight) {
+                return this.tryMoveUp(node, target.parent);
+            }
+
+            this.swapNode(node, target);
+        } else if (target.right.weight < node.weight) {
+            this.swapNode(node, target.right);
+        }
+
+        node.parent.updateWeight();
+        if (node.parent.parent) {
+            this.tryMoveUp(node.parent, node.parent.parent);
+        }
     }
 
     private swapNode(a: TreeNode, b: TreeNode) {
+        if (a.parent == b.parent) {
+            [a.parent.left, a.parent.right] = [a.parent.right, a.parent.left];
+            return;
+        }
 
+        if (a.parent.left == a) {
+            a.parent.bindLeft(b);
+        } else {
+            a.parent.bindRight(b);
+        }
+        if (b.parent.left == b) {
+            b.parent.bindLeft(a);
+        } else {
+            b.parent.bindRight(a);
+        }
+
+        if (b == this.root) {
+            this.root = a;
+        }
     }
 }
 
@@ -164,4 +203,23 @@ class TreeNode {
             this.weight += this.right.weight;
         }
     }
+
+    bindLeft(node: TreeNode) {
+        this.left = node;
+        node.parent = this;
+    }
+
+    bindRight(node: TreeNode) {
+        this.right = node;
+        node.parent = this;
+    }
 }
+
+(function main() {
+    let tree = new Tree();
+    for (let char of 'aardv') {
+        let res = tree.encode(char);
+        console.log('Out: ', char, res.toString(), TABLE[char].toString());
+        console.log(tree.toString());
+    }
+})();
