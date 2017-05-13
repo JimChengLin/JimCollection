@@ -121,8 +121,8 @@ class Tree {
     }
 
     private addChar(char: string) {
-        let NYTParent = new TreeNode();
-        let charNode = new TreeNode();
+        const NYTParent = new TreeNode();
+        const charNode = new TreeNode();
 
         if (this.NYT.parent) {
             this.NYT.parent.bindLeft(NYTParent);
@@ -140,7 +140,9 @@ class Tree {
     }
 
     private tryMoveUp(node: TreeNode) {
-
+        if (node == this.root) {
+            return;
+        }
     }
 
     private increaseWeight(node: TreeNode) {
