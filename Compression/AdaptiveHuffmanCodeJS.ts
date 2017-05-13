@@ -187,6 +187,9 @@ class Tree {
     }
 
     private static swap(node: TreeNode, target: TreeNode) {
+        if (node == target) {
+            return;
+        }
         if (node.parent == target.parent) {
             [node.parent.left, node.parent.right] = [node.parent.right, node.parent.left];
             return;
