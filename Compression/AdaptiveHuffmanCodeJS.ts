@@ -1,4 +1,4 @@
-const ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~';
+const ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~' + `:/?#[]@!$&'()*+,;=`;
 const TABLE: { [id: string]: BitPack } = {};
 
 class BitPack {
@@ -63,11 +63,11 @@ class BitPackHolder {
 
     for (let i = 0, len = ALPHABET.length - k, cnt = r; i < len; ++i, ++cnt) {
         TABLE[ALPHABET[i]] = new BitPack(e, cnt);
-        console.log(ALPHABET[i], TABLE[ALPHABET[i]].toString());
+        // console.log(ALPHABET[i], TABLE[ALPHABET[i]].toString());
     }
     for (let j = ALPHABET.length - k, len = ALPHABET.length, cnt = 0; j < len; ++j, ++cnt) {
         TABLE[ALPHABET[j]] = new BitPack(e + 1, cnt);
-        console.log(ALPHABET[j], TABLE[ALPHABET[j]].toString());
+        // console.log(ALPHABET[j], TABLE[ALPHABET[j]].toString());
     }
 })();
 
@@ -78,11 +78,11 @@ class Tree {
     private root: TreeNode;
 
     constructor() {
-        this.UPDATE_TABLE = {};
         this.root = new TreeNode();
+
         this.NYT = this.root;
         this.NYT.char = 'NYT';
-        this.UPDATE_TABLE['NTY'] = this.NYT;
+        this.UPDATE_TABLE = {'NYT': this.NYT};
     }
 
     toString(): string {
@@ -139,8 +139,8 @@ class Tree {
         ++NYTParent.weight;
 
         newCharNode.char = char;
-        this.increaseWeight(newCharNode);
         this.UPDATE_TABLE[char] = newCharNode;
+        this.increaseWeight(newCharNode);
     }
 
     private increaseWeight(node: TreeNode) {
@@ -172,35 +172,35 @@ class Tree {
         }
     }
 
-    private swapNode(a: TreeNode, b: TreeNode) {
-        if (a.parent == b.parent) {
-            [a.parent.left, a.parent.right] = [a.parent.right, a.parent.left];
+    private swapNode(node: TreeNode, target: TreeNode) {
+        if (node.parent == target.parent) {
+            [node.parent.left, node.parent.right] = [node.parent.right, node.parent.left];
             return;
         }
 
-        if (a.parent.left == a) {
-            a.parent.bindLeft(b);
+        if (node.parent.left == node) {
+            node.parent.bindLeft(target);
         } else {
-            a.parent.bindRight(b);
+            node.parent.bindRight(target);
         }
-        if (b.parent.left == b) {
-            b.parent.bindLeft(a);
+        if (target.parent.left == target) {
+            target.parent.bindLeft(node);
         } else {
-            b.parent.bindRight(a);
+            target.parent.bindRight(node);
         }
 
-        if (b == this.root) {
-            this.root = a;
+        if (target == this.root) {
+            this.root = node;
         }
     }
 }
 
 class TreeNode {
-    parent: TreeNode;
-    left: TreeNode;
-    right: TreeNode;
+    parent?: TreeNode;
+    left?: TreeNode;
+    right?: TreeNode;
 
-    char: string;
+    char?: string;
     weight = 0;
 
     toString(): string {
@@ -256,7 +256,7 @@ class TreeNode {
         let res = tree.encode(char);
         holder.container.push(res);
 
-        console.log('Out: ', char, res.toString(), TABLE[char].toString());
+        console.log('out: ', char, res.toString(), TABLE[char].toString());
         console.log(tree.toString());
     }
 
