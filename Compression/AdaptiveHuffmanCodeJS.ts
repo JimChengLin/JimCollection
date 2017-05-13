@@ -30,10 +30,6 @@ class BitPackHolder {
         this.container = [];
     }
 
-    fromString(str: string) {
-
-    }
-
     toString(): string {
         return this.bitArray().join('');
     }
@@ -125,73 +121,11 @@ class Tree {
     }
 
     private addChar(char: string) {
-        let NYTParent = new TreeNode();
-        let newCharNode = new TreeNode();
 
-        if (this.NYT.parent) {
-            this.NYT.parent.bindLeft(NYTParent);
-        } else {
-            this.root = NYTParent;
-        }
-
-        NYTParent.bindLeft(this.NYT);
-        NYTParent.bindRight(newCharNode);
-        ++NYTParent.weight;
-
-        newCharNode.char = char;
-        this.UPDATE_TABLE[char] = newCharNode;
-        this.increaseWeight(newCharNode);
     }
 
     private increaseWeight(node: TreeNode) {
-        ++node.weight;
-        this.tryMoveUp(node, node.parent);
-    }
 
-    private tryMoveUp(node: TreeNode, target: TreeNode) {
-        if (target == this.root && target.right.weight >= node.weight) {
-            target.updateWeight();
-            return;
-        }
-
-        // 优先向上
-        if (target.weight < node.weight) {
-            // 递归
-            if (target.parent && target.parent.weight < node.weight) {
-                return this.tryMoveUp(node, target.parent);
-            }
-
-            this.swapNode(node, target);
-        } else if (target.right.weight < node.weight) {
-            this.swapNode(node, target.right);
-        }
-
-        node.parent.updateWeight();
-        if (node.parent.parent) {
-            this.tryMoveUp(node.parent, node.parent.parent);
-        }
-    }
-
-    private swapNode(node: TreeNode, target: TreeNode) {
-        if (node.parent == target.parent) {
-            [node.parent.left, node.parent.right] = [node.parent.right, node.parent.left];
-            return;
-        }
-
-        if (node.parent.left == node) {
-            node.parent.bindLeft(target);
-        } else {
-            node.parent.bindRight(target);
-        }
-        if (target.parent.left == target) {
-            target.parent.bindLeft(node);
-        } else {
-            target.parent.bindRight(node);
-        }
-
-        if (target == this.root) {
-            this.root = node;
-        }
     }
 }
 
@@ -207,7 +141,7 @@ class TreeNode {
         if (this.char) {
             return this.char + ' ' + this.weight.toString();
         } else {
-            return '+ ' + this.weight.toString();
+            return '- ' + this.weight.toString();
         }
     }
 
@@ -225,16 +159,6 @@ class TreeNode {
             cursor = cursor.parent;
         }
         return new BitPack(cnt, code);
-    }
-
-    updateWeight() {
-        this.weight = 0;
-        if (this.left) {
-            this.weight += this.left.weight;
-        }
-        if (this.right) {
-            this.weight += this.right.weight;
-        }
     }
 
     bindLeft(node: TreeNode) {
@@ -260,6 +184,5 @@ class TreeNode {
         console.log(tree.toString());
     }
 
-    let str = holder.toString();
-    console.log(str);
+    console.log(holder.toString());
 })();
