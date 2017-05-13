@@ -1,4 +1,4 @@
-const ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~';
+const ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~';
 const TABLE: { [id: string]: BitPack } = {};
 
 class BitPack {
@@ -35,15 +35,24 @@ class BitPackHolder {
     }
 
     toString(): string {
-
+        return this.bitArray().join('');
     }
 
-    private *bitStream(): Iterable<boolean> {
-        for (let bitPack of this.container) {
-            for (let i = 0, len = bitPack.len; i < len; ++i) {
-                yield Boolean(bitPack.val & (1 << i));
+    private *bitStream(): Iterable<number> {
+        for (let i = this.container.length - 1; i >= 0; --i) {
+            let bitPack = this.container[i];
+            for (let j = 0, len = bitPack.len; j < len; ++j) {
+                yield +Boolean(bitPack.val & (1 << j));
             }
         }
+    }
+
+    private bitArray(): number[] {
+        let bitArray: number[] = [];
+        for (let bit of this.bitStream()) {
+            bitArray.push(bit);
+        }
+        return bitArray.reverse();
     }
 }
 
@@ -113,10 +122,6 @@ class Tree {
         }
 
         return res;
-    }
-
-    decode(source: BitPackHolder): string {
-
     }
 
     private addChar(char: string) {
@@ -254,4 +259,7 @@ class TreeNode {
         console.log('Out: ', char, res.toString(), TABLE[char].toString());
         console.log(tree.toString());
     }
+
+    let str = holder.toString();
+    console.log(str);
 })();
