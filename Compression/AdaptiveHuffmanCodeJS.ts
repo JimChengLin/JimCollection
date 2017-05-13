@@ -23,6 +23,30 @@ class BitPack {
     }
 }
 
+class BitPackHolder {
+    container: BitPack[];
+
+    constructor() {
+        this.container = [];
+    }
+
+    fromString(str: string) {
+
+    }
+
+    toString(): string {
+
+    }
+
+    private *bitStream(): Iterable<boolean> {
+        for (let bitPack of this.container) {
+            for (let i = 0, len = bitPack.len; i < len; ++i) {
+                yield Boolean(bitPack.val & (1 << i));
+            }
+        }
+    }
+}
+
 (function init() {
     const e = Math.floor(Math.log2(ALPHABET.length));
     const r = ALPHABET.length - Math.pow(2, e);
@@ -89,6 +113,10 @@ class Tree {
         }
 
         return res;
+    }
+
+    decode(source: BitPackHolder): string {
+
     }
 
     private addChar(char: string) {
@@ -217,8 +245,12 @@ class TreeNode {
 
 (function main() {
     let tree = new Tree();
+    let holder = new BitPackHolder();
+
     for (let char of 'aardv') {
         let res = tree.encode(char);
+        holder.container.push(res);
+
         console.log('Out: ', char, res.toString(), TABLE[char].toString());
         console.log(tree.toString());
     }
