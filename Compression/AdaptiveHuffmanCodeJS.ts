@@ -114,7 +114,7 @@ class Tree {
         } else {
             let charNode = this.UPDATE_TABLE[char];
             res = charNode.toBitPack();
-            this.tryMoveThenIncrease(charNode);
+            this.tryMoveUpThenIncrease(charNode);
         }
 
         return res;
@@ -138,16 +138,34 @@ class Tree {
         this.UPDATE_TABLE[char] = charNode;
         ++charNode.weight;
 
-        this.tryMoveThenIncrease(NYTParent.parent);
+        this.tryMoveUpThenIncrease(NYTParent.parent);
     }
 
-    private tryMoveThenIncrease(node: TreeNode) {
+    private tryMoveUpThenIncrease(node: TreeNode) {
         if (!node) {
             return;
         } else if (node == this.root) {
             ++node.weight;
             return;
         }
+
+        const swapNode = this.findSwapNode(node.weight);
+        if (node.parent == swapNode) {
+            ++node.weight;
+            ++swapNode.weight;
+            return this.tryMoveUpThenIncrease(swapNode.parent);
+        }
+
+        this.swap(node, swapNode);
+        ++node.weight;
+        return this.tryMoveUpThenIncrease(node.parent);
+    }
+
+    private findSwapNode(weight: number): TreeNode {
+
+    }
+
+    private swap(node: TreeNode, target: TreeNode) {
 
     }
 }
