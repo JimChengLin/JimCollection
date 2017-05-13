@@ -162,7 +162,28 @@ class Tree {
     }
 
     private findSwapNode(weight: number): TreeNode {
+        let q = [this.root];
+        while (q.length) {
+            let tempQ: TreeNode[] = [];
 
+            for (let cursor of q) {
+                if (cursor.left) {
+                    tempQ.push(cursor.left);
+                }
+                if (cursor.right) {
+                    tempQ.push(cursor.right);
+                }
+            }
+
+            for (let i = tempQ.length - 1; i >= 0; --i) {
+                let cursor = tempQ[i];
+                if (cursor.weight == weight) {
+                    return cursor;
+                }
+            }
+            q = tempQ;
+        }
+        throw new Error();
     }
 
     private swap(node: TreeNode, target: TreeNode) {
