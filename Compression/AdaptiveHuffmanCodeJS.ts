@@ -156,7 +156,7 @@ class Tree {
             return this.tryMoveUpThenIncrease(swapNode.parent);
         }
 
-        this.swap(node, swapNode);
+        Tree.swap(node, swapNode);
         ++node.weight;
         return this.tryMoveUpThenIncrease(node.parent);
     }
@@ -186,8 +186,21 @@ class Tree {
         throw new Error();
     }
 
-    private swap(node: TreeNode, target: TreeNode) {
-
+    private static swap(node: TreeNode, target: TreeNode) {
+        if (node.parent == target.parent) {
+            [node.parent.left, node.parent.right] = [node.parent.right, node.parent.left];
+            return;
+        }
+        if (node.parent.left == node) {
+            node.parent.bindLeft(target);
+        } else {
+            node.parent.bindRight(target);
+        }
+        if (target.parent.left == target) {
+            target.parent.bindLeft(node);
+        } else {
+            target.parent.bindRight(node);
+        }
     }
 }
 
