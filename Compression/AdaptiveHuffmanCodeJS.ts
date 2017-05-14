@@ -31,7 +31,22 @@ class BitPackHolder {
     }
 
     toString(): string {
-        return this.bitArray().join('');
+        const bitArray = this.bitArray();
+        bitArray.push(1);
+        for (let i = 0, len = 6 - bitArray.length % 6; i < len && len !== 6; ++i) {
+            bitArray.push(0);
+        }
+
+        let res = '';
+        for (let i = 0, len = bitArray.length / 6; i < len; ++i) {
+            let num = 0;
+            for (let j = 0; j < 6; ++j) {
+                num <<= 1;
+                num |= bitArray[i * 6 + j];
+            }
+            res += ALPHABET[num];
+        }
+        return res;
     }
 
     private *bitStream(): Iterable<number> {
@@ -260,9 +275,9 @@ class TreeNode {
         const res = tree.encode(char);
         holder.container.push(res);
 
-        console.log('out: ', char, res.toString(), TABLE[char].toString());
+        console.log('out:', char, res.toString(), TABLE[char].toString());
         console.log(tree.toString());
     }
 
-    console.log(holder.toString());
+    console.log('seq:', holder.toString());
 })();
