@@ -182,10 +182,10 @@ class Tree {
             const tempQ: TreeNode[] = [];
 
             for (const cursor of q) {
-                if (cursor.left) {
+                if (cursor.left && cursor.left.weight >= weight) {
                     tempQ.push(cursor.left);
                 }
-                if (cursor.right) {
+                if (cursor.right && cursor.right.weight >= weight) {
                     tempQ.push(cursor.right);
                 }
             }
@@ -269,7 +269,7 @@ class TreeNode {
     const tree = new Tree();
     const holder = new BitPackHolder();
 
-    for (const char of 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators?redirectlocale=en-US&redirectslug=JavaScript%2FGuide%2FIterators_and_Generators') {
+    for (const char of 'MISSISSIPPI') {
         const res = tree.encode(char);
         holder.container.push(res);
 
