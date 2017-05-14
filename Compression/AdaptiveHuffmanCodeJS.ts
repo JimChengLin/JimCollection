@@ -195,15 +195,16 @@ class Tree {
             return;
         }
 
+        const targetParent = target.parent;
         if (node.parent.left === node) {
             node.parent.bindLeft(target);
         } else {
             node.parent.bindRight(target);
         }
-        if (target.parent.left === target) {
-            target.parent.bindLeft(node);
+        if (targetParent.left === target) {
+            targetParent.bindLeft(node);
         } else {
-            target.parent.bindRight(node);
+            targetParent.bindRight(node);
         }
     }
 }
@@ -255,7 +256,7 @@ class TreeNode {
     const tree = new Tree();
     const holder = new BitPackHolder();
 
-    for (const char of 'aardv') {
+    for (const char of 'abcbaaa') {
         const res = tree.encode(char);
         holder.container.push(res);
 
