@@ -129,7 +129,7 @@ class Tree {
         } else {
             const charNode = this.UPDATE_TABLE[char];
             res = charNode.toBitPack();
-            this.tryMoveUpThenIncrease(charNode);
+            this.moveUpThenIncrease(charNode);
         }
 
         return res;
@@ -153,10 +153,14 @@ class Tree {
         this.UPDATE_TABLE[char] = charNode;
         ++charNode.weight;
 
-        this.tryMoveUpThenIncrease(NYTParent.parent);
+        this.moveUp(NYTParent);
     }
 
-    private tryMoveUpThenIncrease(node: TreeNode) {
+    private moveUp(node: TreeNode) {
+
+    }
+
+    private moveUpThenIncrease(node: TreeNode) {
         if (!node) {
             return;
         } else if (node === this.root) {
@@ -168,12 +172,12 @@ class Tree {
         if (node.parent === swapNode) {
             ++node.weight;
             ++swapNode.weight;
-            return this.tryMoveUpThenIncrease(swapNode.parent);
+            return this.moveUpThenIncrease(swapNode.parent);
         }
 
         Tree.swap(node, swapNode);
         ++node.weight;
-        return this.tryMoveUpThenIncrease(node.parent);
+        return this.moveUpThenIncrease(node.parent);
     }
 
     private findSwapNode(weight: number): TreeNode {
@@ -199,6 +203,34 @@ class Tree {
             q = tempQ;
         }
         throw new Error();
+    }
+
+    private findBlock(weight: number): TreeNode[] {
+        const res: TreeNode[] = [];
+
+        let q = [this.root];
+        while (q.length) {
+            const tempQ: TreeNode[] = [];
+
+            for (const cursor of q) {
+                if (cursor.left && cursor.left.weight >= weight) {
+                    tempQ.push(cursor.left);
+                }
+                if (cursor.right && cursor.right.weight >= weight) {
+                    tempQ.push(cursor.right);
+                }
+            }
+
+            for (let i = tempQ.length - 1; i >= 0; --i) {
+                const cursor = tempQ[i];
+                if (cursor.weight === weight) {
+                    res.push(cursor);
+                }
+            }
+            q = tempQ;
+        }
+
+        return res;
     }
 
     private static swap(node: TreeNode, target: TreeNode) {
@@ -269,7 +301,7 @@ class TreeNode {
     const tree = new Tree();
     const holder = new BitPackHolder();
 
-    for (const char of 'MISSISSIPPI') {
+    for (const char of 'ABCBAAA') {
         const res = tree.encode(char);
         holder.container.push(res);
 

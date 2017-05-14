@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "sourceMap": true
+    "sourceMap": true,
+    "removeComments": true
   }
 }
