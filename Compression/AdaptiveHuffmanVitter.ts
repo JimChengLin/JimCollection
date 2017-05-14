@@ -164,13 +164,31 @@ namespace Vitter {
                 return;
             }
 
+            ++node.weight;
             const origParent = node.parent;
+            const block = this.findBlock(node.weight);
 
+            let nodeIdx: number;
+            let leafIdx: number;
+            for (let i = 0; i < block.length; ++i) {
+                if (block[i] === node) {
+                    nodeIdx = i;
+                } else if (block[i].isLeaf()) {
+                    leafIdx = i;
+                }
+            }
+
+            if (nodeIdx < leafIdx) {
+                Tree.swap(block[nodeIdx], block[leafIdx]);
+            }
             return this.increaseThenMoveUp(origParent);
         }
 
-        private moveUpThenIncrease(node: TreeNode, increase = true) {
+        private moveUpThenIncrease(node: TreeNode) {
+            const block = this.findBlock(node.weight);
 
+            ++node.weight;
+            return this.increaseThenMoveUp(node.parent);
         }
 
         private findBlock(weight: number): TreeNode[] {
@@ -199,6 +217,25 @@ namespace Vitter {
             }
 
             return res.reverse();
+        }
+
+        private static swap(node: TreeNode, target: TreeNode) {
+            if (node.parent === target.parent) {
+                [node.parent.left, node.parent.right] = [node.parent.right, node.parent.left];
+                return;
+            }
+
+            const targetParent = target.parent;
+            if (node.parent.left === node) {
+                node.parent.bindLeft(target);
+            } else {
+                node.parent.bindRight(target);
+            }
+            if (targetParent.left === target) {
+                targetParent.bindLeft(node);
+            } else {
+                targetParent.bindRight(node);
+            }
         }
     }
 
@@ -240,6 +277,10 @@ namespace Vitter {
         bindRight(node: TreeNode) {
             this.right = node;
             node.parent = this;
+        }
+
+        isLeaf(): boolean {
+            return !this.left && !this.right;
         }
     }
 
