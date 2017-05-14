@@ -36,7 +36,7 @@ class BitPackHolder {
 
     private *bitStream(): Iterable<number> {
         for (let i = this.container.length - 1; i >= 0; --i) {
-            let bitPack = this.container[i];
+            const bitPack = this.container[i];
             for (let j = 0, len = bitPack.len; j < len; ++j) {
                 yield +Boolean(bitPack.val & (1 << j));
             }
@@ -44,8 +44,8 @@ class BitPackHolder {
     }
 
     private bitArray(): number[] {
-        let bitArray: number[] = [];
-        for (let bit of this.bitStream()) {
+        const bitArray: number[] = [];
+        for (const bit of this.bitStream()) {
             bitArray.push(bit);
         }
         return bitArray.reverse();
@@ -112,7 +112,7 @@ class Tree {
             res = this.NYT.toBitPack().extend(TABLE[char]);
             this.addChar(char);
         } else {
-            let charNode = this.UPDATE_TABLE[char];
+            const charNode = this.UPDATE_TABLE[char];
             res = charNode.toBitPack();
             this.tryMoveUpThenIncrease(charNode);
         }
@@ -144,13 +144,13 @@ class Tree {
     private tryMoveUpThenIncrease(node: TreeNode) {
         if (!node) {
             return;
-        } else if (node == this.root) {
+        } else if (node === this.root) {
             ++node.weight;
             return;
         }
 
         const swapNode = this.findSwapNode(node.weight);
-        if (node.parent == swapNode) {
+        if (node.parent === swapNode) {
             ++node.weight;
             ++swapNode.weight;
             return this.tryMoveUpThenIncrease(swapNode.parent);
@@ -164,9 +164,9 @@ class Tree {
     private findSwapNode(weight: number): TreeNode {
         let q = [this.root];
         while (q.length) {
-            let tempQ: TreeNode[] = [];
+            const tempQ: TreeNode[] = [];
 
-            for (let cursor of q) {
+            for (const cursor of q) {
                 if (cursor.left) {
                     tempQ.push(cursor.left);
                 }
@@ -176,8 +176,8 @@ class Tree {
             }
 
             for (let i = tempQ.length - 1; i >= 0; --i) {
-                let cursor = tempQ[i];
-                if (cursor.weight == weight) {
+                const cursor = tempQ[i];
+                if (cursor.weight === weight) {
                     return cursor;
                 }
             }
@@ -187,19 +187,20 @@ class Tree {
     }
 
     private static swap(node: TreeNode, target: TreeNode) {
-        if (node == target) {
+        if (node === target) {
             return;
         }
-        if (node.parent == target.parent) {
+        if (node.parent === target.parent) {
             [node.parent.left, node.parent.right] = [node.parent.right, node.parent.left];
             return;
         }
-        if (node.parent.left == node) {
+
+        if (node.parent.left === node) {
             node.parent.bindLeft(target);
         } else {
             node.parent.bindRight(target);
         }
-        if (target.parent.left == target) {
+        if (target.parent.left === target) {
             target.parent.bindLeft(node);
         } else {
             target.parent.bindRight(node);
@@ -231,7 +232,7 @@ class TreeNode {
             ++cnt;
             code <<= 1;
 
-            if (cursor == cursor.parent.right) {
+            if (cursor === cursor.parent.right) {
                 code |= 1;
             }
             cursor = cursor.parent;
@@ -251,11 +252,11 @@ class TreeNode {
 }
 
 (function main() {
-    let tree = new Tree();
-    let holder = new BitPackHolder();
+    const tree = new Tree();
+    const holder = new BitPackHolder();
 
-    for (let char of 'aardv') {
-        let res = tree.encode(char);
+    for (const char of 'aardv') {
+        const res = tree.encode(char);
         holder.container.push(res);
 
         console.log('out: ', char, res.toString(), TABLE[char].toString());
