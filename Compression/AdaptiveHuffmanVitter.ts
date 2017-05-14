@@ -148,20 +148,15 @@ namespace Vitter {
 
             NYTParent.bindLeft(this.NYT);
             NYTParent.bindRight(charNode);
-            ++NYTParent.weight;
 
             charNode.char = char;
             this.UPDATE_TABLE[char] = charNode;
             ++charNode.weight;
 
-            this.moveUp(NYTParent);
+            this.increaseThenMoveUp(NYTParent);
         }
 
-        private moveUp(node: TreeNode) {
-
-        }
-
-        private moveUpThenIncrease(node: TreeNode) {
+        private increaseThenMoveUp(node: TreeNode) {
             if (!node) {
                 return;
             } else if (node === this.root) {
@@ -169,41 +164,13 @@ namespace Vitter {
                 return;
             }
 
-            const swapNode = this.findSwapNode(node.weight);
-            if (node.parent === swapNode) {
-                ++node.weight;
-                ++swapNode.weight;
-                return this.moveUpThenIncrease(swapNode.parent);
-            }
+            const origParent = node.parent;
 
-            Tree.swap(node, swapNode);
-            ++node.weight;
-            return this.moveUpThenIncrease(node.parent);
+            return this.increaseThenMoveUp(origParent);
         }
 
-        private findSwapNode(weight: number): TreeNode {
-            let q = [this.root];
-            while (q.length) {
-                const tempQ: TreeNode[] = [];
+        private moveUpThenIncrease(node: TreeNode, increase = true) {
 
-                for (const cursor of q) {
-                    if (cursor.left && cursor.left.weight >= weight) {
-                        tempQ.push(cursor.left);
-                    }
-                    if (cursor.right && cursor.right.weight >= weight) {
-                        tempQ.push(cursor.right);
-                    }
-                }
-
-                for (let i = tempQ.length - 1; i >= 0; --i) {
-                    const cursor = tempQ[i];
-                    if (cursor.weight === weight) {
-                        return cursor;
-                    }
-                }
-                q = tempQ;
-            }
-            throw new Error();
         }
 
         private findBlock(weight: number): TreeNode[] {
@@ -231,29 +198,7 @@ namespace Vitter {
                 q = tempQ;
             }
 
-            return res;
-        }
-
-        private static swap(node: TreeNode, target: TreeNode) {
-            if (node === target) {
-                return;
-            }
-            if (node.parent === target.parent) {
-                [node.parent.left, node.parent.right] = [node.parent.right, node.parent.left];
-                return;
-            }
-
-            const targetParent = target.parent;
-            if (node.parent.left === node) {
-                node.parent.bindLeft(target);
-            } else {
-                node.parent.bindRight(target);
-            }
-            if (targetParent.left === target) {
-                targetParent.bindLeft(node);
-            } else {
-                targetParent.bindRight(node);
-            }
+            return res.reverse();
         }
     }
 
@@ -302,7 +247,7 @@ namespace Vitter {
         const tree = new Tree();
         const holder = new BitPackHolder();
 
-        for (const char of 'ABCBAAA') {
+        for (const char of 'AA#BBB#C') {
             const res = tree.encode(char);
             holder.container.push(res);
 
