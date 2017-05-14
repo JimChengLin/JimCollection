@@ -1,4 +1,4 @@
-const ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~' + `:/?#[]@!$&'()*+,;=`;
+const ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~' + `:/?#[]@!$&'()*+,;=%`;
 const TABLE: { [id: string]: BitPack } = {};
 
 class BitPack {
@@ -245,12 +245,10 @@ class TreeNode {
         let code = 0;
         let cursor: TreeNode = this;
         while (cursor.parent) {
-            ++cnt;
-            code <<= 1;
-
             if (cursor === cursor.parent.right) {
-                code |= 1;
+                code |= (1 << cnt);
             }
+            ++cnt;
             cursor = cursor.parent;
         }
         return new BitPack(cnt, code);
@@ -271,7 +269,7 @@ class TreeNode {
     const tree = new Tree();
     const holder = new BitPackHolder();
 
-    for (const char of 'abcbaaa') {
+    for (const char of 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators?redirectlocale=en-US&redirectslug=JavaScript%2FGuide%2FIterators_and_Generators') {
         const res = tree.encode(char);
         holder.container.push(res);
 
