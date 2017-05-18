@@ -226,7 +226,7 @@ namespace Vitter {
                 leafToIncrement = charNode;
             }
             else {
-                const block = this.findBlock(q.weight);
+                const block = this.findBlock(q.weight).filter(val => val.isLeaf() === q.isLeaf());
                 Tree.swap(q, block[block.length - 1]);
                 if (q.parent.left === this.NYT) {
                     leafToIncrement = q;
