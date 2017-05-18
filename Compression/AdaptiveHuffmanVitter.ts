@@ -22,6 +22,10 @@ namespace Vitter {
             this.val |= other.val;
             return this;
         }
+
+        equals(other: BitPack): boolean {
+            return this.len === other.len && this.val === other.val;
+        }
     }
 
     class BitPackHolder {
@@ -48,6 +52,24 @@ namespace Vitter {
                 }
                 res += ALPHABET[num];
             }
+            return res;
+        }
+
+        static stringToBitArray(source: string): number[] {
+            // 64进制转2进制
+            const res: number[] = [];
+            for (const char of source) {
+                const num64 = ALPHABET.indexOf(char);
+                for (let i = 5; i >= 0; --i) {
+                    res.push(+Boolean(num64 & (1 << i)));
+                }
+            }
+
+            // 删除EOF
+            while (res[res.length - 1] === 0) {
+                res.pop();
+            }
+            res.pop();
             return res;
         }
 
@@ -132,6 +154,50 @@ namespace Vitter {
                 const charNode = this.UPDATE_TABLE[char];
                 res = charNode.toBitPack();
                 this.update(charNode);
+            }
+
+            return res;
+        }
+
+        decode(source: string): string {
+            let res = '';
+
+            const bitArray = BitPackHolder.stringToBitArray(source);
+            let bitPack;
+            let state = this.root;
+
+            for (const bit of bitArray) {
+                if (state === this.NYT && !bitPack) {
+                    bitPack = new BitPack(0, 0);
+                }
+                if (bitPack) {
+                    bitPack.extend({len: 1, val: bit});
+                    for (const key in TABLE) {
+                        if (TABLE[key].equals(bitPack)) {
+                            res += key;
+                            this.encode(key);
+
+                            state = this.root;
+                            bitPack = null;
+                            break;
+                        }
+                    }
+                } else {
+                    if (bit === 0) {
+                        state = state.left;
+                    } else {
+                        state = state.right;
+                    }
+
+                    if (state === this.NYT) {
+                        continue;
+                    }
+                    if (state.char) {
+                        res += state.char;
+                        this.encode(state.char);
+                        state = this.root;
+                    }
+                }
             }
 
             return res;
@@ -309,16 +375,19 @@ namespace Vitter {
     }
 
     (function main() {
-        const tree = new Tree();
+        const encodeTree = new Tree();
+        const decodeTree = new Tree();
         const holder = new BitPackHolder();
 
         for (const char of 'AA#BBB#C') {
-            const res = tree.encode(char);
+            const res = encodeTree.encode(char);
             holder.container.push(res);
 
-            console.log('out:', char, res.toString(), TABLE[char].toString());
-            console.log(tree.toString());
+            console.log(char, res.toString(), TABLE[char].toString());
+            console.log(encodeTree.toString());
         }
-        console.log('seq:', holder.toString());
+
+        console.log('encode:', holder.toString());
+        console.log('decode:', decodeTree.decode(holder.toString()));
     })();
 }

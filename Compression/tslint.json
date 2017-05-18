@@ -56,7 +56,6 @@
       true
     ],
     "no-inferrable-types": true,
-    "no-null-keyword": true,
     "boolean-trivia": true,
     "type-operator-spacing": true,
     "prefer-const": true,
