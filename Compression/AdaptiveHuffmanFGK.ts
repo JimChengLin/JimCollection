@@ -226,11 +226,11 @@ namespace FGK {
     }
 
     class TreeNode {
-        parent?: TreeNode;
-        left?: TreeNode;
-        right?: TreeNode;
+        parent: TreeNode;
+        left: TreeNode;
+        right: TreeNode;
 
-        char?: string;
+        char: string;
         weight = 0;
 
         toString(): string {

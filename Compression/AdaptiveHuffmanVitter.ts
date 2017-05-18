@@ -32,6 +32,7 @@ namespace Vitter {
         }
 
         toString(): string {
+            // 2进制转64进制
             const bitArray = this.bitArray();
             bitArray.push(1);
             for (let i = 0, len = 6 - bitArray.length % 6; i < len && len !== 6; ++i) {
@@ -126,69 +127,89 @@ namespace Vitter {
 
             if (!this.UPDATE_TABLE.hasOwnProperty(char)) {
                 res = this.NYT.toBitPack().extend(TABLE[char]);
-                this.addChar(char);
+                this.update(this.NYT, char);
             } else {
                 const charNode = this.UPDATE_TABLE[char];
                 res = charNode.toBitPack();
-                this.moveUpThenIncrease(charNode);
+                this.update(charNode);
             }
 
             return res;
         }
 
-        private addChar(char: string) {
-            const NYTParent = new TreeNode();
-            const charNode = new TreeNode();
+        private update(q: TreeNode, char = '') {
+            let leafToIncrement: TreeNode;
 
-            if (this.NYT.parent) {
-                this.NYT.parent.bindLeft(NYTParent);
-            } else {
-                this.root = NYTParent;
+            if (q === this.NYT) {
+                const NYTParent = new TreeNode();
+                const charNode = new TreeNode();
+
+                if (this.NYT.parent) {
+                    this.NYT.parent.bindLeft(NYTParent);
+                } else {
+                    this.root = NYTParent;
+                }
+
+                NYTParent.bindLeft(this.NYT);
+                NYTParent.bindRight(charNode);
+
+                charNode.char = char;
+                this.UPDATE_TABLE[char] = charNode;
+
+                q = NYTParent;
+                leafToIncrement = charNode;
             }
-
-            NYTParent.bindLeft(this.NYT);
-            NYTParent.bindRight(charNode);
-
-            charNode.char = char;
-            this.UPDATE_TABLE[char] = charNode;
-            ++charNode.weight;
-
-            this.increaseThenMoveUp(NYTParent);
-        }
-
-        private increaseThenMoveUp(node: TreeNode) {
-            if (!node) {
-                return;
-            } else if (node === this.root) {
-                ++node.weight;
-                return;
-            }
-
-            ++node.weight;
-            const origParent = node.parent;
-            const block = this.findBlock(node.weight);
-
-            let nodeIdx: number;
-            let leafIdx: number;
-            for (let i = 0; i < block.length; ++i) {
-                if (block[i] === node) {
-                    nodeIdx = i;
-                } else if (block[i].isLeaf()) {
-                    leafIdx = i;
+            else {
+                const block = this.findBlock(q.weight);
+                Tree.swap(q, block[block.length - 1]);
+                if (q.parent.left === this.NYT) {
+                    leafToIncrement = q;
+                    q = q.parent;
                 }
             }
 
-            if (nodeIdx < leafIdx) {
-                Tree.swap(block[nodeIdx], block[leafIdx]);
+            while (q !== this.root) {
+                q = this.slideAndIncrement(q);
             }
-            return this.increaseThenMoveUp(origParent);
+            if (leafToIncrement) {
+                this.slideAndIncrement(leafToIncrement);
+            }
         }
 
-        private moveUpThenIncrease(node: TreeNode) {
-            const block = this.findBlock(node.weight);
+        private slideAndIncrement(q: TreeNode): TreeNode {
+            const block = q.isLeaf() ?
+                this.findBlock(q.weight).filter(val => !val.isLeaf()) :
+                this.findBlock(q.weight + 1).filter(val => val.isLeaf());
 
-            ++node.weight;
-            return this.increaseThenMoveUp(node.parent);
+            let parent = q.parent;
+            Tree.slide(q, block);
+            ++q.weight;
+            if (q.isLeaf()) {
+                parent = q.parent;
+            }
+            return parent;
+        }
+
+        private static slide(q: TreeNode, block: TreeNode[]) {
+            if (!block.length) {
+                return;
+            }
+
+            const blockAfter = block.slice(0);
+            blockAfter.push(q);
+            block.unshift(q);
+            const blockParentInfo = block.map((val): [TreeNode, number] => [val.parent, val.parent.left === val ? 0 : 1]);
+
+            for (let i = 0; i < block.length; ++i) {
+                const after = blockAfter[i];
+                const [parent, direction] = blockParentInfo[i];
+
+                if (direction === 0) {
+                    parent.bindLeft(after);
+                } else {
+                    parent.bindRight(after);
+                }
+            }
         }
 
         private findBlock(weight: number): TreeNode[] {
@@ -220,6 +241,9 @@ namespace Vitter {
         }
 
         private static swap(node: TreeNode, target: TreeNode) {
+            if (node === target || node.parent === target) {
+                return;
+            }
             if (node.parent === target.parent) {
                 [node.parent.left, node.parent.right] = [node.parent.right, node.parent.left];
                 return;
@@ -240,11 +264,11 @@ namespace Vitter {
     }
 
     class TreeNode {
-        parent?: TreeNode;
-        left?: TreeNode;
-        right?: TreeNode;
+        parent: TreeNode;
+        left: TreeNode;
+        right: TreeNode;
 
-        char?: string;
+        char: string;
         weight = 0;
 
         toString(): string {
@@ -295,7 +319,6 @@ namespace Vitter {
             console.log('out:', char, res.toString(), TABLE[char].toString());
             console.log(tree.toString());
         }
-
         console.log('seq:', holder.toString());
     })();
 }
